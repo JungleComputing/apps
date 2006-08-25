@@ -13,8 +13,8 @@
 
     <property name="ibis-run-args" value="-Dsatin.closed"/>
 	
-    <property name="test-par-run" value="Fib"/>
-    <property name="test-seq-run" value="Fib"/>
+    <property name="test-par-run" value="Sleep"/>
+    <property name="test-seq-run" value="Sleep"/>
 
     <import file="${ibis}/build-files/apps/build-satin-app.xml"/>
 
