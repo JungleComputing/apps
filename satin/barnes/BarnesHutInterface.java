@@ -1,7 +1,6 @@
 /* $Id: */
 
 import ibis.satin.*;
-import java.util.ArrayList;
 
 public interface BarnesHutInterface extends Spawnable {
     

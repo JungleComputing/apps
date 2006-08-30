@@ -1,6 +1,5 @@
 /* $Id$ */
 
-import java.util.*;
 
 /**
  * This oct tree is designed as follows: A node has two modes: - cell node, with
@@ -572,7 +571,6 @@ import java.util.*;
             }
         } else { // Cell node
             for (i = 0; i < 8; i++) {
-                double[] childresult;
                 if (children[i] != null) {
                     children[i].barnesBodyDbg(body, totalAcc, debug, params);
                 }

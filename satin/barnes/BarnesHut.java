@@ -11,8 +11,6 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 
 import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
 
 /* strictfp */final class BarnesHut extends SatinObject implements BarnesHutInterface {
 
@@ -178,7 +176,7 @@ import java.util.List;
     static void initialize(int nBodies) {
         bodyArray = new Plummer().generate(nBodies);
 
-        //Plummer should make sure that a body with number x also has index x
+        // Plummer should make sure that a body with number x also has index x
         for (int i = 0; i < nBodies; i++) {
             if (ASSERTS && bodyArray[i].number != i) {
                 System.err.println("EEK! Plummer generated an "
@@ -202,29 +200,27 @@ import java.util.List;
         return new BodyUpdatesFloat(n);
     }
 
-    /*spawnable*/
+    /* spawnable */
     public BodyUpdates doBarnesSO(byte[] nodeId, int iteration,
 				    BodiesSO bodies) {
-	BodyTreeNode treeNode; 
+	BodyTreeNode me = bodies.findTreeNode(nodeId);
 
-        treeNode = bodies.findTreeNode(nodeId);
-
-	if (treeNode.children == null
-                || treeNode.bodyCount < bodies.params.THRESHOLD) {
-	    /*it is a leaf node, do sequential computation*/
-            BodyUpdates res = getBodyUpdates(treeNode.bodyCount, bodies.params);
-	    treeNode.barnesSequential(bodies.bodyTreeRoot, res, bodies.params);
+	if (me.children == null
+                || me.bodyCount < bodies.params.THRESHOLD) {
+	    /* it is a leaf node, do sequential computation */
+            BodyUpdates res = getBodyUpdates(me.bodyCount, bodies.params);
+	    me.barnesSequential(bodies.bodyTreeRoot, res, bodies.params);
             return res;
 	} 
 
         int childcount = 0;
         int resultsz = 0;
 	for (int i = 0; i < 8; i++) {
-	    if (treeNode.children[i] != null) {
-                if (treeNode.children[i].children != null) {
+	    if (me.children[i] != null) {
+                if (me.children[i].children != null) {
                     childcount++;
                 } else {
-                    resultsz += treeNode.children[i].bodyCount;
+                    resultsz += me.children[i].bodyCount;
                 }
             }
         }
@@ -236,25 +232,23 @@ import java.util.List;
         childcount = 0;
 
 	for (int i = 0; i < 8; i++) {
-	    BodyTreeNode ch = treeNode.children[i];
+	    BodyTreeNode ch = me.children[i];
 	    if (ch != null) {
                 if (ch.children == null) {
                     ch.barnesSequential(bodies.bodyTreeRoot, result, bodies.params);
                 } else {
-		    /*spawn child jobs*/
+		    /* spawn child jobs */
 		    byte[] newNodeId = new byte[nodeId.length + 1];
 		    System.arraycopy(nodeId, 0, newNodeId, 0, nodeId.length);
 		    newNodeId[nodeId.length] = (byte) i;
-		    res[childcount] = /*spawn*/ doBarnesSO(newNodeId,
+		    res[childcount] = /* spawn */ doBarnesSO(newNodeId,
                             iteration, bodies);
                     childcount++;
 		}
 	    }
 	}
 
-        // And then wait.
 	if (childcount > 0) {
-	    // If we spawned, we have to sync.
             sync();
             return result.combineResults(res);
 	}
@@ -265,7 +259,6 @@ import java.util.List;
 	    RunParameters params) {
         if (me.children == null || me.bodyCount < params.THRESHOLD) {
             // leaf node, let barnesSequential handle this
-            // (using optimizeList isn't useful for leaf nodes)
             BodyUpdates res = getBodyUpdates(me.bodyCount, params);
             me.barnesSequential(tree, res, params);
             return res;
@@ -289,8 +282,6 @@ import java.util.List;
         BodyUpdates result = getBodyUpdates(resultsz, params);
         childcount = 0;
 
-        //cell node -> call children[].barnes()
-
         for (int i = 0; i < 8; i++) {
             BodyTreeNode ch = me.children[i];
             if (ch != null) {
@@ -300,13 +291,14 @@ import java.util.List;
                     //necessaryTree creation
                     BodyTreeNode necessaryTree = ch == tree
                         ? tree : new BodyTreeNode(tree, ch);
-                    res[childcount] = barnesNTC(ch, necessaryTree, params);
+                    res[childcount] = barnesNTC(ch, necessaryTree, params); // spawn
                     //alternative: copy whole tree
                     //res[childcount] = barnesNTC(ch, tree, params);
                     childcount++;
                 }
             }
         }
+
         if (childcount > 0) {
             sync();
             return result.combineResults(res);
