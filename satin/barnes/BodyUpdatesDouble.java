@@ -7,13 +7,13 @@
 public final class BodyUpdatesDouble extends BodyUpdates {
 
     /** Cached array, to avoid re-allocation. */
-    private static double[] acc_x_static;
+//    private static double[] acc_x_static;
 
     /** Cached array, to avoid re-allocation. */
-    private static double[] acc_y_static;
+//    private static double[] acc_y_static;
 
     /** Cached array, to avoid re-allocation. */
-    private static double[] acc_z_static;
+//    private static double[] acc_z_static;
 
     /** Acceleration in X direction. */
     private double[] acc_x;
@@ -110,6 +110,30 @@ public final class BodyUpdatesDouble extends BodyUpdates {
 
     public final void prepareForUpdate() {
         int sz = computeSz();
+        double[] acc_x_tmp = new double[sz];
+        double[] acc_y_tmp = new double[sz];
+        double[] acc_z_tmp = new double[sz];
+        
+        for (int i = 0; i < index; i++) {
+            int ix = bodyNumbers[i];
+            acc_x_tmp[ix] = acc_x[i];
+            acc_y_tmp[ix] = acc_y[i];
+            acc_z_tmp[ix] = acc_z[i];
+        }
+        bodyNumbers = null;
+        acc_x = acc_x_tmp;
+        acc_y = acc_y_tmp;
+        acc_z = acc_z_tmp;
+        if (more != null) {
+            for (int i = 0; i < more.length; i++) {
+                addUpdates((BodyUpdatesDouble) more[i]);
+            }
+            more = null;
+        }
+    }
+/*
+    public final void prepareForUpdate() {
+        int sz = computeSz();
         if (acc_x_static == null) {
             acc_x_static = new double[sz];
             acc_y_static = new double[sz];
@@ -135,7 +159,7 @@ public final class BodyUpdatesDouble extends BodyUpdates {
             more = null;
         }
     }
-
+*/
     public final void updateBodies(Body[] bodyArray, int iteration,
             RunParameters params) {
         for (int i = 0; i < bodyArray.length; i++) {
