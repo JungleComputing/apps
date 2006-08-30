@@ -9,7 +9,7 @@
     <property name="build"       value="build"/>
 
     <property name="satinc-flags" value="-keep"/>
-    <property name="satin-classes" value="Fib"/>
+    <property name="satin-classes" value="Sleep"/>
 
     <property name="ibis-run-args" value="-Dsatin.closed"/>
 	
