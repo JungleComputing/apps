@@ -4,26 +4,45 @@
  */
 public final class RunParameters implements java.io.Serializable {
     /** Cell subdivision tolerance. */
-    double THETA;
+    final double THETA;
 
     /** Integration time-step. */
-    double DT;
+    final double DT;
 
     /** Half of the integration time-step. */
-    double DT_HALF;
+    final double DT_HALF;
 
     /** Potential softening value. */
-    double SOFT;
+    final double SOFT;
 
     /** Potential softening value squared. */
-    double SOFT_SQ;
+    final double SOFT_SQ;
 
     /** Maximum bumber of bodies per leaf. */
-    int MAX_BODIES_PER_LEAF;
+    final int MAX_BODIES_PER_LEAF;
 
     /** Spawn threshold. */
-    int THRESHOLD;
+    final int SPAWN_MIN_THRESHOLD;
 
-    /** Wether to use double or float for accelerations. */
-    boolean useDoubleUpdates;
+    /** Whether to use double or float for accelerations. */
+    final boolean USE_DOUBLE_UPDATES;
+
+    /**
+     * @param theta
+     * @param dt
+     * @param soft
+     * @param maxBodiesPerLeaf
+     * @param threshold
+     * @param useDoubleUpdates
+     */
+    public RunParameters(double theta, double dt, double soft, int maxBodiesPerLeaf, int threshold, boolean useDoubleUpdates) {
+        THETA = theta;
+        DT = dt;
+        DT_HALF = dt / 2.0;
+        SOFT = soft;
+        SOFT_SQ = SOFT * SOFT;
+        MAX_BODIES_PER_LEAF = maxBodiesPerLeaf;
+        SPAWN_MIN_THRESHOLD = threshold;
+        USE_DOUBLE_UPDATES = useDoubleUpdates;
+    }
 }

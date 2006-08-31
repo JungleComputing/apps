@@ -49,14 +49,6 @@
 
     private double totalMass; //set during CoM computation
 
-    //usual potential softening value, copied from splash2-barnes
-    //	static final double SOFT = 0.05;
-
-    // this value is copied from Suel --Rob
-    static final double SOFT = 0.0000025;
-
-    static final double SOFT_SQ = SOFT * SOFT;
-
     // Extra margin of space used around the bodies.
     private static final double DIM_SLACK = 0.00001;
 
@@ -226,7 +218,7 @@
         if (ydiff > 0.0) out.println("y : " + ydiff);
         if (zdiff > 0.0) out.println("z : " + zdiff);
     }
-
+/*
     private double[] computeChildCenter(int childIndex, double[] newCenter) {
         double newHalfSize = halfSize / 2.0;
 
@@ -248,7 +240,7 @@
 
         return newCenter;
     }
-
+*/
     /**
      * Adds 'b' to 'this' or its children
      */

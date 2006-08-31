@@ -1,15 +1,16 @@
 /* $Id$ */
 
+// @@@ TODO: NTC version with inlets, should be more memory efficient.
+
 import ibis.satin.SatinObject;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StreamTokenizer;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-
 import java.util.Arrays;
 
 /* strictfp */final class BarnesHut extends SatinObject implements BarnesHutInterface {
@@ -34,17 +35,8 @@ import java.util.Arrays;
 
     static int impl = IMPL_NTC;
 
-    //number of bodies at which the ntc impl work sequentially
-    private static int spawn_min = 500; //use -min <threshold> to modify
-
     private static long totalTime = 0,
             updateTime = 0, forceCalcTime = 0, vizTime = 0;
-
-    //Parameters for the BarnesHut algorithm / simulation
-    private static final double THETA = 2.0; // cell subdivision tolerance
-
-    private static final double DT = 0.025; // default integration time-step
-    private static final double DT_HALF = DT / 2.0; // default integration time-step
 
     //we do 7 iterations (first one isn't measured)
     private static double START_TIME = 0.0;
@@ -53,7 +45,7 @@ import java.util.Arrays;
 
     static int iterations = -1;
 
-    static Body[] bodyArray;
+    private static Body[] bodyArray;
 
     //Indicates if we are the root divide-and-conquer node
     
@@ -194,7 +186,7 @@ import java.util.Arrays;
     }
     
     public BodyUpdates getBodyUpdates(int n, RunParameters params) {
-        if (params.useDoubleUpdates) {
+        if (params.USE_DOUBLE_UPDATES) {
             return new BodyUpdatesDouble(n);
         }
         return new BodyUpdatesFloat(n);
@@ -206,7 +198,7 @@ import java.util.Arrays;
 	BodyTreeNode me = bodies.findTreeNode(nodeId);
 
 	if (me.children == null
-                || me.bodyCount < bodies.params.THRESHOLD) {
+                || me.bodyCount < bodies.params.SPAWN_MIN_THRESHOLD) {
 	    /* it is a leaf node, do sequential computation */
             BodyUpdates res = getBodyUpdates(me.bodyCount, bodies.params);
 	    me.barnesSequential(bodies.bodyTreeRoot, res, bodies.params);
@@ -257,7 +249,7 @@ import java.util.Arrays;
 
     public BodyUpdates doBarnesNTC(BodyTreeNode me, BodyTreeNode tree,
 	    RunParameters params) {
-        if (me.children == null || me.bodyCount < params.THRESHOLD) {
+        if (me.children == null || me.bodyCount < params.SPAWN_MIN_THRESHOLD) {
             // leaf node, let barnesSequential handle this
             BodyUpdates res = getBodyUpdates(me.bodyCount, params);
             me.barnesSequential(tree, res, params);
@@ -288,12 +280,14 @@ import java.util.Arrays;
                 if (ch.children == null) {
                     ch.barnesSequential(tree, result, params);
                 } else {
-                    //necessaryTree creation
-                    BodyTreeNode necessaryTree = ch == tree
-                        ? tree : new BodyTreeNode(tree, ch);
+                    // necessaryTree creation
+                    BodyTreeNode necessaryTree;
+                    if(ch == tree) {
+                        necessaryTree =  tree;
+                    } else {
+                        necessaryTree = new BodyTreeNode(tree, ch);
+                    }
                     res[childcount] = barnesNTC(ch, necessaryTree, params); // spawn
-                    //alternative: copy whole tree
-                    //res[childcount] = barnesNTC(ch, tree, params);
                     childcount++;
                 }
             }
@@ -329,7 +323,7 @@ import java.util.Arrays;
                 + bodyArray.length + " bodies, "
                 + params.MAX_BODIES_PER_LEAF + " bodies/leaf node, "
                 + "theta = " + params.THETA
-                + ", spawn-min-threshold = " + spawn_min);
+                + ", spawn-min-threshold = " + params.SPAWN_MIN_THRESHOLD);
 
         // print the starting problem
         if (verbose) {
@@ -366,6 +360,9 @@ import java.util.Arrays;
         start = System.currentTimeMillis();
 
         for (int iteration = 0; iteration < iterations; iteration++) {
+
+            System.gc();
+            
             long updateTimeTmp = 0, forceCalcTimeTmp = 0, vizTimeTmp = 0;
 
             // System.out.println("Starting iteration " + iteration);
@@ -392,7 +389,7 @@ import java.util.Arrays;
                 break;
             }
 
-            ibis.satin.SatinObject.pause(); //killall divide-and-conquer stuff
+            ibis.satin.SatinObject.pause(); // Pause Satin during sequential part.
 
             forceCalcTimeTmp = System.currentTimeMillis() - phaseStart;
             forceCalcTime += forceCalcTimeTmp;
@@ -406,7 +403,8 @@ import java.util.Arrays;
             } else {
                 bodies.updateBodiesLocally(result, iteration);
             }
-
+            result = null; // Explicitely free memory.
+            
             updateTimeTmp = System.currentTimeMillis() - phaseStart;
             updateTime += updateTimeTmp;
 
@@ -507,18 +505,15 @@ import java.util.Arrays;
         boolean mlbSeen = false;
         FileReader rdr = null;
         int i;
+        double theta = 2.0;
+        double dt = 0.025;
+        boolean useDoubleUpdates = true;
+        double soft = 0.0000025; // this default value is copied from Suel --Rob
+        int spawnMin = 500;
 
-        RunParameters params = new RunParameters();
-        params.THETA = THETA;
-        params.DT = DT;
-        params.DT_HALF = DT_HALF;
-        params.SOFT = BodyTreeNode.SOFT;
-        params.SOFT_SQ = BodyTreeNode.SOFT_SQ;
-        params.useDoubleUpdates = true;
-
-        //parse arguments
+        // parse arguments
         for (i = 0; i < argv.length; i++) {
-            //options
+            // options
             if (argv[i].equals("-debug")) {
                 debug = true;
             } else if (argv[i].equals("-no-debug")) {
@@ -534,9 +529,9 @@ import java.util.Arrays;
             } else if (argv[i].equals("-dump-viz")) {
                 dumpViz = argv[++i];
             } else if (argv[i].equals("-float")) {
-                params.useDoubleUpdates = false;
+                useDoubleUpdates = false;
             } else if (argv[i].equals("-double")) {
-                params.useDoubleUpdates = true;
+                useDoubleUpdates = true;
             } else if (argv[i].equals("-no-viz")) {
                 viz = false;
             } else if (argv[i].equals("-ntc")) {
@@ -558,17 +553,15 @@ import java.util.Arrays;
                         "Illegal argument to -dump-iter: number of iterations must be > 0 !");
                 }
             } else if (argv[i].equals("-theta")) {
-                params.THETA = Double.parseDouble(argv[++i]);
+                theta = Double.parseDouble(argv[++i]);
             } else if (argv[i].equals("-starttime")) {
                 START_TIME = Double.parseDouble(argv[++i]);
             } else if (argv[i].equals("-endtime")) {
                 END_TIME = Double.parseDouble(argv[++i]);
             } else if (argv[i].equals("-dt")) {
-                params.DT = Double.parseDouble(argv[++i]);
-                params.DT_HALF = params.DT / 2.0;
+                dt = Double.parseDouble(argv[++i]);
             } else if (argv[i].equals("-eps")) {
-                params.SOFT = Double.parseDouble(argv[++i]);
-                params.SOFT_SQ = params.SOFT * params.SOFT;
+                soft = Double.parseDouble(argv[++i]);
             } else if (argv[i].equals("-input")) {
                 try {
                     rdr = new FileReader(argv[++i]);
@@ -579,15 +572,14 @@ import java.util.Arrays;
             } else if (argv[i].equals("-dump")) {
                 dump_file = argv[++i];
             } else if (argv[i].equals("-min")) {
-                spawn_min = Integer.parseInt(argv[++i]);
-                if (spawn_min < 0) {
+                spawnMin = Integer.parseInt(argv[++i]);
+                if (spawnMin < 0) {
                     throw new IllegalArgumentException(
                         "Illegal argument to -min: Spawn min threshold must be >= 0 !");
                 }
             } else if (!nBodiesSeen) {
                 try {
-                    nBodies = Integer.parseInt(argv[i]); //nr of bodies to
-                    // simulate
+                    nBodies = Integer.parseInt(argv[i]); // Nr of bodies to simulate.
                     nBodiesSeen = true;
                 } catch (NumberFormatException e) {
                     System.err.println("Illegal argument: " + argv[i]);
@@ -595,7 +587,7 @@ import java.util.Arrays;
                 }
             } else if (!mlbSeen) {
                 try {
-                    mlb = Integer.parseInt(argv[i]); //max bodies per leaf node
+                    mlb = Integer.parseInt(argv[i]); // Max bodies per leaf node.
                     mlbSeen = true;
                 } catch (NumberFormatException e) {
                     System.err.println("Illegal argument: " + argv[i]);
@@ -608,13 +600,12 @@ import java.util.Arrays;
         }
 
         if (nBodies < 1 && rdr == null) {
-            System.err.println("Invalid body count, generating 300 bodies...");
-            nBodies = 300;
+            System.err.println("Invalid body count.");
+            return;
         }
 
-        params.MAX_BODIES_PER_LEAF = mlb;
-        params.THRESHOLD = spawn_min;
-
+        RunParameters params = new RunParameters(theta, dt, soft, mlb, spawnMin, useDoubleUpdates);
+        
         if (rdr != null) {
             if (nBodiesSeen) {
                 System.out
