@@ -33,7 +33,7 @@
     <target name="load-contrib" unless="contrib-loaded">
 	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
 	    <classpath>
-		<pathelement location="${ibis}/lib/ant-contrib-0.4.jar"/>
+		<pathelement location="${ibis}/build-files/ant-contrib-0.4.jar"/>
 	    </classpath>
 	</taskdef>
 	<property name="contrib-loaded" value="true"/>
