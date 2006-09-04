@@ -56,7 +56,7 @@ final class TranspositionTable extends SharedObject implements
         int elementSize = 7 + (4 * tagSize);
 
         Runtime r = Runtime.getRuntime();
-        int procs = r.availableProcessors();
+        int procs = 1; // r.availableProcessors();
         long free = r.freeMemory();
         long max = r.maxMemory();
         long total = r.totalMemory();

@@ -17,7 +17,7 @@ public final class Othello extends ibis.satin.SatinObject implements OthelloInte
         "othello.tt", true);
 
     static final int REPLICATED_DEPTH = TypedProperties.intProperty(
-        "othello.replicatedDepth", 7);
+        "othello.replicatedDepth", 9);
 
     static final int SPAWN_THRESHOLD = ibis.util.TypedProperties.intProperty(
         "othello.spawnThreshold", 7);
