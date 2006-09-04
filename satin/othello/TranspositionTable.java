@@ -56,15 +56,16 @@ final class TranspositionTable extends SharedObject implements
         int elementSize = 7 + (4 * tagSize);
 
         Runtime r = Runtime.getRuntime();
-        int procs = 1; // r.availableProcessors();
+
+        System.gc();
         long free = r.freeMemory();
         long max = r.maxMemory();
         long total = r.totalMemory();
-        System.err.println("TT: " + procs + " processor(s), mem: free = "
+        System.err.println("TT: mem: free = "
             + free + " max = " + max + " total = " + total);
 
         long AppMem = 64 * 1024 * 1024;
-        long toUse = (max / procs) - AppMem;
+        long toUse = max - AppMem;
         long elts = toUse / elementSize;
         if (elts < 0) {
             System.err
@@ -101,6 +102,13 @@ final class TranspositionTable extends SharedObject implements
 
         inited = true;
 
+        System.gc();
+        long newFree = r.freeMemory();
+        long newMax = r.maxMemory();
+        long newTotal = r.totalMemory();
+        System.err.println("TT after mem: free = "
+            + free + " max = " + max + " total = " + total + " USED by TT: " + (total - newTotal));
+        
         Runtime.getRuntime().addShutdownHook(new Shutdown(this));
     }
 
