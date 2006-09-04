@@ -107,7 +107,7 @@ final class TranspositionTable extends SharedObject implements
         long newMax = r.maxMemory();
         long newTotal = r.totalMemory();
         System.err.println("TT after mem: free = "
-            + free + " max = " + max + " total = " + total + " USED by TT: " + (total - newTotal));
+            + newFree + " max = " + newMax + " total = " + newTotal + " USED by TT: " + (free - newFree));
         
         Runtime.getRuntime().addShutdownHook(new Shutdown(this));
     }
