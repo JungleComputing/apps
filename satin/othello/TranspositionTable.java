@@ -125,8 +125,6 @@ final class TranspositionTable extends SharedObject implements
 
         int index = tag.hashCode() & (SIZE - 1);
 
-        if (valid[index] && depth < depths[index]) return;
-
         if (depth >= Othello.REPLICATED_DEPTH) {
             sharedStore(index, tag, value, bestChild, depth, lowerBound);
         } else {
@@ -138,8 +136,10 @@ final class TranspositionTable extends SharedObject implements
         byte depth, boolean lowerBound) {
         if (!inited) init();
 
-        stores++;
+        if (valid[index] && depth < depths[index]) return;
 
+        stores++;
+        
         if (!valid[index]) used++;
         else overwrites++;
 
