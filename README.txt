@@ -26,29 +26,31 @@ the Ibis tree lives on your system.
 
 System-specific notes
 
-Mac OS X
+Linux, Solaris, other Unix systems
+    Install a recent Java SDK, at least 1.4, and set the JAVA_HOME
+    environment variable to the location where it is installed,
+    for example
+        export JAVA_HOME=/usr/local/java/jdk1.4
+    or
+        set JAVA_HOME=/usr/local/java/jdk1.4
+    for CSH users.
+    It is probably best to add this to your .bash_profile, .profile,
+    or .cshrc file (whichever gets executed when you log in to your
+    system).
 
+Mac OS X
     Set the environment variable JAVA_HOME to "/Library/Java/Home".
-    You are required to install the Java SDK.
+    You are required to install the Java SDK. See the Linux notes on
+    how to set environment variables.
 
 Windows 2000, Windows XP
-
     Install a recent Java SDK, at least 1.4, and preferably 1.5, because
     1.4 seems to have some problems. This will get installed in
     for instance "c:\Program Files\Java\jdk1.5.0". You can set the
     JAVA_HOME environment variable to this path by going to the
     Control Panel, System, the "Advanced" tab, Environment variables,
-    add it there and reboot your system.
+    add it there and reboot your system. IBIS_HOME can be set
+    similarly.
 
 Cygwin
-
-    Set the environment variable JAVA_HOME to wherever it is installed
-    on your windows system. You can do that as described above, or do
-    it the "Unix" way. If you choose the Unix way, use quoting, so,
-    for instance,
-
-	export JAVA_HOME="/cygdrive/c/Program Files/Java/jdk1.5.0"
-
-	or
-
-	export JAVA_HOME="C:\Program Files\Java\jdk1.5.0"
+    See the notes on Windows 2000, Windows XP.
