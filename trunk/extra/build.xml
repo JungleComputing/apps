@@ -1,0 +1,12 @@
+<project
+    name="'extra' applications"
+    default="build"
+    basedir=".">
+
+    <description>
+	Applications build.
+    </description>
+
+    <import file="../build-apps.xml"/>
+
+</project>

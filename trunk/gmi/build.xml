@@ -1,0 +1,12 @@
+<project
+    name="GMI applications"
+    default="build"
+    basedir=".">
+
+    <description>
+	GMI applications build.
+    </description>
+
+    <import file="../build-apps.xml"/>
+
+</project>

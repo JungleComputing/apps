@@ -1,0 +1,12 @@
+<project
+    name="IO tests"
+    default="build"
+    basedir=".">
+
+    <description>
+	IO tests build.
+    </description>
+
+    <import file="../build-apps.xml"/>
+
+</project>
