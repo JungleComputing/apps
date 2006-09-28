@@ -1,7 +1,7 @@
 /**
- * You can run the sequential version by setting the mtdf.threshold value to a big number (i.e. 1000). 
+ * You can run the sequential version by setting the othello.threshold value to a big number (i.e. 1000). 
  * You can get a version that only uses a local transposition table (the old "par" version)
- * by setting the mtdf.replicatedDepth larger than the search depth.
+ * by setting the othello.replicatedDepth larger than the search depth.
  */
 import ibis.util.TypedProperties;
 
@@ -17,7 +17,7 @@ public final class Othello extends ibis.satin.SatinObject implements OthelloInte
         "othello.tt", true);
 
     static final int REPLICATED_DEPTH = TypedProperties.intProperty(
-        "othello.replicatedDepth", 7);
+        "othello.replicatedDepth", 9);
 
     static final int SPAWN_THRESHOLD = ibis.util.TypedProperties.intProperty(
         "othello.spawnThreshold", 7);

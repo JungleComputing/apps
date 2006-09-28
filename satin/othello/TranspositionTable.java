@@ -56,15 +56,16 @@ final class TranspositionTable extends SharedObject implements
         int elementSize = 7 + (4 * tagSize);
 
         Runtime r = Runtime.getRuntime();
-        int procs = r.availableProcessors();
+
+        System.gc();
         long free = r.freeMemory();
         long max = r.maxMemory();
         long total = r.totalMemory();
-        System.err.println("TT: " + procs + " processor(s), mem: free = "
+        System.err.println("TT: mem: free = "
             + free + " max = " + max + " total = " + total);
 
         long AppMem = 64 * 1024 * 1024;
-        long toUse = (max / procs) - AppMem;
+        long toUse = max - AppMem;
         long elts = toUse / elementSize;
         if (elts < 0) {
             System.err
@@ -124,8 +125,6 @@ final class TranspositionTable extends SharedObject implements
 
         int index = tag.hashCode() & (SIZE - 1);
 
-        if (valid[index] && depth < depths[index]) return;
-
         if (depth >= Othello.REPLICATED_DEPTH) {
             sharedStore(index, tag, value, bestChild, depth, lowerBound);
         } else {
@@ -137,8 +136,10 @@ final class TranspositionTable extends SharedObject implements
         byte depth, boolean lowerBound) {
         if (!inited) init();
 
-        stores++;
+        if (valid[index] && depth < depths[index]) return;
 
+        stores++;
+        
         if (!valid[index]) used++;
         else overwrites++;
 
