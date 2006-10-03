@@ -186,7 +186,7 @@ import java.util.Arrays;
         }
     }
 
-    public boolean guard_doBarnesSO(byte[] nodeId, int iteration,
+    public boolean guard_BarnesSO(int nodeId, int iteration,
 				       BodiesSO bodies) {
         // System.out.println("guard: iteration = " + iteration
         //         + ", bodies.iteration = " + bodies.iteration);
@@ -201,58 +201,44 @@ import java.util.Arrays;
     }
 
     /* spawnable */
-    public BodyUpdates doBarnesSO(byte[] nodeId, int iteration,
-				    BodiesSO bodies) {
-	BodyTreeNode me = bodies.findTreeNode(nodeId);
+    public BodyUpdates BarnesSO(int nodeId, int iteration, BodiesSO bodies) {
+        return doBarnesSO(nodeId, iteration, bodies);
+    }
 
-	if (me.children == null
-                || me.bodyCount < bodies.params.THRESHOLD) {
+    public BodyUpdates doBarnesSO(int nodeId, int iteration, BodiesSO bodies) {
+        RunParameters params = bodies.params;
+	BodyTreeNode me = BodyTreeNode.getTreeNode(nodeId);
+        BodyTreeNode root = bodies.bodyTreeRoot;
+
+	if (me.children == null || me.bodyCount < params.THRESHOLD) {
 	    /* it is a leaf node, do sequential computation */
-            BodyUpdates res = getBodyUpdates(me.bodyCount, bodies.params);
-	    me.barnesSequential(bodies.bodyTreeRoot, res, bodies.params);
+            BodyUpdates res = getBodyUpdates(me.bodyCount, params);
+	    me.barnesSequential(root, res, params);
             return res;
 	} 
 
         int childcount = 0;
-        int resultsz = 0;
 	for (int i = 0; i < 8; i++) {
 	    if (me.children[i] != null) {
-                if (me.children[i].children != null) {
-                    childcount++;
-                } else {
-                    resultsz += me.children[i].bodyCount;
-                }
+                childcount++;
             }
         }
-        BodyUpdates[] res = null;
-        if (childcount != 0) {
-            res = new BodyUpdates[childcount];
-        }
-        BodyUpdates result = getBodyUpdates(resultsz, bodies.params);
+        BodyUpdates[] res = new BodyUpdates[childcount];
         childcount = 0;
+        BodyUpdates result = getBodyUpdates(0, params);
 
 	for (int i = 0; i < 8; i++) {
 	    BodyTreeNode ch = me.children[i];
 	    if (ch != null) {
-                if (ch.children == null) {
-                    ch.barnesSequential(bodies.bodyTreeRoot, result, bodies.params);
-                } else {
-		    /* spawn child jobs */
-		    byte[] newNodeId = new byte[nodeId.length + 1];
-		    System.arraycopy(nodeId, 0, newNodeId, 0, nodeId.length);
-		    newNodeId[nodeId.length] = (byte) i;
-		    res[childcount] = /* spawn */ doBarnesSO(newNodeId,
-                            iteration, bodies);
-                    childcount++;
-		}
+                /* spawn child jobs */
+                res[childcount] = /* spawn */ BarnesSO(ch.getId(),
+                        iteration, bodies);
+                childcount++;
 	    }
-	}
+        }
 
-	if (childcount > 0) {
-            sync();
-            return result.combineResults(res);
-	}
-        return result;
+        sync();
+        return result.combineResults(res);
     }	
 
     public BodyUpdates doBarnesNTC(BodyTreeNode me, BodyTreeNode tree,
@@ -265,45 +251,30 @@ import java.util.Arrays;
         }
 
         int childcount = 0;
-        int resultsz = 0;
 	for (int i = 0; i < 8; i++) {
 	    if (me.children[i] != null) {
-                if (me.children[i].children != null) {
-                    childcount++;
-                } else {
-                    resultsz += me.children[i].bodyCount;
-                }
+                childcount++;
             }
         }
-        BodyUpdates[] res = null;
-        if (childcount != 0) {
-            res = new BodyUpdates[childcount];
-        }
-        BodyUpdates result = getBodyUpdates(resultsz, params);
+        BodyUpdates[] res = new BodyUpdates[childcount];
+        BodyUpdates result = getBodyUpdates(0, params);
         childcount = 0;
 
         for (int i = 0; i < 8; i++) {
             BodyTreeNode ch = me.children[i];
             if (ch != null) {
-                if (ch.children == null) {
-                    ch.barnesSequential(tree, result, params);
-                } else {
-                    //necessaryTree creation
-                    BodyTreeNode necessaryTree = ch == tree
-                        ? tree : new BodyTreeNode(tree, ch);
-                    res[childcount] = barnesNTC(ch, necessaryTree, params); // spawn
-                    //alternative: copy whole tree
-                    //res[childcount] = barnesNTC(ch, tree, params);
-                    childcount++;
-                }
+                //necessaryTree creation
+                BodyTreeNode necessaryTree = ch == tree
+                    ? tree : new BodyTreeNode(tree, ch);
+                res[childcount] = barnesNTC(ch, necessaryTree, params); // spawn
+                //alternative: copy whole tree
+                //res[childcount] = barnesNTC(ch, tree, params);
+                childcount++;
             }
         }
 
-        if (childcount > 0) {
-            sync();
-            return result.combineResults(res);
-        }
-        return result;
+        sync();
+        return result.combineResults(res);
     }
 
     /**
@@ -382,7 +353,7 @@ import java.util.Arrays;
                         params);
                 break;
             case IMPL_SO:
-                result = doBarnesSO(new byte[0], iteration, (BodiesSO) bodies);
+                result = doBarnesSO(0, iteration, (BodiesSO) bodies);
                 sync();
                 break;
             case IMPL_SEQ:
@@ -470,21 +441,20 @@ import java.util.Arrays;
         switch (impl) {
         case IMPL_NTC:
             System.out.println("Using necessary tree impl");
-            runSim();
             break;
         case IMPL_SEQ:
             System.out.println("Using hierarchical sequential impl");
-            runSim();
             break;
         case IMPL_SO:
             System.out.println("Using shared object impl");
-            runSim();
             break;
         default:
             System.out.println("EEK! Using unknown implementation #" + impl);
             System.exit(1);
             break; //blah
         }
+
+        runSim();
 
         System.out.println("update took             " + updateTime / 1000.0
             + " s");

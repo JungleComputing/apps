@@ -42,22 +42,6 @@ final public class BodiesSO extends SharedObject implements BodiesInterface, Bod
         //         + ": " + bodyArray[0]);
     }    
 
-    public BodyTreeNode findTreeNode(byte[] treeNodeIdentifier) {
-
-        /*no consistency check for the time being*/
-        if (bodyTreeRoot == null) {
-            System.err.println("bodyTreeRoot is null!");
-        }
-
-        BodyTreeNode treeNode = bodyTreeRoot;
-        if (treeNodeIdentifier != null) {
-            for (int i = 0; i < treeNodeIdentifier.length; i++) {
-                treeNode = treeNode.children[treeNodeIdentifier[i]];
-            }
-        }
-        return treeNode;
-    }
-
     private void readObject(java.io.ObjectInputStream in)
             throws java.io.IOException, ClassNotFoundException {
         
