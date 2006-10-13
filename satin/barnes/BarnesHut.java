@@ -208,12 +208,14 @@ import java.util.Arrays;
     public BodyUpdates doBarnesSO(int nodeId, int iteration, BodiesSO bodies) {
         RunParameters params = bodies.params;
 	BodyTreeNode me = BodyTreeNode.getTreeNode(nodeId);
-        BodyTreeNode root = bodies.bodyTreeRoot;
 
 	if (me.children == null || me.bodyCount < params.THRESHOLD) {
 	    /* it is a leaf node, do sequential computation */
             BodyUpdates res = getBodyUpdates(me.bodyCount, params);
-	    me.barnesSequential(root, res, params);
+            // Experiment:
+            // BodyTreeNode necessaryTree = new BodyTreeNode(bodies.bodyTreeRoot, me);
+	    // me.barnesSequential(necessaryTree, res, params);
+	    me.barnesSequential(bodies.bodyTreeRoot, res, params);
             return res;
 	} 
 
