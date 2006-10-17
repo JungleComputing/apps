@@ -1,0 +1,94 @@
+#!/bin/sh
+depth=0;
+#dir=/home2/versto/Projects/SAT/SATLIB/longmult/BMC-dimacs-examples-0.0/unsatisfiable;
+#dir=/home2/versto/Projects/SAT/SATLIB/UF75.325.100
+#dir=/home2/versto/Projects/SAT/SATLIB/UF250.1065.100
+#dir=/home2/versto/Projects/SAT/SATLIB/UUF225.960.100
+#dir=../sat/examples/uuf100.430.1000
+#dir=/home2/versto/Projects/SAT/SATLIB/FPGA_SWB_UNS/
+dir=./fpga.in
+defopts=""
+defopts="$defopts -Dmaxdecisiondepth=400"
+defopts="$defopts -Dmaxspawndepth=100"
+defopts="$defopts -Dclone=cloning"
+#defopts="$defopts -Dclone=ibis"
+#defopts="$defopts -Dclone=sun"
+defopts="$defopts -Dusearrays=1"
+#defopts="$defopts -DconflictInc=4"
+#defopts="$defopts -DlearntInc=1.1"
+#defopts="$defopts -DlearntInc=1.5"
+#defopts="$defopts -DlearntInc=1.3"
+#defopts="$defopts -DconflictInit=5000000"
+#defopts="$defopts -Dfixes=1"
+#solver=MiniSATLimitedRestarts
+#solver=MiniSAT2Heap
+#prunopts="-reserve 148433"
+prunopts=""
+#prunopts="-o split"
+
+jvmopts="-Xms800M -Xmx800M"
+#jvmopts="-Xms800M -Xmx800M -ea"
+satinopts="-satin-stats -satin-tcp -satin-closed"
+#satinopts="-satin-stats -satin-closed"
+fixes=0
+for i in `range 1 1`; do
+  echo $i;
+  #for solver in MiniSATLimitedRestarts MiniSAT2Heap; do
+  for solver in MiniSATLimitedRestarts; do
+    #for problem in longmult14.dimacs; do
+    #for problem in longmult15.dimacs; do
+    #for problem in `(cd $dir; ls *cnf*)`; do
+    #for problem in uf250-020.cnf; do
+    #for problem in  fpga10_12_uns_rcr.cnf fpga10_13_uns_rcr.cnf; do
+    #for problem in  uuf225-01.cnf; do
+    #for problem in uuf100-01.cnf.gz; do
+    #for problem in  fpga10_13_uns_rcr.cnf; do
+    for problem in  fpga11_13_uns_rcr.cnf; do
+      for varorder in varorder; do
+      #for varorder in default varorder heap; do
+	#for learn in 10 20 30 40; do
+	#for learn in 0; do
+	#for learn in 30; do
+	for learn in 0; do
+          # for sharedobjects in 0 1; do
+          for sharedobjects in 1; do
+          #for sharedobjects in 0; do
+	    #Hack: constraints not all counted in case of binary opt!!
+	    #for learntC in 8.0; do
+	    for learntC in 0.5; do
+	    #for learntC in 64.0; do
+	      for conflictInc in 64.0; do
+		# for iter in 2000; do
+		#for learntInc in 1.1 1.2 1.3 1.5 2.0 2.5; do
+		for learntInc in 1.3; do
+		  # for iter in 5000; do
+		  for iter in 500000000; do
+		    # for nodes in 32; do
+		    for nodes in 1; do
+			out="$problem-iter$iter-learn$learn-varOrder$varorder-sharedobjects$sharedobjects-conflictInc$conflictInc-learntInc$learntInc-$solver-$nodes.out"
+			echo $out
+			opts="$defopts"
+			opts="$opts -Dfixes=$fixes"
+			opts="$opts -Dmaxdepth=$depth"
+			opts="$opts -Dmaxlearnsize=$learn"
+			opts="$opts -Dmaxiter=$iter"
+			opts="$opts -DconflictInc=$conflictInc"
+			opts="$opts -DlearntInc=$learntInc"
+			opts="$opts -DlearntConstraint=$learntC"
+			opts="$opts -Dsharedobjects=$sharedobjects"
+			opts="$opts -DvarOrder=$varorder"
+			prun $prunopts -v -1 -t 24000 ~/ibis/bin/ibis-prun $nodes $jvmopts $opts \
+			    org/sat4j/Lanceur $solver \
+			    $dir/$problem $satinopts >> $out 2>&1 </dev/null;
+			grep CPU $out | tail -1
+		    done
+		  done
+		done
+	      done
+	    done
+          done
+	done
+      done
+    done
+  done
+done

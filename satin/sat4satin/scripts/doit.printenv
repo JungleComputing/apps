@@ -1,0 +1,9 @@
+#!/bin/sh
+echo foo2: $foo2
+echo PATH: $PATH
+echo p2: $p2
+echo reading .bashrc
+. ~/.bashrc 
+echo foo2: $foo2
+echo PATH: $PATH
+echo p2: $p2

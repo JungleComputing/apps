@@ -1,0 +1,44 @@
+{
+    if ($1 == "v") {
+	printf "v: %d: ", NF;
+	for (i = 2; i < NF; i++) {
+	    # dimacs format
+	    if ($i < 0) {
+		var = - $i;
+		model[var] = 0;
+	    } else {
+		var = $i;
+		model[var] = 1;
+	    }
+	    printf "%d[%d:%d] ", var, $i, model[var];
+	}
+	printf "\n";
+    } else {
+	res = 0;
+	if (0) {
+	    # sat4j/minisat internal format
+	    for (i = 3; i <= NF; i++) {
+	        lit = $i;
+	        sign = lit % 2;
+	        var = (lit - sign) / 2;
+	        res += (sign != model[var]);
+	        printf "%d (%d=%d;%d) ", $i, var, sign, model[var];
+	    }
+	} else {
+	    # dimacs clause format, 0 terminated
+	    for (i = 1; i < NF; i++) {
+		if ($i < 0) {
+	            var = - $i;
+		    sign = 1;
+		} else {
+	            var = $i;
+		    sign = 0;
+	        }
+	        res += (sign != model[var]);
+	        printf "%d (%d=%d;%d) ", $i, var, sign, model[var];
+	    }
+        }
+	printf "res %d \n", res;
+    }
+}
+
