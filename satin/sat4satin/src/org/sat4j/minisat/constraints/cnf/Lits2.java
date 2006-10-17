@@ -6,8 +6,8 @@
  */
 package org.sat4j.minisat.constraints.cnf;
 
-import org.sat4j.minisat.core.ILits2;
 import org.sat4j.core.Vec;
+import org.sat4j.minisat.core.ILits2;
 import org.sat4j.minisat.core.Propagatable;
 
 /**

@@ -6,14 +6,13 @@
  */
 package org.sat4j.minisat.constraints;
 
+import org.sat4j.core.Vec;
 import org.sat4j.minisat.constraints.cnf.WLClause;
 import org.sat4j.minisat.core.Constr;
+import org.sat4j.minisat.core.ILits;
+import org.sat4j.minisat.core.Propagatable;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IVecInt;
-import org.sat4j.minisat.core.ILits;
-
-import org.sat4j.core.Vec;
-import org.sat4j.minisat.core.Propagatable;
 
 /**
  * @author leberre To change the template for this generated type comment go to

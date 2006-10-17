@@ -36,9 +36,6 @@ import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IVec;
 import org.sat4j.specs.IVecInt;
 
-//
-import org.sat4j.minisat.core.Constr;
-
 public class MinWatchPb extends WatchPb implements Serializable {
 
     private static final long serialVersionUID = 1L;

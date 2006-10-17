@@ -35,9 +35,6 @@ import org.sat4j.minisat.core.UnitPropagationListener;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IVecInt;
 
-//
-import org.sat4j.minisat.core.Propagatable;
-
 /*
  * Created on 16 oct. 2003 To change the template for this generated file go to
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments

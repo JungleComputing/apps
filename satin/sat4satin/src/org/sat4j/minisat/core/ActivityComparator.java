@@ -2,7 +2,6 @@ package org.sat4j.minisat.core;
 
 import java.io.Serializable;
 import java.util.Comparator;
-import org.sat4j.specs.IConstr;
 
 public class ActivityComparator implements Comparator<Constr>, Serializable {
 

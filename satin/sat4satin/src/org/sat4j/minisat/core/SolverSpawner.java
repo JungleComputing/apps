@@ -1,35 +1,11 @@
 package org.sat4j.minisat.core;
 
-import java.io.PrintStream;
+import ibis.satin.SatinObject;
+
 import java.io.Serializable;
-import java.math.BigInteger;
-import java.util.Comparator;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import org.sat4j.core.Vec;
 import org.sat4j.core.VecInt;
-import org.sat4j.specs.ContradictionException;
-import org.sat4j.specs.IConstr;
-import org.sat4j.specs.ISolver;
-import org.sat4j.specs.IVec;
-import org.sat4j.specs.IVecInt;
-import org.sat4j.specs.TimeoutException;
-
-import org.sat4j.minisat.core.ISimplifier;
-import org.sat4j.minisat.core.ActivityComparator;
-import org.sat4j.minisat.learning.MiniSATLearning;
-import org.sat4j.minisat.learning.LimitedLearning;
-import java.util.Properties;
-
-import ibis.satin.SatinObject;
-import ibis.satin.Inlet;
-import java.util.Enumeration;
-// for serialClone:
-import java.io.*;
-import java.util.Hashtable;
-import org.sat4j.minisat.constraints.cnf.Lits2; // Hack
-import org.sat4j.minisat.constraints.cnf.WLClause; // Hack
 
 /**
  * @author Kees Verstoep (versto@cs.vu.nl)

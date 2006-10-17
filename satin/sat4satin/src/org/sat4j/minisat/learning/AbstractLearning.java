@@ -1,11 +1,10 @@
 package org.sat4j.minisat.learning;
 
+import java.io.Serializable;
+
 import org.sat4j.minisat.core.Constr;
 import org.sat4j.minisat.core.LearningStrategy;
 import org.sat4j.minisat.core.VarActivityListener;
-
-//
-import java.io.Serializable;
 
 abstract class AbstractLearning implements LearningStrategy, Serializable, Cloneable {
 

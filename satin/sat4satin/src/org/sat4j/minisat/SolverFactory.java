@@ -24,6 +24,8 @@
  */
 package org.sat4j.minisat;
 
+import java.util.Properties;
+
 import org.sat4j.core.ASolverFactory;
 import org.sat4j.minisat.constraints.CardinalityDataStructure;
 import org.sat4j.minisat.constraints.ClausalDataStructureCB;
@@ -51,10 +53,6 @@ import org.sat4j.minisat.orders.VarOrderHeap;
 import org.sat4j.minisat.uip.DecisionUIP;
 import org.sat4j.minisat.uip.FirstUIP;
 import org.sat4j.specs.ISolver;
-
-import java.util.Properties;
-import java.lang.Double;
-import java.lang.Integer;
 
 /**
  * User friendly access to pre-constructed solvers.

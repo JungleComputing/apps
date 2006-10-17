@@ -36,7 +36,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 
-// import org.apache.commons.beanutils.BeanUtils;
 import org.sat4j.core.ASolverFactory;
 import org.sat4j.reader.InstanceReader;
 import org.sat4j.reader.ParseFormatException;
@@ -45,9 +44,6 @@ import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IProblem;
 import org.sat4j.specs.ISolver;
 import org.sat4j.specs.TimeoutException;
-
-//
-import org.sat4j.minisat.core.Solver;
 
 /**
  * This class is used to launch the SAT solvers from the command line.

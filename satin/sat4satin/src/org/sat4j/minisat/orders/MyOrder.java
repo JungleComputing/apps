@@ -6,13 +6,12 @@
  */
 package org.sat4j.minisat.orders;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 
 import org.sat4j.minisat.core.ILits;
 import org.sat4j.minisat.core.ILits2;
-
-import java.io.Serializable;
 
 /**
  * @author leberre To change the template for this generated type comment go to

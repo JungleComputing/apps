@@ -1,9 +1,10 @@
 package org.sat4j.minisat.core;
-import org.sat4j.core.Vec;
-import org.sat4j.core.VecInt;
 import java.io.Serializable;
 import java.util.Hashtable;
 import java.util.Vector;
+
+import org.sat4j.core.Vec;
+import org.sat4j.core.VecInt;
 
 // interface SolverStateInterface extends ibis.satin.so.WriteMethodsInterface {
 interface SolverStateInterface extends ibis.satin.WriteMethodsInterface {
