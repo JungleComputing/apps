@@ -56,7 +56,7 @@ public class JWOrder extends VarOrder implements Serializable, Cloneable {
         int pos3 = lits.nTernaryClauses(p);
         int neg3 = lits.nTernaryClauses(p ^ 1);
         return (pos2 * neg2 * 100 + pos2 + neg2) * 5 + pos3 * neg3 * 10 + pos3
-                + neg3;
+            + neg3;
     }
 
     class Temp implements Comparable<Temp> {
@@ -135,23 +135,23 @@ public class JWOrder extends VarOrder implements Serializable, Cloneable {
 
     @Override
     public String toString() {
-        return "Jeroslow-Wang static like heuristics updated when new clauses are learnt"; 
+        return "Jeroslow-Wang static like heuristics updated when new clauses are learnt";
     }
 
     @Override
     public Object clone() {
-	JWOrder clone;
+        JWOrder clone;
 
-	// try {
-	    clone = (JWOrder) super.clone();
-	// }
-	// catch (CloneNotSupportedException e) {
-	//    throw new InternalError(e.toString());
-	// }
+        // try {
+        clone = (JWOrder) super.clone();
+        // }
+        // catch (CloneNotSupportedException e) {
+        //    throw new InternalError(e.toString());
+        // }
 
-	clone.lits = (ILits23) this.lits.clone();
+        clone.lits = (ILits23) this.lits.clone();
 
-	return clone;
+        return clone;
     }
 
 }

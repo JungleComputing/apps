@@ -55,7 +55,7 @@ public class OPBReader2005 implements Reader, Serializable {
 
     // does the instance have an objective function?
     private boolean hasObjFunc = false;
-    
+
     /**
      * callback called when we get the number of variables and the expected
      * number of constraints
@@ -135,8 +135,8 @@ public class OPBReader2005 implements Reader, Serializable {
         coeffs.push(coeff);
         Integer id = map.get(var);
         if (id == null) {
-            assert map.size()<solver.nVars();
-            map.put(var, id = map.size()+1);
+            assert map.size() < solver.nVars();
+            map.put(var, id = map.size() + 1);
             assert id > 0;
             assert id <= solver.nVars();
             decode.push(var);
@@ -269,7 +269,7 @@ public class OPBReader2005 implements Reader, Serializable {
         c = get();
         if (c == '-' || Character.isDigit(c)) {
             s.append(c);
-        // note: BigInteger don't like a '+' before the number, we just skip it
+            // note: BigInteger don't like a '+' before the number, we just skip it
         }
 
         while (Character.isDigit(c = get()) && !eof()) {
@@ -366,13 +366,13 @@ public class OPBReader2005 implements Reader, Serializable {
         c = get();
         if (c != '*') {
             throw new ParseFormatException(
-                    "First line of input file should be a comment");
+                "First line of input file should be a comment");
         }
 
         s = readWord();
         if (eof() || !s.equals("#variable=")) {
             throw new ParseFormatException(
-                    "First line should contain #variable= as first keyword");
+                "First line should contain #variable= as first keyword");
         }
 
         nbVars = Integer.parseInt(readWord());
@@ -380,7 +380,7 @@ public class OPBReader2005 implements Reader, Serializable {
         s = readWord();
         if (eof() || !s.equals("#constraint=")) {
             throw new ParseFormatException(
-                    "First line should contain #constraint= as second keyword");
+                "First line should contain #constraint= as second keyword");
         }
 
         nbConstr = Integer.parseInt(readWord());
@@ -420,7 +420,7 @@ public class OPBReader2005 implements Reader, Serializable {
      * @throws ParseException
      */
     private void readTerm(StringBuffer coeff, StringBuffer var)
-            throws IOException, ParseFormatException {
+        throws IOException, ParseFormatException {
         char c;
 
         readInteger(coeff);
@@ -429,7 +429,7 @@ public class OPBReader2005 implements Reader, Serializable {
         c = get();
         if (c != '*') {
             throw new ParseFormatException(
-                    "'*' expected between a coefficient and a variable");
+                "'*' expected between a coefficient and a variable");
         }
 
         if (!readIdentifier(var)) {
@@ -475,14 +475,14 @@ public class OPBReader2005 implements Reader, Serializable {
                     putback(c);
                 } else {
                     throw new ParseFormatException(
-                            "unexpected character in objective function");
+                        "unexpected character in objective function");
                 }
             }
 
             endObjective();
         } else {
             throw new ParseFormatException(
-                    "input format error: 'min:' expected");
+                "input format error: 'min:' expected");
         }
     }
 
@@ -494,7 +494,7 @@ public class OPBReader2005 implements Reader, Serializable {
      * @throws ContradictionException
      */
     private void readConstraint() throws IOException, ParseFormatException,
-            ContradictionException {
+        ContradictionException {
         StringBuffer var = new StringBuffer();
         StringBuffer coeff = new StringBuffer();
         char c;
@@ -515,13 +515,13 @@ public class OPBReader2005 implements Reader, Serializable {
                 putback(c);
             } else {
                 throw new ParseFormatException(
-                        "unexpected character in constraint");
+                    "unexpected character in constraint");
             }
         }
 
         if (eof()) {
             throw new ParseFormatException(
-                    "unexpected EOF before end of constraint");
+                "unexpected EOF before end of constraint");
         }
 
         String relop;
@@ -529,7 +529,7 @@ public class OPBReader2005 implements Reader, Serializable {
             constraintRelOp(relop);
         } else {
             throw new ParseFormatException(
-                    "unexpected relational operator in constraint");
+                "unexpected relational operator in constraint");
         }
 
         readInteger(coeff);
@@ -539,7 +539,7 @@ public class OPBReader2005 implements Reader, Serializable {
         c = get();
         if (eof() || c != ';') {
             throw new ParseFormatException(
-                    "semicolon expected at end of constraint");
+                "semicolon expected at end of constraint");
         }
 
         endConstraint();
@@ -560,7 +560,7 @@ public class OPBReader2005 implements Reader, Serializable {
      * @throws ContradictionException
      */
     public void parse() throws IOException, ParseFormatException,
-            ContradictionException {
+        ContradictionException {
         readMetaData();
 
         skipComments();
@@ -579,12 +579,12 @@ public class OPBReader2005 implements Reader, Serializable {
     }
 
     public IProblem parseInstance(String filename)
-            throws FileNotFoundException, ParseFormatException, IOException,
-            ContradictionException {
+        throws FileNotFoundException, ParseFormatException, IOException,
+        ContradictionException {
 
         if (filename.endsWith(".gz")) {
             parseInstance(new LineNumberReader(new InputStreamReader(
-                    new GZIPInputStream(new FileInputStream(filename)))));
+                new GZIPInputStream(new FileInputStream(filename)))));
         } else {
             parseInstance(new LineNumberReader(new FileReader(filename)));
         }
@@ -593,7 +593,7 @@ public class OPBReader2005 implements Reader, Serializable {
     }
 
     public void parseInstance(LineNumberReader in) throws ParseFormatException,
-            ContradictionException {
+        ContradictionException {
         solver.reset();
         this.in = in;
         try {

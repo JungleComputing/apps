@@ -58,6 +58,6 @@ public class FixedLengthLearning extends LimitedLearning {
     @Override
     public String toString() {
         return "Limit learning to clauses of size smaller or equal to "
-                + maxlength;
+            + maxlength;
     }
 }

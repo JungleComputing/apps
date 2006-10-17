@@ -84,25 +84,25 @@ public class MyOrder extends VarOrder implements Serializable, Cloneable {
         }
         lastVar = 1;
     }
-    
+
     @Override
     public String toString() {
-        return "Init VSIDS order using a POSIT-like static order on 2 and 3 clauses."; 
+        return "Init VSIDS order using a POSIT-like static order on 2 and 3 clauses.";
     }
 
     @Override
     public Object clone() {
-	MyOrder clone;
+        MyOrder clone;
 
-	// try {
-	    clone = (MyOrder) super.clone();
-	// }
-	// catch (CloneNotSupportedException e) {
-	//    throw new InternalError(e.toString());
-	// }
+        // try {
+        clone = (MyOrder) super.clone();
+        // }
+        // catch (CloneNotSupportedException e) {
+        //    throw new InternalError(e.toString());
+        // }
 
-	clone.lits = (ILits2) this.lits.clone();
+        clone.lits = (ILits2) this.lits.clone();
 
-	return clone;
+        return clone;
     }
 }

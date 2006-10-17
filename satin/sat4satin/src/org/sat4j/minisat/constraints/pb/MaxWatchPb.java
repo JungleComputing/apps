@@ -1,4 +1,3 @@
-
 /*
  * MiniSAT in Java, a Java based-SAT framework Copyright (C) 2004 Daniel Le
  * Berre

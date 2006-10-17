@@ -48,8 +48,8 @@ public class Lits implements Serializable, Cloneable, ILits {
 
     private boolean pool[] = new boolean[0];
 
-    private int realnVars=0;
-    
+    private int realnVars = 0;
+
     @SuppressWarnings("unchecked")
     protected IVec<Propagatable>[] watches = new IVec[0];
 
@@ -65,7 +65,7 @@ public class Lits implements Serializable, Cloneable, ILits {
     public Lits() {
     }
 
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings( { "unchecked" })
     public void init(int nvar) {
         assert nvar >= 0;
         // let some space for unused 0 indexer.
@@ -120,7 +120,7 @@ public class Lits implements Serializable, Cloneable, ILits {
         assert x > 0;
         return pool[x];
     }
-    
+
     public void resetPool() {
         for (int i = 0; i < pool.length; i++) {
             if (pool[i]) {
@@ -148,16 +148,16 @@ public class Lits implements Serializable, Cloneable, ILits {
     }
 
     public boolean isSatisfied(int lit) {
-	return truthValue[lit >> 1] == satisfyingValue(lit);
+        return truthValue[lit >> 1] == satisfyingValue(lit);
     }
 
     public boolean isFalsified(int lit) {
         Lbool falsified = ((lit & 1) == 0) ? Lbool.FALSE : Lbool.TRUE;
-	return truthValue[lit >> 1] == falsified;
+        return truthValue[lit >> 1] == falsified;
     }
 
     public boolean isUnassigned(int lit) {
-	return truthValue[lit >> 1] == Lbool.UNDEFINED;
+        return truthValue[lit >> 1] == Lbool.UNDEFINED;
     }
 
     public String valueToString(int lit) {
@@ -167,7 +167,7 @@ public class Lits implements Serializable, Cloneable, ILits {
         if (isSatisfied(lit)) {
             return "T";
         }
-	return "F";
+        return "F";
     }
 
     public int nVars() {
@@ -208,26 +208,26 @@ public class Lits implements Serializable, Cloneable, ILits {
     }
 
     public IVec<Undoable> undos(int lit) {
-	if (undos[lit >> 1] == null) {
-	    // create lazily after clone
-	    undos[lit >> 1] = new Vec<Undoable>();
-	}
+        if (undos[lit >> 1] == null) {
+            // create lazily after clone
+            undos[lit >> 1] = new Vec<Undoable>();
+        }
         return undos[lit >> 1];
     }
 
     public void watch(int lit, Propagatable c) {
-	if (watches[lit] == null) {
-	    // create lazily after clone
-	    watches[lit] = new Vec<Propagatable>();
-	}
+        if (watches[lit] == null) {
+            // create lazily after clone
+            watches[lit] = new Vec<Propagatable>();
+        }
         watches[lit].push(c);
     }
 
     public IVec<Propagatable> watches(int lit) {
-	if (watches[lit] == null) {
-	    // create lazily after clone
-	    watches[lit] = new Vec<Propagatable>();
-	}
+        if (watches[lit] == null) {
+            // create lazily after clone
+            watches[lit] = new Vec<Propagatable>();
+        }
         return watches[lit];
     }
 
@@ -246,46 +246,45 @@ public class Lits implements Serializable, Cloneable, ILits {
 
     @Override
     public Object clone() {
-	Lits clone;
+        Lits clone;
 
-	try {
-	    clone = (Lits) super.clone();
-	}
-	catch (CloneNotSupportedException e) {
-	    throw new InternalError(e.toString());
-	}
+        try {
+            clone = (Lits) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError(e.toString());
+        }
 
         clone.pool = this.pool.clone();
         clone.level = this.level.clone();
         // clone.truthValue = (Lbool[]) this.truthValue.clone();
-	// Actually need a shallow copy of the truthValues themselves,
-	// since we don't want multiple TRUE/FALSE/UNDEF objects
-	// (which would break some assumptions in other code)
+        // Actually need a shallow copy of the truthValues themselves,
+        // since we don't want multiple TRUE/FALSE/UNDEF objects
+        // (which would break some assumptions in other code)
         clone.truthValue = new Lbool[truthValue.length];
-	for (int i = 0; i < clone.truthValue.length; i++) {
-	    clone.truthValue[i] = this.truthValue[i];
-	}
+        for (int i = 0; i < clone.truthValue.length; i++) {
+            clone.truthValue[i] = this.truthValue[i];
+        }
 
-	// NOTE: undos should be reconstructed after clone
+        // NOTE: undos should be reconstructed after clone
         // clone.undos = (IVec<Undoable>[]) this.undos.clone();
         clone.undos = new IVec[undos.length];
 
-	// NOTE: reason should be reconstructed after clone
+        // NOTE: reason should be reconstructed after clone
         // clone.reason = (Constr[]) this.reason.clone();
         clone.reason = new Constr[reason.length];
 
-	// NOTE: watches need to be reconstructed after deep clone()
-	//clone.watches = (IVec<Propagatable>[]) this.watches.clone();
+        // NOTE: watches need to be reconstructed after deep clone()
+        //clone.watches = (IVec<Propagatable>[]) this.watches.clone();
         clone.watches = new IVec[watches.length];
-	// for (int var = 1; var <= clone.realnVars; var++) {
+        // for (int var = 1; var <= clone.realnVars; var++) {
         //     clone.watches[var << 1] = new Vec<Propagatable>();
         //     clone.watches[(var << 1) | 1] = new Vec<Propagatable>();
-	// }
+        // }
 
-	if (false) {
-	    System.out.println("Lits clone " + clone + ", orig " + this);
-	}
+        if (false) {
+            System.out.println("Lits clone " + clone + ", orig " + this);
+        }
 
-	return clone;
+        return clone;
     }
 }

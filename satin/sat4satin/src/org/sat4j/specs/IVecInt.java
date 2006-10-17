@@ -77,7 +77,7 @@ public interface IVecInt extends Iterable<Integer> {
     public abstract void moveTo2(IVecInt dest);
 
     public abstract void moveTo(int[] dest);
-    
+
     /**
      * Move elements inside the vector.
      * The content of the method is equivalent to: 

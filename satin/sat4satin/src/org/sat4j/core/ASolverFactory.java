@@ -30,7 +30,7 @@ public abstract class ASolverFactory {
         Method[] solvers = this.getClass().getDeclaredMethods();
         for (int i = 0; i < solvers.length; i++) {
             if (solvers[i].getParameterTypes().length == 0
-                    && solvers[i].getName().startsWith("new")) {
+                && solvers[i].getName().startsWith("new")) {
                 l.add(solvers[i].getName().substring(3));
             }
         }
@@ -52,14 +52,14 @@ public abstract class ASolverFactory {
         Class[] paramtypes = {};
         try {
             Method m = this.getClass()
-                    .getMethod("new" + solvername, paramtypes);
+                .getMethod("new" + solvername, paramtypes);
             return (ISolver) m.invoke(null, (Object[]) null);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
-    
+
     /**
      * To obtain the default solver of the library.
      * The solver is suitable to solve huge SAT benchmarks.
@@ -70,8 +70,8 @@ public abstract class ASolverFactory {
      * @return a solver from the factory
      * @see #lightSolver()
      */
-    public abstract ISolver defaultSolver(); 
-    
+    public abstract ISolver defaultSolver();
+
     /**
      * To obtain a solver that is suitable for solving
      * many small instances of SAT problems.

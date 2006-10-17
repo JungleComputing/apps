@@ -33,8 +33,8 @@ public class Heap implements Serializable, Cloneable {
     private IVecInt indices = new VecInt(); // int -> index in heap
 
     // private final double [] activity;
-    private double [] activity;
-    
+    private double[] activity;
+
     final void percolateUp(int i) {
         int x = heap.get(i);
         while (parent(i) != 0 && comp(x, heap.get(parent(i)))) {
@@ -50,8 +50,8 @@ public class Heap implements Serializable, Cloneable {
         int x = heap.get(i);
         while (left(i) < heap.size()) {
             int child = right(i) < heap.size()
-                    && comp(heap.get(right(i)), heap.get(left(i))) ? right(i)
-                    : left(i);
+                && comp(heap.get(right(i)), heap.get(left(i))) ? right(i)
+                : left(i);
             if (!comp(heap.get(child), x)) {
                 break;
             }
@@ -67,7 +67,7 @@ public class Heap implements Serializable, Cloneable {
         return n >= 0 && n < indices.size();
     }
 
-    public Heap(double [] activity) {
+    public Heap(double[] activity) {
         this.activity = activity;
         heap.push(-1);
     }
@@ -117,30 +117,29 @@ public class Heap implements Serializable, Cloneable {
 
     public boolean heapProperty(int i) {
         return i >= heap.size()
-                || ((parent(i) == 0 || !comp(heap.get(i), heap.get(parent(i))))
-                        && heapProperty(left(i)) && heapProperty(right(i)));
+            || ((parent(i) == 0 || !comp(heap.get(i), heap.get(parent(i))))
+                && heapProperty(left(i)) && heapProperty(right(i)));
     }
 
-    public void setActivity(double [] activity) {
+    public void setActivity(double[] activity) {
         this.activity = activity;
     }
 
     @Override
     public Object clone() {
-	Heap clone;
+        Heap clone;
 
-	try {
-	    clone = (Heap) super.clone();
-	}
-	catch (CloneNotSupportedException e) {
-	    throw new InternalError(e.toString());
-	}
+        try {
+            clone = (Heap) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError(e.toString());
+        }
 
-	clone.heap = (VecInt) this.heap.clone();
-	clone.indices = (VecInt) this.indices.clone();
-	// NOTE: caller should update activity using setActivity!
-	clone.activity = null;
+        clone.heap = (VecInt) this.heap.clone();
+        clone.indices = (VecInt) this.indices.clone();
+        // NOTE: caller should update activity using setActivity!
+        clone.activity = null;
 
-	return clone;
+        return clone;
     }
 }

@@ -34,7 +34,8 @@ import org.sat4j.minisat.core.DataStructureFactory;
  * 
  * @author leberre
  */
-public class MiniSATLearning extends AbstractLearning implements Serializable, Cloneable {
+public class MiniSATLearning extends AbstractLearning implements Serializable,
+        Cloneable {
     private static final long serialVersionUID = 1L;
 
     private DataStructureFactory dsf;
@@ -62,12 +63,11 @@ public class MiniSATLearning extends AbstractLearning implements Serializable, C
     }
 
     @Override
-    public Object clone()
-    {
-	MiniSATLearning clone;
+    public Object clone() {
+        MiniSATLearning clone;
 
-	clone = (MiniSATLearning) super.clone();
+        clone = (MiniSATLearning) super.clone();
 
-	return clone;
+        return clone;
     }
 }

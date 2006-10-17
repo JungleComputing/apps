@@ -70,8 +70,8 @@ public class Lanceur {
      * 
      */
     public enum ExitCode {
-        OPTIMUM_FOUND(30, "OPTIMUM FOUND"), SATISFIABLE(10), UNKNOWN(0), UNSATISFIABLE(
-                20);
+        OPTIMUM_FOUND(30, "OPTIMUM FOUND"), SATISFIABLE(10), UNKNOWN(0),
+            UNSATISFIABLE(20);
 
         /** value of the exit code. */
         private final int value;
@@ -183,10 +183,10 @@ public class Lanceur {
                 assert param.length == 2;
                 System.out.println("c setting " + param[0] + " to " + param[1]);
                 try {
-		  // BeanUtils.setProperty(asolver, param[0], param[1]);
+                    // BeanUtils.setProperty(asolver, param[0], param[1]);
                 } catch (Exception e) {
                     System.out.println("c Cannot set parameter : "
-                            + args[others]);
+                        + args[others]);
                 }
                 others++;
             }
@@ -198,7 +198,7 @@ public class Lanceur {
 
     private void usage() {
         out
-                .println("Usage: java -jar sat4j.jar [<solver>] <cnffile> [<timeout>]");
+            .println("Usage: java -jar sat4j.jar [<solver>] <cnffile> [<timeout>]");
         showAvailableSolvers();
     }
 
@@ -211,13 +211,13 @@ public class Lanceur {
      */
     private void displayHeader() throws IOException {
         out
-                .println("c SAT4J: a SATisfiability library for Java (c) 2004-2005 Daniel Le Berre");
+            .println("c SAT4J: a SATisfiability library for Java (c) 2004-2005 Daniel Le Berre");
         out
-                .println("c This is free software under the GNU LGPL licence. See www.sat4j.org for details.");
+            .println("c This is free software under the GNU LGPL licence. See www.sat4j.org for details.");
         URL url = Lanceur.class.getResource("/sat4j.version");
         if (url != null) {
             BufferedReader in = new BufferedReader(new InputStreamReader(url
-                    .openStream()));
+                .openStream()));
             out.println("c version " + in.readLine());
             in.close();
         } else {
@@ -231,7 +231,7 @@ public class Lanceur {
      * @param isSat
      */
     protected void displayResult(final ISolver solver, final long begintime,
-            final ExitCode exitcode) {
+        final ExitCode exitcode) {
         if (solver != null) {
             double cputime = (System.currentTimeMillis() - begintime) / 1000.0;
             solver.printStat(System.out, "c ");
@@ -258,14 +258,14 @@ public class Lanceur {
      * @throws ContradictionException if the problem is found trivially unsat
      */
     private IProblem readProblem(String[] args, ISolver solver, long begintime)
-            throws FileNotFoundException, ParseFormatException, IOException,
-            ContradictionException {
+        throws FileNotFoundException, ParseFormatException, IOException,
+        ContradictionException {
         out.println("c solving " + args[argindex]);
         out.println("c reading problem ... ");
         reader = createReader(solver);
         IProblem problem = reader.parseInstance(args[argindex]);
         out.println("c ... done. Time "
-                + (System.currentTimeMillis() - begintime) / 1000.0 + " ms.");
+            + (System.currentTimeMillis() - begintime) / 1000.0 + " ms.");
         out.println("c #vars     " + solver.nVars());
         out.println("c #constraints  " + solver.nConstraints());
         return problem;

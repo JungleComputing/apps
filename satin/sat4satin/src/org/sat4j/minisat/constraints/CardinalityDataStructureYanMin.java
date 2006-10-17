@@ -28,7 +28,7 @@ public class CardinalityDataStructureYanMin extends
      */
     public Constr createClause(IVecInt literals) throws ContradictionException {
         return MinWatchCard.minWatchCardNew(solver, getVocabulary(), literals,
-                MinWatchCard.ATLEAST, 1);
+            MinWatchCard.ATLEAST, 1);
     }
 
     public Constr createUnregisteredClause(IVecInt literals) {
@@ -43,8 +43,8 @@ public class CardinalityDataStructureYanMin extends
      */
     @Override
     public Constr createCardinalityConstraint(IVecInt literals, int degree)
-            throws ContradictionException {
+        throws ContradictionException {
         return MinWatchCard.minWatchCardNew(solver, getVocabulary(), literals,
-                MinWatchCard.ATLEAST, degree);
+            MinWatchCard.ATLEAST, degree);
     }
 }

@@ -28,7 +28,7 @@ public interface ILits {
      * @return true iff the variable belongs to the formula.
      */
     boolean belongsToPool(int x);
-    
+
     public abstract void resetPool();
 
     public abstract void ensurePool(int howmany);
@@ -61,7 +61,7 @@ public interface ILits {
      * @return the number of variables used in the pool
      */
     int realnVars();
-    
+
     public abstract int not(int lit);
 
     public abstract void reset(int lit);

@@ -68,7 +68,7 @@ class Conflict extends MapPb {
         // 1- Reduction de la contrainte
         // jusqu'a obtenir une resolvante conflictuelle
         degreeCons = reduceUntilConflict(litImplied, ind, litsCons, coefsCons,
-                degreeCons, wpb);
+            degreeCons, wpb);
 
         // 2- multiplication par coefMult des coefficients du conflit
         // mise-a-jour du degre du conflit
@@ -84,7 +84,7 @@ class Conflict extends MapPb {
         // 3- On ajoute les informations de la contrainte courante
         // On effectue la resolution
         degree = addCoeffNewConstraint(litsCons, coefsCons, degreeCons,
-                coefMultCons);
+            coefMultCons);
         assert !coefs.containsKey(litImplied);
         assert !coefs.containsKey(litImplied ^ 1);
         assert degree.signum() > 0;
@@ -97,7 +97,7 @@ class Conflict extends MapPb {
     }
 
     private BigInteger reduceUntilConflict(int litImplied, int ind, int[] lits,
-            BigInteger[] coefsBis, BigInteger degreeBis, WatchPb wpb) {
+        BigInteger[] coefsBis, BigInteger degreeBis, WatchPb wpb) {
         BigInteger slackResolve = BigInteger.ONE.negate();
         BigInteger slackThis = BigInteger.ZERO;
         BigInteger slackIndex = BigInteger.ZERO;
@@ -112,9 +112,9 @@ class Conflict extends MapPb {
                 assert slackThis.signum() > 0;
                 // r?duction de la contrainte
                 BigInteger tmp = reduceInConstraint(coefsBis, lits, ind,
-                        degreeBis);
+                    degreeBis);
                 assert ((tmp.compareTo(degreeBis) < 0) && (tmp
-                        .compareTo(BigInteger.ONE) >= 0));
+                    .compareTo(BigInteger.ONE) >= 0));
                 degreeBis = tmp;
             }
             // Recherche des coefficients multiplicateurs
@@ -129,11 +129,11 @@ class Conflict extends MapPb {
             assert coefMultCons.signum() > 0;
             assert coefMult.signum() > 0;
             assert coefMult.multiply(coefs.get(litImplied ^ 1)).equals(
-                    coefMultCons.multiply(coefsBis[ind]));
+                coefMultCons.multiply(coefsBis[ind]));
 
             // calcul des marges (poss) de chaque contrainte
             slackThis = wpb.slackConstraint(coefsBis, degreeBis).multiply(
-                    coefMultCons);
+                coefMultCons);
             slackIndex = slackConflict().multiply(coefMult);
 
             assert slackIndex.signum() <= 0;
@@ -142,7 +142,7 @@ class Conflict extends MapPb {
             slackResolve = slackThis.add(slackIndex);
         } while (slackResolve.signum() >= 0);
         assert coefMult.multiply(coefs.get(litImplied ^ 1)).equals(
-                coefMultCons.multiply(coefsBis[ind]));
+            coefMultCons.multiply(coefsBis[ind]));
         return degreeBis;
 
     }
@@ -166,7 +166,7 @@ class Conflict extends MapPb {
         BigInteger slack = BigInteger.ZERO;
         for (Integer i : coefs.keySet()) {
             if ((coefs.get(i).signum() > 0)
-                    && (((!voc.isFalsified(i)) || voc.getLevel(i) >= dl))) {
+                && (((!voc.isFalsified(i)) || voc.getLevel(i) >= dl))) {
                 slack = slack.add(coefs.get(i));
             }
         }
@@ -176,8 +176,8 @@ class Conflict extends MapPb {
         }
         for (Integer i : coefs.keySet()) {
             if ((coefs.get(i).signum() > 0)
-                    && (voc.isUnassigned(i) || voc.getLevel(i) >= dl)
-                    && (slack.subtract(coefs.get(i)).signum() < 0)) {
+                && (voc.isUnassigned(i) || voc.getLevel(i) >= dl)
+                && (slack.subtract(coefs.get(i)).signum() < 0)) {
                 return true;
             }
         }
@@ -206,8 +206,7 @@ class Conflict extends MapPb {
      * @return mise a jour du degre
      */
     public BigInteger reduceInConstraint(final BigInteger[] coefsBis,
-            final int[] lits, final int indLitImplied,
-            final BigInteger degreeBis) {
+        final int[] lits, final int indLitImplied, final BigInteger degreeBis) {
         // logger.entering(this.getClass().getName(),"reduceInConstraint");
         assert degreeBis.compareTo(BigInteger.ONE) > 0;
         // Recherche d'un litt?ral non assign?
@@ -223,8 +222,7 @@ class Conflict extends MapPb {
         if (lit == -1) {
             for (int ind = 0; (ind < lits.length) && (lit == -1); ind++) {
                 if ((coefsBis[ind].signum() != 0)
-                        && (voc.isSatisfied(lits[ind]))
-                        && (ind != indLitImplied)) {
+                    && (voc.isSatisfied(lits[ind])) && (ind != indLitImplied)) {
                     lit = ind;
                 }
             }

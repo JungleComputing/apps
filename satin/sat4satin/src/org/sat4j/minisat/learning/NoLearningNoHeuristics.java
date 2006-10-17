@@ -38,7 +38,8 @@ import org.sat4j.minisat.core.Constr;
  * 
  * @author leberre
  */
-public class NoLearningNoHeuristics extends AbstractLearning implements Serializable {
+public class NoLearningNoHeuristics extends AbstractLearning implements
+        Serializable {
 
     private static final long serialVersionUID = 1L;
 

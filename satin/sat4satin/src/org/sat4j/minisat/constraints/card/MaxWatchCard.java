@@ -211,8 +211,8 @@ public class MaxWatchCard implements Constr, Undoable, Serializable {
      * @throws ContradictionException
      */
     public static MaxWatchCard maxWatchCardNew(UnitPropagationListener s,
-            ILits voc, IVecInt ps, boolean moreThan, int degree)
-            throws ContradictionException {
+        ILits voc, IVecInt ps, boolean moreThan, int degree)
+        throws ContradictionException {
 
         MaxWatchCard outclause = null;
 
@@ -223,7 +223,7 @@ public class MaxWatchCard implements Constr, Undoable, Serializable {
             for (int i = 0; i < ps.size(); i++) {
                 if (!s.enqueue(ps.get(i))) {
                     throw new ContradictionException(
-                            "Contradiction avec le litt?ral impliqu?.");
+                        "Contradiction avec le litt?ral impliqu?.");
                 }
             }
             return null;
@@ -247,7 +247,7 @@ public class MaxWatchCard implements Constr, Undoable, Serializable {
             for (int i = 0; i < outclause.lits.length; i++) {
                 if (!s.enqueue(outclause.lits[i])) {
                     throw new ContradictionException(
-                            "Contradiction avec le litt?ral impliqu?.");
+                        "Contradiction avec le litt?ral impliqu?.");
                 }
             }
             return null;
@@ -419,7 +419,7 @@ public class MaxWatchCard implements Constr, Undoable, Serializable {
     }
 
     public void setStatus(long st) {
-	status = st;
+        status = st;
     }
 
     public long getStatus() {
@@ -428,11 +428,11 @@ public class MaxWatchCard implements Constr, Undoable, Serializable {
 
     @Override
     public Object clone() {
-	// TODO: deep copy
-	try {
-	    return super.clone();
-	} catch (CloneNotSupportedException e) {
-	    throw new InternalError(e.toString());
-	}
+        // TODO: deep copy
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError(e.toString());
+        }
     }
 }

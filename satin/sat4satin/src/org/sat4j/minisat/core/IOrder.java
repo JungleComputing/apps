@@ -52,9 +52,9 @@ public interface IOrder {
     void printStat(PrintStream out, String prefix);
 
     void setVarDecay(double d);
-    
+
     void varDecayActivity();
-    
+
     /**
      * To obtain the current activity of a variable. 
      * @param p a literal

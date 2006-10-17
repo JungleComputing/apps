@@ -58,13 +58,13 @@ public class Lits23 extends Lits2 implements ILits23 {
 
     @Override
     public Object clone() {
-	Lits23 clone;
+        Lits23 clone;
 
-	clone = (Lits23) super.clone();
-	if (clone.ternclauses != null) {
-	    clone.ternclauses = ternclauses.clone();
-	}
+        clone = (Lits23) super.clone();
+        if (clone.ternclauses != null) {
+            clone.ternclauses = ternclauses.clone();
+        }
 
-	return clone;
+        return clone;
     }
 }

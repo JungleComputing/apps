@@ -132,7 +132,7 @@ public class Vec<T> implements Serializable, Cloneable, IVec<T> {
     @SuppressWarnings("unchecked")
     public final void ensure(final int nsize) {
         // WAS: if (nsize >= myarray.length) {
-	if (nsize > myarray.length) {
+        if (nsize > myarray.length) {
             T[] narray = (T[]) new Object[Math.max(nsize, nbelem * 2)];
             System.arraycopy(myarray, 0, narray, 0, nbelem);
             myarray = narray;
@@ -260,22 +260,21 @@ public class Vec<T> implements Serializable, Cloneable, IVec<T> {
     public Vec<T> clone() {
         Vec<T> clone;
 
-	try {
-	    clone = (Vec<T>) super.clone();
+        try {
+            clone = (Vec<T>) super.clone();
 
-	    clone.myarray = (T[]) new Object[this.myarray.length];
-	    for (int i = 0; i < nbelem; i++) {
-		Class<?> clzz = this.myarray[i].getClass();
-		Method   meth = clzz.getMethod("clone" , new Class[0]);
-		Object   dupl = meth.invoke(this.myarray[i], new Object[0]);
-		clone.myarray[i] = (T) dupl;  
-	    }
-	}
-	catch (Exception e) {
-	    throw new InternalError(e.toString());
-	}
+            clone.myarray = (T[]) new Object[this.myarray.length];
+            for (int i = 0; i < nbelem; i++) {
+                Class<?> clzz = this.myarray[i].getClass();
+                Method meth = clzz.getMethod("clone", new Class[0]);
+                Object dupl = meth.invoke(this.myarray[i], new Object[0]);
+                clone.myarray[i] = (T) dupl;
+            }
+        } catch (Exception e) {
+            throw new InternalError(e.toString());
+        }
 
-	return clone;
+        return clone;
     }
 
     /**
@@ -295,10 +294,10 @@ public class Vec<T> implements Serializable, Cloneable, IVec<T> {
     }
 
     public void moveTo(int dest, int source) {
-        myarray[dest]=myarray[source];
-        myarray[source]=null;
+        myarray[dest] = myarray[source];
+        myarray[source] = null;
     }
-    
+
     private int nbelem;
 
     private T[] myarray;

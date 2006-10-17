@@ -54,9 +54,9 @@ public class SearchParams implements Serializable {
     }
 
     public SearchParams(double learntincfactor, double confincfactor,
-            double initLearntbound, int conflictBound) {
+        double initLearntbound, int conflictBound) {
         this(0.95, 0.999, learntincfactor, confincfactor, initLearntbound,
-                conflictBound);
+            conflictBound);
     }
 
     /**
@@ -135,17 +135,15 @@ public class SearchParams implements Serializable {
     }
 
     @Override
-    public Object clone()
-    {
-	SearchParams clone;
+    public Object clone() {
+        SearchParams clone;
 
-	try {
-	    clone = (SearchParams) super.clone();
-	}
-	catch (CloneNotSupportedException e) {
-	    throw new InternalError(e.toString());
-	}
+        try {
+            clone = (SearchParams) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError(e.toString());
+        }
 
-	return clone;
+        return clone;
     }
 }

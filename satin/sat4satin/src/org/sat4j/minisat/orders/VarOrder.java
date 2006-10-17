@@ -94,9 +94,9 @@ public class VarOrder implements Serializable, Cloneable, IOrder {
      * @see org.sat4j.minisat.core.IOrder#setLits(org.sat4j.minisat.core.ILits)
      */
     public void setLits(ILits lits) {
-	// System.err.println("VarOrder " + this + " setLits " +  lits +
-	//		   " was " + this.lits);
-	// " at 47 now: " + lits.valueToString(47));
+        // System.err.println("VarOrder " + this + " setLits " +  lits +
+        //		   " was " + this.lits);
+        // " at 47 now: " + lits.valueToString(47));
         this.lits = lits;
     }
 
@@ -118,10 +118,10 @@ public class VarOrder implements Serializable, Cloneable, IOrder {
      */
     public int select() {
         assert lastVar > 0;
-	// System.err.println("*** lastVar " + lastVar);
-	// System.err.println("*** lits " + lits);
-	// System.err.println("*** order " + order);
-	// System.err.println("*** order.length " + order.length);
+        // System.err.println("*** lastVar " + lastVar);
+        // System.err.println("*** lits " + lits);
+        // System.err.println("*** order " + order);
+        // System.err.println("*** order.length " + order.length);
         for (int i = lastVar; i < order.length; i++) {
             assert i > 0;
             if (lits.isUnassigned(order[i])) {
@@ -137,21 +137,21 @@ public class VarOrder implements Serializable, Cloneable, IOrder {
                     // }
                     // }
                     nullchoice++;
-		    // System.err.println("** nullchoice " + nullchoice +
-		    //		       ": " + order[i] +
-		    //		       " act " + activity[i]);
+                    // System.err.println("** nullchoice " + nullchoice +
+                    //		       ": " + order[i] +
+                    //		       " act " + activity[i]);
                 }
                 return order[i];
             }
-	    // System.err.println("*** select: lits " + lits + " order " +
-	    //                    order +
-	    //                    " order["+ i + "] = " + order[i] +
-	    //                    " lits["+ order[i] + "] = " +
-	    //                    lits.valueToString(order[i]));
+            // System.err.println("*** select: lits " + lits + " order " +
+            //                    order +
+            //                    " order["+ i + "] = " + order[i] +
+            //                    " lits["+ order[i] + "] = " +
+            //                    lits.valueToString(order[i]));
         }
-	// Satin debug:
-	System.err.println("*** VarOrder.order.select(): UNDEFINED, lits " +
-			   lits);
+        // Satin debug:
+        System.err.println("*** VarOrder.order.select(): UNDEFINED, lits "
+            + lits);
         return ILits.UNDEFINED;
     }
 
@@ -188,7 +188,7 @@ public class VarOrder implements Serializable, Cloneable, IOrder {
         updateActivity(var);
         int i = varpos[var];
         for (; i > 1 // because there is nothing at i=0
-                && (activity[order[i - 1] >> 1] < activity[var]); i--) {
+            && (activity[order[i - 1] >> 1] < activity[var]); i--) {
             assert i > 1;
             // echange p avec son predecesseur
             final int orderpm1 = order[i - 1];
@@ -213,7 +213,7 @@ public class VarOrder implements Serializable, Cloneable, IOrder {
 
     // For satin:
     public void setActivity(int p, double val) {
-	int var = p >> 1;
+        int var = p >> 1;
         activity[var] = val;
     }
 
@@ -256,21 +256,21 @@ public class VarOrder implements Serializable, Cloneable, IOrder {
      */
     public void init() {
         int nlength = lits.nVars() + 1;
-        int reallength = lits.realnVars()+1;
+        int reallength = lits.realnVars() + 1;
         int[] nvarpos = new int[nlength];
         double[] nactivity = new double[nlength];
         int[] norder = new int[reallength];
         nvarpos[0] = -1;
         nactivity[0] = -1;
         norder[0] = ILits.UNDEFINED;
-        for (int i = 1,j=1; i < nlength; i++) {
+        for (int i = 1, j = 1; i < nlength; i++) {
             assert i > 0;
             assert i <= lits.nVars() : "" + lits.nVars() + "/" + i;
             if (lits.belongsToPool(i)) {
-               norder[j] = lits.getFromPool(i) ^ 1; // Looks a
-               // promising
-               // approach
-               nvarpos[i] = j++;
+                norder[j] = lits.getFromPool(i) ^ 1; // Looks a
+                // promising
+                // approach
+                nvarpos[i] = j++;
             }
             nactivity[i] = 0.0;
         }
@@ -282,21 +282,20 @@ public class VarOrder implements Serializable, Cloneable, IOrder {
 
     @Override
     public Object clone() {
-	VarOrder clone;
+        VarOrder clone;
 
-	try {
-	    clone = (VarOrder) super.clone();
-	}
-	catch (CloneNotSupportedException e) {
-	    throw new InternalError(e.toString());
-	}
+        try {
+            clone = (VarOrder) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError(e.toString());
+        }
 
-	clone.activity = this.activity.clone();
-	clone.order    = this.order.clone();
-	clone.varpos   = this.varpos.clone();
-	// lits is set by setLits() after cloning
+        clone.activity = this.activity.clone();
+        clone.order = this.order.clone();
+        clone.varpos = this.varpos.clone();
+        // lits is set by setLits() after cloning
 
-	return clone;
+        return clone;
     }
 
     /**

@@ -63,7 +63,7 @@ public class SolverStats implements Serializable, Cloneable {
     public long changedreason;
 
     public int reduceddb;
-    
+
     // Satin/Global learning stats:
     public long publishglobalclauses;
 
@@ -81,9 +81,9 @@ public class SolverStats implements Serializable, Cloneable {
 
     public long learntGlobalFired;
 
-    public int  maxSpawnDepth;
+    public int maxSpawnDepth;
 
-    public int  maxIter;
+    public int maxIter;
 
     public double cloneOverhead;
 
@@ -98,71 +98,69 @@ public class SolverStats implements Serializable, Cloneable {
         learnedbinaryclauses = 0;
         learnedternaryclauses = 0;
         rootSimplifications = 0;
-        reducedliterals=0;
-        changedreason=0;
-        reduceddb=0;
+        reducedliterals = 0;
+        changedreason = 0;
+        reduceddb = 0;
 
-	conflFired = 0;
-	learntLocalFired = 0;
-	learntGlobalFired = 0;
-        
-	publishglobalclauses = 0;
-	publishglobaljobs = 0;
-	learnedglobalclauses = 0;
-	learnedglobaljobs = 0;
-	removedglobaljobs = 0;
-	maxSpawnDepth = 0;
-	maxIter = 0;
-	cloneOverhead = 0.0;
+        conflFired = 0;
+        learntLocalFired = 0;
+        learntGlobalFired = 0;
+
+        publishglobalclauses = 0;
+        publishglobaljobs = 0;
+        learnedglobalclauses = 0;
+        learnedglobaljobs = 0;
+        removedglobaljobs = 0;
+        maxSpawnDepth = 0;
+        maxIter = 0;
+        cloneOverhead = 0.0;
     }
-    
+
     @Override
     public Object clone() {
         SolverStats clone;
 
-	try {
-	    clone = (SolverStats) super.clone();
-	}
-	catch (CloneNotSupportedException e) {
-	    throw new InternalError(e.toString());
-	}
+        try {
+            clone = (SolverStats) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError(e.toString());
+        }
 
-	return clone;
+        return clone;
     }
 
-    public void addStats(SolverStats add)
-    {
-        starts                += add.starts;
-        decisions             += add.decisions;
-        propagations          += add.propagations;
-        inspects              += add.inspects;
-        conflicts             += add.conflicts;
-        learnedliterals       += add.learnedliterals;
-        learnedclauses        += add.learnedclauses;
-        learnedbinaryclauses  += add.learnedbinaryclauses;
+    public void addStats(SolverStats add) {
+        starts += add.starts;
+        decisions += add.decisions;
+        propagations += add.propagations;
+        inspects += add.inspects;
+        conflicts += add.conflicts;
+        learnedliterals += add.learnedliterals;
+        learnedclauses += add.learnedclauses;
+        learnedbinaryclauses += add.learnedbinaryclauses;
         learnedternaryclauses += add.learnedternaryclauses;
-        rootSimplifications   += add.rootSimplifications;
-        reducedliterals       += add.reducedliterals;
-        changedreason         += add.changedreason;
-        reduceddb             += add.reduceddb;
+        rootSimplifications += add.rootSimplifications;
+        reducedliterals += add.reducedliterals;
+        changedreason += add.changedreason;
+        reduceddb += add.reduceddb;
 
-	conflFired            += add.conflFired;
-	learntLocalFired      += add.learntLocalFired;
-	learntGlobalFired     += add.learntGlobalFired;
+        conflFired += add.conflFired;
+        learntLocalFired += add.learntLocalFired;
+        learntGlobalFired += add.learntGlobalFired;
 
-	publishglobalclauses  += add.publishglobalclauses;
-	publishglobaljobs     += add.publishglobaljobs;
-	learnedglobalclauses  += add.learnedglobalclauses;
-	learnedglobaljobs     += add.learnedglobaljobs;
-	removedglobaljobs     += add.removedglobaljobs;
+        publishglobalclauses += add.publishglobalclauses;
+        publishglobaljobs += add.publishglobaljobs;
+        learnedglobalclauses += add.learnedglobalclauses;
+        learnedglobaljobs += add.learnedglobaljobs;
+        removedglobaljobs += add.removedglobaljobs;
 
-	if (add.maxSpawnDepth > maxSpawnDepth) {
-	    maxSpawnDepth = add.maxSpawnDepth;
-	}
-	if (add.maxIter > maxIter) {
-	    maxIter = add.maxIter;
-	}
-	cloneOverhead         += add.cloneOverhead;
+        if (add.maxSpawnDepth > maxSpawnDepth) {
+            maxSpawnDepth = add.maxSpawnDepth;
+        }
+        if (add.maxIter > maxIter) {
+            maxIter = add.maxIter;
+        }
+        cloneOverhead += add.cloneOverhead;
     }
 
     public void printStat(PrintStream out, String prefix) {
@@ -175,34 +173,28 @@ public class SolverStats implements Serializable, Cloneable {
         out.println(prefix + "propagations\t\t: " + propagations);
         out.println(prefix + "inspects\t\t: " + inspects);
         out.println(prefix + "learnt literals\t: " + learnedliterals);
-        out.println(prefix + "learnt binary clauses\t: "
+        out
+            .println(prefix + "learnt binary clauses\t: "
                 + learnedbinaryclauses);
         out.println(prefix + "learnt ternary clauses\t: "
-                + learnedternaryclauses);
+            + learnedternaryclauses);
         out.println(prefix + "learnt clauses\t: " + learnedclauses);
-        out.println(prefix + "root simplifications\t: "
-                + rootSimplifications);
+        out.println(prefix + "root simplifications\t: " + rootSimplifications);
         out.println(prefix + "removed literals (reason simplification)\t: "
-                + reducedliterals);
+            + reducedliterals);
         out.println(prefix + "reason swapping (by a shorter reason)\t: "
-                + changedreason);
-        out.println(prefix + "Calls to reduceDB\t: "
-                + reduceddb);
+            + changedreason);
+        out.println(prefix + "Calls to reduceDB\t: " + reduceddb);
         out.println(prefix + "publish global clauses\t: "
-                + publishglobalclauses);
-        out.println(prefix + "publish global jobs\t: "
-                + publishglobaljobs);
-        out.println(prefix + "learnt global clauses\t: "
-		+ learnedglobalclauses);
-        out.println(prefix + "learnt global jobs\t: "
-                + learnedglobaljobs);
-        out.println(prefix + "removed global jobs\t: "
-                + removedglobaljobs);
-        out.println(prefix + "max spawn depth\t: "
-                + maxSpawnDepth);
-        out.println(prefix + "max iter\t\t: "
-                + maxIter);
-        out.println(prefix + "clone overhead\t: "
-                + cloneOverhead);
+            + publishglobalclauses);
+        out.println(prefix + "publish global jobs\t: " + publishglobaljobs);
+        out
+            .println(prefix + "learnt global clauses\t: "
+                + learnedglobalclauses);
+        out.println(prefix + "learnt global jobs\t: " + learnedglobaljobs);
+        out.println(prefix + "removed global jobs\t: " + removedglobaljobs);
+        out.println(prefix + "max spawn depth\t: " + maxSpawnDepth);
+        out.println(prefix + "max iter\t\t: " + maxIter);
+        out.println(prefix + "clone overhead\t: " + cloneOverhead);
     }
 }

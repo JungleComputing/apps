@@ -30,9 +30,9 @@ public class PBMinDataStructure extends AbstractPBDataStructureFactory {
      */
     @Override
     protected WatchPb constraintFactory(IVecInt literals, IVecInt coefs,
-            boolean moreThan, int degree) throws ContradictionException {
+        boolean moreThan, int degree) throws ContradictionException {
         return MinWatchPb.minWatchPbNew(solver, getVocabulary(), literals,
-                coefs, moreThan, degree);
+            coefs, moreThan, degree);
     }
 
     /*
@@ -43,9 +43,9 @@ public class PBMinDataStructure extends AbstractPBDataStructureFactory {
      */
     @Override
     protected WatchPb constraintFactory(IVecInt literals, IVecInt coefs,
-            int degree) {
+        int degree) {
         return MinWatchPb.watchPbNew(getVocabulary(), literals, coefs, true,
-                degree);
+            degree);
     }
 
     /*
@@ -56,10 +56,10 @@ public class PBMinDataStructure extends AbstractPBDataStructureFactory {
      */
     @Override
     protected WatchPb constraintFactory(IVecInt literals,
-            IVec<BigInteger> coefs, boolean moreThan, BigInteger degree)
-            throws ContradictionException {
+        IVec<BigInteger> coefs, boolean moreThan, BigInteger degree)
+        throws ContradictionException {
         return MinWatchPb.minWatchPbNew(solver, getVocabulary(), literals,
-                coefs, moreThan, degree);
+            coefs, moreThan, degree);
     }
 
     /*
@@ -70,9 +70,9 @@ public class PBMinDataStructure extends AbstractPBDataStructureFactory {
      */
     @Override
     protected WatchPb constraintFactory(IVecInt literals,
-            IVec<BigInteger> coefs, BigInteger degree) {
+        IVec<BigInteger> coefs, BigInteger degree) {
         return MinWatchPb.watchPbNew(getVocabulary(), literals, coefs, true,
-                degree);
+            degree);
     }
 
 }

@@ -40,15 +40,15 @@ public abstract class AbstractPBDataStructureFactory extends
 
     @Override
     public Constr createCardinalityConstraint(IVecInt literals, int degree)
-            throws ContradictionException {
+        throws ContradictionException {
         IVecInt coefs = new VecInt(literals.size(), 1);
         return constraintFactory(literals, coefs, true, degree);
     }
 
     @Override
     public Constr createPseudoBooleanConstraint(IVecInt literals,
-            IVec<BigInteger> coefs, boolean moreThan, BigInteger degree)
-            throws ContradictionException {
+        IVec<BigInteger> coefs, boolean moreThan, BigInteger degree)
+        throws ContradictionException {
         return constraintFactory(literals, coefs, moreThan, degree);
     }
 
@@ -60,12 +60,12 @@ public abstract class AbstractPBDataStructureFactory extends
      * @return
      */
     protected abstract WatchPb constraintFactory(IVecInt literals,
-            IVecInt coefs, boolean moreThan, int degree)
-            throws ContradictionException;
+        IVecInt coefs, boolean moreThan, int degree)
+        throws ContradictionException;
 
     protected abstract WatchPb constraintFactory(IVecInt literals,
-            IVec<BigInteger> coefs, boolean moreThan, BigInteger degree)
-            throws ContradictionException;
+        IVec<BigInteger> coefs, boolean moreThan, BigInteger degree)
+        throws ContradictionException;
 
     @Override
     public void reset() {
@@ -73,13 +73,13 @@ public abstract class AbstractPBDataStructureFactory extends
 
     @Override
     public Constr createUnregisteredPseudoBooleanConstraint(IVecInt literals,
-            IVec<BigInteger> coefs, BigInteger degree) {
+        IVec<BigInteger> coefs, BigInteger degree) {
         return constraintFactory(literals, coefs, degree);
     }
 
     public IConstr createUnregisteredPseudoBooleanConstraint(IVecInt literals,
-            IVec<BigInteger> coefs, boolean moreThan, BigInteger degree)
-            throws ContradictionException {
+        IVec<BigInteger> coefs, boolean moreThan, BigInteger degree)
+        throws ContradictionException {
         return constraintFactory(literals, coefs, moreThan, degree);
     }
 
@@ -90,9 +90,9 @@ public abstract class AbstractPBDataStructureFactory extends
      * @return
      */
     protected abstract WatchPb constraintFactory(IVecInt literals,
-            IVecInt coefs, int degree);
+        IVecInt coefs, int degree);
 
     protected abstract WatchPb constraintFactory(IVecInt literals,
-            IVec<BigInteger> coefs, BigInteger degree);
+        IVec<BigInteger> coefs, BigInteger degree);
 
 }

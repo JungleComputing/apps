@@ -69,22 +69,22 @@ public class ExtendedDimacsReader extends DimacsReader {
      */
     @Override
     protected void readProblemLine(LineNumberReader in) throws IOException,
-            ParseFormatException {
+        ParseFormatException {
 
         String line = in.readLine();
 
         if (line == null) {
             throw new ParseFormatException(
-                    "premature end of file: <p noncnf ...> expected  on line "
-                            + in.getLineNumber());
+                "premature end of file: <p noncnf ...> expected  on line "
+                    + in.getLineNumber());
         }
         StringTokenizer stk = new StringTokenizer(line);
 
         if (!(stk.hasMoreTokens() && stk.nextToken().equals("p")
-                && stk.hasMoreTokens() && stk.nextToken().equals("noncnf"))) {
+            && stk.hasMoreTokens() && stk.nextToken().equals("noncnf"))) {
             throw new ParseFormatException(
-                    "problem line expected (p noncnf ...) on line "
-                            + in.getLineNumber());
+                "problem line expected (p noncnf ...) on line "
+                    + in.getLineNumber());
         }
 
         int vars;
@@ -110,7 +110,7 @@ public class ExtendedDimacsReader extends DimacsReader {
      */
     @Override
     protected boolean handleConstr(String line, IVecInt literals)
-            throws ContradictionException {
+        throws ContradictionException {
         boolean added = true;
         assert literals.size() == 0;
         Scanner scan = new Scanner(line);
@@ -130,33 +130,33 @@ public class ExtendedDimacsReader extends DimacsReader {
                 literals.push(x);
             }
             switch (gateType) {
-                case FALSE:
-                    gateFalse(y, literals);
-                    break;
-                case TRUE:
-                    gateTrue(y, literals);
-                    break;
-                case OR:
-                    or(y, literals);
-                    break;
-                case NOT:
-                    not(y, literals);
-                    break;
-                case AND:
-                    and(y, literals);
-                    break;
-                case XOR:
-                    xor(y, literals);
-                    break;
-                case IFF:
-                    iff(y, literals);
-                    break;
-                case IFTHENELSE:
-                    ite(y, literals);
-                    break;
-                default:
-                    throw new UnsupportedOperationException("Gate type "
-                            + gateType + " not handled yet");
+            case FALSE:
+                gateFalse(y, literals);
+                break;
+            case TRUE:
+                gateTrue(y, literals);
+                break;
+            case OR:
+                or(y, literals);
+                break;
+            case NOT:
+                not(y, literals);
+                break;
+            case AND:
+                and(y, literals);
+                break;
+            case XOR:
+                xor(y, literals);
+                break;
+            case IFF:
+                iff(y, literals);
+                break;
+            case IFTHENELSE:
+                ite(y, literals);
+                break;
+            default:
+                throw new UnsupportedOperationException("Gate type " + gateType
+                    + " not handled yet");
             }
         }
         literals.clear();
@@ -164,7 +164,7 @@ public class ExtendedDimacsReader extends DimacsReader {
     }
 
     private void gateFalse(int y, IVecInt literals)
-            throws ContradictionException {
+        throws ContradictionException {
         assert literals.size() == 0;
         IVecInt clause = new VecInt(1);
         clause.push(-y);
@@ -172,7 +172,7 @@ public class ExtendedDimacsReader extends DimacsReader {
     }
 
     private void gateTrue(int y, IVecInt literals)
-            throws ContradictionException {
+        throws ContradictionException {
         assert literals.size() == 0;
         IVecInt clause = new VecInt(1);
         clause.push(y);
@@ -276,7 +276,7 @@ public class ExtendedDimacsReader extends DimacsReader {
     }
 
     void xor2Clause(int[] f, int prefix, boolean negation)
-            throws ContradictionException {
+        throws ContradictionException {
         if (prefix == f.length - 1) {
             IVecInt clause = new VecInt(f.length);
             for (int i = 0; i < f.length - 1; ++i) {
@@ -303,7 +303,7 @@ public class ExtendedDimacsReader extends DimacsReader {
     }
 
     void iff2Clause(int[] f, int prefix, boolean negation)
-            throws ContradictionException {
+        throws ContradictionException {
         if (prefix == f.length - 1) {
             IVecInt clause = new VecInt(f.length);
             for (int i = 0; i < f.length - 1; ++i) {

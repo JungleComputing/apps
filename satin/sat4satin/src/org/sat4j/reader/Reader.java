@@ -21,7 +21,7 @@ import org.sat4j.specs.IProblem;
 public interface Reader {
 
     IProblem parseInstance(String filename) throws FileNotFoundException,
-            ParseFormatException, IOException, ContradictionException;
+        ParseFormatException, IOException, ContradictionException;
 
     /**
      * Produce a model using the reader format.

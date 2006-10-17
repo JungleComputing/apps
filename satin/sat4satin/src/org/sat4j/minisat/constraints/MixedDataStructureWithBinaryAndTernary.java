@@ -82,12 +82,12 @@ public class MixedDataStructureWithBinaryAndTernary extends
 
     @Override
     public Object clone() {
-	MixedDataStructureWithBinaryAndTernary clone;
+        MixedDataStructureWithBinaryAndTernary clone;
 
-	clone = (MixedDataStructureWithBinaryAndTernary) super.clone();
-	clone.mlits = (ILits23) clone.mlits.clone();
-	clone.lits = clone.mlits;
+        clone = (MixedDataStructureWithBinaryAndTernary) super.clone();
+        clone.mlits = (ILits23) clone.mlits.clone();
+        clone.lits = clone.mlits;
 
-	return clone;
+        return clone;
     }
 }

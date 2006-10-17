@@ -109,7 +109,7 @@ public class TernaryClauses implements Constr, Serializable {
         if (p == ILits.UNDEFINED) {
             int i = 0;
             while (!voc.isFalsified(stubs.get(i))
-                    || !voc.isFalsified(stubs.get(i + 1))) {
+                || !voc.isFalsified(stubs.get(i + 1))) {
                 i += 2;
             }
             outReason.push(this.phead ^ 1);
@@ -218,7 +218,7 @@ public class TernaryClauses implements Constr, Serializable {
     }
 
     public void setStatus(long st) {
-	status = st;
+        status = st;
     }
 
     public long getStatus() {
@@ -229,15 +229,14 @@ public class TernaryClauses implements Constr, Serializable {
     public Object clone() {
         TernaryClauses clone;
 
-	try {
-	    clone = (TernaryClauses) super.clone();
-	}
-	catch (CloneNotSupportedException e) {
-	    throw new InternalError(e.toString());
-	}
+        try {
+            clone = (TernaryClauses) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError(e.toString());
+        }
 
-	clone.stubs = (VecInt) clone.stubs.clone();
+        clone.stubs = (VecInt) clone.stubs.clone();
 
-	return clone;
+        return clone;
     }
 }

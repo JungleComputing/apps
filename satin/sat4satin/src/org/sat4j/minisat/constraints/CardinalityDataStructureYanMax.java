@@ -29,7 +29,7 @@ public class CardinalityDataStructureYanMax extends
      */
     public Constr createClause(IVecInt literals) throws ContradictionException {
         return MaxWatchCard.maxWatchCardNew(solver, getVocabulary(), literals,
-                MinWatchCard.ATLEAST, 1);
+            MinWatchCard.ATLEAST, 1);
     }
 
     public Constr createUnregisteredClause(IVecInt literals) {
@@ -44,9 +44,9 @@ public class CardinalityDataStructureYanMax extends
      */
     @Override
     public Constr createCardinalityConstraint(IVecInt literals, int degree)
-            throws ContradictionException {
+        throws ContradictionException {
         return MaxWatchCard.maxWatchCardNew(solver, getVocabulary(), literals,
-                MinWatchCard.ATLEAST, degree);
+            MinWatchCard.ATLEAST, degree);
     }
 
 }

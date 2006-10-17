@@ -58,12 +58,12 @@ public class GoodOPBReader implements Reader, Serializable {
     }
 
     public IProblem parseInstance(String filename)
-            throws FileNotFoundException, ParseFormatException, IOException,
-            ContradictionException {
+        throws FileNotFoundException, ParseFormatException, IOException,
+        ContradictionException {
 
         if (filename.endsWith(".gz")) {
             parseInstance(new LineNumberReader(new InputStreamReader(
-                    new GZIPInputStream(new FileInputStream(filename)))));
+                new GZIPInputStream(new FileInputStream(filename)))));
         } else {
             parseInstance(new LineNumberReader(new FileReader(filename)));
         }
@@ -71,7 +71,7 @@ public class GoodOPBReader implements Reader, Serializable {
     }
 
     public void parseInstance(LineNumberReader in)
-            throws ContradictionException, IOException {
+        throws ContradictionException, IOException {
         solver.reset();
         String line;
         while ((line = in.readLine()) != null) {
@@ -108,7 +108,7 @@ public class GoodOPBReader implements Reader, Serializable {
         IVecInt lits = new VecInt();
         IVec<BigInteger> coeffs = new Vec<BigInteger>();
         Scanner stk = new Scanner(line)
-                .useDelimiter("\\s*\\*\\s*|\\s*\\+\\s*|\\s+");
+            .useDelimiter("\\s*\\*\\s*|\\s*\\+\\s*|\\s+");
         while (stk.hasNext()) {
             String token = stk.next();
             if (token.equals(">=") || token.equals("<=") || token.equals("=")) {

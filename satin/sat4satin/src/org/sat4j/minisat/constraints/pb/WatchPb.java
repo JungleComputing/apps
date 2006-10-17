@@ -116,7 +116,7 @@ public abstract class WatchPb implements Constr, Undoable {
     }
 
     WatchPb(IVecInt ps, IVec<BigInteger> bigCoefs, boolean moreThan,
-            BigInteger bigDeg) {
+        BigInteger bigDeg) {
         assert ps.size() > 0;
         assert ps.size() == bigCoefs.size();
         this.moreThan = moreThan;
@@ -167,7 +167,7 @@ public abstract class WatchPb implements Constr, Undoable {
         BigInteger slack = BigInteger.ZERO;
         for (int i = 0; i < lits.length; i++) {
             if ((coefs[i].signum() > 0)
-                    && ((!voc.isFalsified(lits[i]) || voc.getLevel(lits[i]) >= dl))) {
+                && ((!voc.isFalsified(lits[i]) || voc.getLevel(lits[i]) >= dl))) {
                 slack = slack.add(coefs[i]);
             }
         }
@@ -177,8 +177,8 @@ public abstract class WatchPb implements Constr, Undoable {
         }
         for (int i = 0; i < lits.length; i++) {
             if ((coefs[i].signum() > 0)
-                    && (voc.isUnassigned(lits[i]) || voc.getLevel(lits[i]) >= dl)
-                    && (slack.subtract(coefs[i]).signum() < 0)) {
+                && (voc.isUnassigned(lits[i]) || voc.getLevel(lits[i]) >= dl)
+                && (slack.subtract(coefs[i]).signum() < 0)) {
                 return true;
             }
         }
@@ -206,7 +206,7 @@ public abstract class WatchPb implements Constr, Undoable {
     abstract protected void computeWatches() throws ContradictionException;
 
     abstract protected void computePropagation(UnitPropagationListener s)
-            throws ContradictionException;
+        throws ContradictionException;
 
     /**
      * Permet d'obtenir le i-???me litt???ral de la contrainte
@@ -241,14 +241,14 @@ public abstract class WatchPb implements Constr, Undoable {
     }
 
     protected static void niceParameter(IVecInt lits, IVec<BigInteger> coefs)
-            throws ContradictionException {
+        throws ContradictionException {
         // Ajouter les simplifications quand la structure sera d?finitive
         if (lits.size() == 0) {
             throw new ContradictionException("Creating Empty clause ?");
         } else if (lits.size() != coefs.size()) {
             throw new IllegalArgumentException(
-                    "Contradiction dans la taille des tableaux ps="
-                            + lits.size() + " coefs=" + coefs.size() + ".");
+                "Contradiction dans la taille des tableaux ps=" + lits.size()
+                    + " coefs=" + coefs.size() + ".");
         }
     }
 
@@ -616,7 +616,7 @@ public abstract class WatchPb implements Constr, Undoable {
         BigInteger tmp = slackConstraint();
         for (int i = 0; i < lits.length; i++) {
             if (voc.isUnassigned(lits[i])
-                    && tmp.subtract(coefs[i]).signum() < 0) {
+                && tmp.subtract(coefs[i]).signum() < 0) {
                 boolean ret = s.enqueue(lits[i], this);
                 assert ret;
             }

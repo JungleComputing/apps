@@ -73,19 +73,19 @@ public class LecteurDimacs implements Reader, Serializable {
      * lit la base de clauses et la met dans le vecteur donn? en param?tre
      */
     public IProblem parseInstance(String nomFichier) throws IOException,
-            ContradictionException {
+        ContradictionException {
         if (nomFichier.endsWith(".gz")) {
             in = new BufferedInputStream(new GZIPInputStream(
-                    new FileInputStream(nomFichier), TAILLE_BUF));
+                new FileInputStream(nomFichier), TAILLE_BUF));
         } else {
             in = new BufferedInputStream(new FileInputStream(nomFichier),
-                    TAILLE_BUF);
+                TAILLE_BUF);
         }
         s.reset();
         char car = passerCommentaire();
         if (nbLit == 0) {
             throw new IOException(
-                    "DIMACS non valide (nombre de Literaux non valide)");
+                "DIMACS non valide (nombre de Literaux non valide)");
         }
         s.newVar(nbLit);
         car = passerEspaces();
@@ -137,7 +137,7 @@ public class LecteurDimacs implements Reader, Serializable {
 
     /** lit les clauses et les ajoute dans le vecteur donn? en param?tre */
     private void ajouterClauses(char car) throws IOException,
-            ContradictionException {
+        ContradictionException {
         final IVecInt lit = new VecInt();
         int val = 0;
         boolean neg = false;

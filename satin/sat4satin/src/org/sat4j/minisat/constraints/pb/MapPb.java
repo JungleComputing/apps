@@ -53,12 +53,12 @@ class MapPb {
     }
 
     BigInteger addCoeffNewConstraint(int[] lits, BigInteger[] coefsBis,
-            BigInteger deg) {
+        BigInteger deg) {
         return addCoeffNewConstraint(lits, coefsBis, deg, BigInteger.ONE);
     }
 
     BigInteger addCoeffNewConstraint(int[] litsCons, BigInteger[] coefsCons,
-            BigInteger degreeCons, BigInteger coefMult) {
+        BigInteger degreeCons, BigInteger coefMult) {
         int lit;
         BigInteger coef;
         degree = degree.add(degreeCons);
@@ -70,9 +70,9 @@ class MapPb {
             if (coef.signum() > 0) {
                 if (!coefs.containsKey(lit ^ 1)) {
                     assert (!coefs.containsKey(lit))
-                            || (coefs.get(lit).signum() > 0);
+                        || (coefs.get(lit).signum() > 0);
                     coefs.put(lit, (coefs.containsKey(lit) ? coefs.get(lit)
-                            : BigInteger.ZERO).add(coef));
+                        : BigInteger.ZERO).add(coef));
                     assert coefs.get(lit).signum() > 0;
                 } else {
                     assert !coefs.containsKey(lit);
@@ -87,7 +87,7 @@ class MapPb {
                             coefs.remove(lit ^ 1);
                         } else {
                             coefs.put(lit ^ 1, coefs.get(lit ^ 1)
-                                    .subtract(coef));
+                                .subtract(coef));
                             assert coefs.get(lit ^ 1).signum() > 0;
                             degree = degree.subtract(coef);
                         }

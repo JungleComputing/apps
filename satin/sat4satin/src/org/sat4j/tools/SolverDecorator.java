@@ -92,7 +92,7 @@ public abstract class SolverDecorator implements ISolver, Serializable {
     }
 
     public void addAllClauses(IVec<IVecInt> clauses)
-            throws ContradictionException {
+        throws ContradictionException {
         solver.addAllClauses(clauses);
     }
 
@@ -102,7 +102,7 @@ public abstract class SolverDecorator implements ISolver, Serializable {
      * @see org.sat4j.ISolver#addAtMost(org.sat4j.datatype.VecInt, int)
      */
     public IConstr addAtMost(IVecInt literals, int degree)
-            throws ContradictionException {
+        throws ContradictionException {
         return solver.addAtMost(literals, degree);
     }
 
@@ -112,12 +112,12 @@ public abstract class SolverDecorator implements ISolver, Serializable {
      * @see org.sat4j.ISolver#addAtLeast(org.sat4j.datatype.VecInt, int)
      */
     public IConstr addAtLeast(IVecInt literals, int degree)
-            throws ContradictionException {
+        throws ContradictionException {
         return solver.addAtLeast(literals, degree);
     }
 
     public IConstr addPseudoBoolean(IVecInt literals, IVec<BigInteger> coeffs,
-            boolean moreThan, BigInteger degree) throws ContradictionException {
+        boolean moreThan, BigInteger degree) throws ContradictionException {
         return solver.addPseudoBoolean(literals, coeffs, moreThan, degree);
     }
 

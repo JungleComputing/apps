@@ -41,7 +41,7 @@ public class CardinalityDataStructure extends AbstractCardinalityDataStructure {
      */
     @Override
     public Constr createCardinalityConstraint(IVecInt literals, int degree)
-            throws ContradictionException {
+        throws ContradictionException {
         return AtLeast.atLeastNew(solver, getVocabulary(), literals, degree);
     }
 

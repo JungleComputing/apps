@@ -36,14 +36,14 @@ public interface DataStructureFactory {
     void learnConstraint(Constr constr);
 
     Constr createCardinalityConstraint(IVecInt literals, int degree)
-            throws ContradictionException;
+        throws ContradictionException;
 
     Constr createPseudoBooleanConstraint(IVecInt literals,
-            IVec<BigInteger> coefs, boolean moreThan, BigInteger degree)
-            throws ContradictionException;
+        IVec<BigInteger> coefs, boolean moreThan, BigInteger degree)
+        throws ContradictionException;
 
     Constr createUnregisteredPseudoBooleanConstraint(IVecInt literals,
-            IVec<BigInteger> coefs, BigInteger degree);
+        IVec<BigInteger> coefs, BigInteger degree);
 
     void setUnitPropagationListener(UnitPropagationListener s);
 

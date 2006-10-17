@@ -31,7 +31,7 @@ public class InstanceReader implements Reader {
     private final CSPReader csp;
 
     private final CSPReader csp2;
-    
+
     private Reader reader = null;
 
     public InstanceReader(ISolver solver) {
@@ -44,8 +44,8 @@ public class InstanceReader implements Reader {
     }
 
     public IProblem parseInstance(String filename)
-            throws FileNotFoundException, ParseFormatException, IOException,
-            ContradictionException {
+        throws FileNotFoundException, ParseFormatException, IOException,
+        ContradictionException {
         String fname;
         String prefix = "";
         if (filename.indexOf(':') != -1) {
@@ -65,7 +65,7 @@ public class InstanceReader implements Reader {
         } else if (fname.endsWith(".opb") || prefix.equals("PB")) {
             reader = opb;
         } else if (fname.endsWith(".edimacs") || fname.endsWith(".ncnf")
-                || prefix.equals("EDIMACS")) {
+            || prefix.equals("EDIMACS")) {
             reader = edimacs;
         } else {
             reader = dimacs;

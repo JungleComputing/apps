@@ -66,7 +66,7 @@ public class BinaryClauses implements Constr, Cloneable, Serializable {
         voc.watch(p, this);
         for (int i = 0; i < clauses.size(); i++) {
             int q = clauses.get(i);
-            if (!s.enqueue(q,this)) {
+            if (!s.enqueue(q, this)) {
                 conflictindex = i;
                 return false;
             }
@@ -80,14 +80,14 @@ public class BinaryClauses implements Constr, Cloneable, Serializable {
      * @see org.sat4j.minisat.Constr#simplify()
      */
     public boolean simplify() {
-	System.out.println("simplify BC:" + this);
+        System.out.println("simplify BC:" + this);
         for (int i = 0; i < clauses.size(); i++) {
             if (voc.isSatisfied(clauses.get(i))) {
-		System.out.println("satisfied " + clauses.get(i));
+                System.out.println("satisfied " + clauses.get(i));
                 return true;
             }
             if (voc.isFalsified(clauses.get(i))) {
-		System.out.println("delete falsified " + clauses.get(i));
+                System.out.println("delete falsified " + clauses.get(i));
                 clauses.delete(i);
             }
 
@@ -211,17 +211,17 @@ public class BinaryClauses implements Constr, Cloneable, Serializable {
     final boolean debug = false;
 
     public void setVoc(ILits newvoc) {
-	if (debug) {
-	    System.out.println("BC setVoc " + this.toString() + ": " + newvoc);
-	}
+        if (debug) {
+            System.out.println("BC setVoc " + this.toString() + ": " + newvoc);
+        }
         voc = newvoc;
     }
 
     public void updateVoc(ILits newvoc) {
-	if (debug) {
-	    System.out.println("BC updateVoc " + this.toString() +
-			       ": " + newvoc);
-	}
+        if (debug) {
+            System.out.println("BC updateVoc " + this.toString() + ": "
+                + newvoc);
+        }
         voc = newvoc;
     }
 
@@ -229,7 +229,7 @@ public class BinaryClauses implements Constr, Cloneable, Serializable {
     public String toString() {
         StringBuffer stb = new StringBuffer();
 
-	stb.append("BC:");
+        stb.append("BC:");
         for (int i = 0; i < clauses.size() - 1; i++) {
             stb.append(clauses.get(i));
             stb.append(",");
@@ -241,7 +241,7 @@ public class BinaryClauses implements Constr, Cloneable, Serializable {
     }
 
     public void setStatus(long st) {
-	status = st;
+        status = st;
     }
 
     public long getStatus() {
@@ -252,15 +252,14 @@ public class BinaryClauses implements Constr, Cloneable, Serializable {
     public Object clone() {
         BinaryClauses clone;
 
-	try {
-	    clone = (BinaryClauses) super.clone();
-	}
-	catch (CloneNotSupportedException e) {
-	    throw new InternalError(e.toString());
-	}
+        try {
+            clone = (BinaryClauses) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError(e.toString());
+        }
 
-	clone.clauses = (VecInt) clone.clauses.clone();
+        clone.clauses = (VecInt) clone.clauses.clone();
 
-	return clone;
+        return clone;
     }
 }

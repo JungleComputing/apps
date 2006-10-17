@@ -6,7 +6,8 @@ import org.sat4j.minisat.core.Constr;
 import org.sat4j.minisat.core.LearningStrategy;
 import org.sat4j.minisat.core.VarActivityListener;
 
-abstract class AbstractLearning implements LearningStrategy, Serializable, Cloneable {
+abstract class AbstractLearning implements LearningStrategy, Serializable,
+        Cloneable {
 
     private VarActivityListener val;
 
@@ -33,12 +34,11 @@ abstract class AbstractLearning implements LearningStrategy, Serializable, Clone
     }
 
     @Override
-    public Object clone()
-    {
-	try {
-	    return super.clone();
-	} catch (CloneNotSupportedException e) {
-	    throw new InternalError(e.toString());
-	}
+    public Object clone() {
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError(e.toString());
+        }
     }
 }

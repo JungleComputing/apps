@@ -38,7 +38,8 @@ import org.sat4j.minisat.core.Constr;
  * 
  * @author leberre
  */
-public class NoLearningButHeuristics extends AbstractLearning implements Serializable, Cloneable {
+public class NoLearningButHeuristics extends AbstractLearning implements
+        Serializable, Cloneable {
 
     private static final long serialVersionUID = 1L;
 
@@ -59,12 +60,11 @@ public class NoLearningButHeuristics extends AbstractLearning implements Seriali
     }
 
     @Override
-    public Object clone()
-    {
+    public Object clone() {
         NoLearningButHeuristics clone;
 
-	clone = (NoLearningButHeuristics) super.clone();
+        clone = (NoLearningButHeuristics) super.clone();
 
-	return clone;
+        return clone;
     }
 }

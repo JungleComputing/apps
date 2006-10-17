@@ -113,6 +113,8 @@ public interface Constr extends Propagatable, IConstr {
 
     // Extensions for satin version:
     void setVoc(ILits voc);
+
     long getStatus();
+
     void setStatus(long st);
 }

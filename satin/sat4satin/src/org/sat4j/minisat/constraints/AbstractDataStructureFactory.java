@@ -48,10 +48,10 @@ public abstract class AbstractDataStructureFactory implements
     public IVec<Propagatable> getWatchesFor(int p) {
         tmp.clear();
         lits.watches(p).moveTo(tmp);
-	if (false) {
-	    System.out.println("watches for " + p + ": " +
-			       tmp + " len " + tmp.size());
-	}
+        if (false) {
+            System.out.println("watches for " + p + ": " + tmp + " len "
+                + tmp.size());
+        }
         return tmp;
     }
 
@@ -66,7 +66,7 @@ public abstract class AbstractDataStructureFactory implements
      * @see org.sat4j.minisat.DataStructureFactory#createVocabulary()
      */
     public ILits getVocabulary() {
-	// System.out.println("ADSWB: getVoc: " + lits);
+        // System.out.println("ADSWB: getVoc: " + lits);
         return lits;
     }
 
@@ -97,7 +97,7 @@ public abstract class AbstractDataStructureFactory implements
      *      int)
      */
     public Constr createCardinalityConstraint(IVecInt literals, int degree)
-            throws ContradictionException {
+        throws ContradictionException {
         throw new UnsupportedOperationException();
     }
 
@@ -108,22 +108,22 @@ public abstract class AbstractDataStructureFactory implements
      *      org.sat4j.datatype.VecInt, int)
      */
     public Constr createPseudoBooleanConstraint(IVecInt literals,
-            IVec<BigInteger> coefs, boolean moreThan, BigInteger degree)
-            throws ContradictionException {
+        IVec<BigInteger> coefs, boolean moreThan, BigInteger degree)
+        throws ContradictionException {
         throw new UnsupportedOperationException();
     }
 
     public Constr createUnregisteredPseudoBooleanConstraint(IVecInt literals,
-            IVec<BigInteger> coefs, BigInteger degree) {
+        IVec<BigInteger> coefs, BigInteger degree) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public Object clone() {
-	try {
-	    return super.clone();
-	} catch (CloneNotSupportedException e) {
-	    throw new InternalError(e.toString());
-	}
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError(e.toString());
+        }
     }
 }

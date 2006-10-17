@@ -69,7 +69,7 @@ public class ClausalDataStructureCB extends AbstractDataStructureFactory {
     public Object clone() {
         ClausalDataStructureCB clone;
 
-	clone = (ClausalDataStructureCB) super.clone();
+        clone = (ClausalDataStructureCB) super.clone();
 
         return clone;
     }

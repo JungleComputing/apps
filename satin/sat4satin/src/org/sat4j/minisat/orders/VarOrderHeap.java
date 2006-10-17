@@ -75,8 +75,8 @@ public class VarOrderHeap implements IOrder, Serializable, Cloneable {
 
     private Heap heap;
 
-    private int [] phase;
-    
+    private int[] phase;
+
     public void setLits(ILits lits) {
         this.lits = lits;
     }
@@ -115,19 +115,18 @@ public class VarOrderHeap implements IOrder, Serializable, Cloneable {
             }
         }
 
-	// Satin debug:
-	System.out.println("*** order.select(): UNDEFINED");
-	System.out.println("*** order.select(): heap " + heap);
+        // Satin debug:
+        System.out.println("*** order.select(): UNDEFINED");
+        System.out.println("*** order.select(): heap " + heap);
         int nlength = lits.nVars() + 1;
         for (int i = 1; i < nlength; i++) {
             if (lits.belongsToPool(i)) {
-		if (lits.isUnassigned(i << 1)) {
-		    System.out.println("might still have chosen " + i +
-				       " phase " + phase[i] +
-				       " activity " + activity[i]);
-		}
+                if (lits.isUnassigned(i << 1)) {
+                    System.out.println("might still have chosen " + i
+                        + " phase " + phase[i] + " activity " + activity[i]);
+                }
             } else {
-		System.out.println("not in pool " + i);
+                System.out.println("not in pool " + i);
             }
         }
 
@@ -177,11 +176,11 @@ public class VarOrderHeap implements IOrder, Serializable, Cloneable {
 
     // For satin:
     public void setActivity(int p, double val) {
-	int var = p >> 1;
+        int var = p >> 1;
         activity[var] = val;
         if (heap.inHeap(var)) {
             heap.increase(var);
-	}
+        }
     }
 
     /**
@@ -235,7 +234,7 @@ public class VarOrderHeap implements IOrder, Serializable, Cloneable {
             activity[i] = 0.0;
             if (lits.belongsToPool(i)) {
                 heap.insert(i);
-                phase[i] = (i<<1)^1;
+                phase[i] = (i << 1) ^ 1;
             } else {
                 phase[i] = ILits.UNDEFINED;
             }
@@ -244,22 +243,21 @@ public class VarOrderHeap implements IOrder, Serializable, Cloneable {
 
     @Override
     public Object clone() {
-	VarOrderHeap clone;
+        VarOrderHeap clone;
 
-	try {
-	    clone = (VarOrderHeap) super.clone();
-	}
-	catch (CloneNotSupportedException e) {
-	    throw new InternalError(e.toString());
-	}
-	
-	clone.activity = this.activity.clone();
-	clone.phase    = this.phase.clone();
-	clone.heap     = (Heap) this.heap.clone();
-	clone.heap.setActivity(clone.activity);
-	// lits is set by setLits() after cloning
+        try {
+            clone = (VarOrderHeap) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError(e.toString());
+        }
 
-	return clone;
+        clone.activity = this.activity.clone();
+        clone.phase = this.phase.clone();
+        clone.heap = (Heap) this.heap.clone();
+        clone.heap.setActivity(clone.activity);
+        // lits is set by setLits() after cloning
+
+        return clone;
     }
 
     @Override

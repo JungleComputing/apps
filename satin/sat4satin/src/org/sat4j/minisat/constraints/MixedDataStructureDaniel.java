@@ -27,20 +27,20 @@ public class MixedDataStructureDaniel extends ClausalDataStructureWL {
      */
     @Override
     public Constr createCardinalityConstraint(IVecInt literals, int degree)
-            throws ContradictionException {
+        throws ContradictionException {
         return AtLeast.atLeastNew(solver, getVocabulary(), literals, degree);
     }
 
     @Override
     public Object clone() {
-	MixedDataStructureDaniel clone;
+        MixedDataStructureDaniel clone;
 
-	clone = (MixedDataStructureDaniel) super.clone();
-	if (false) {
-	    System.out.println("MDSD " + this + " clone " + clone);
-	}
+        clone = (MixedDataStructureDaniel) super.clone();
+        if (false) {
+            System.out.println("MDSD " + this + " clone " + clone);
+        }
 
-	return clone;
+        return clone;
     }
 
 }

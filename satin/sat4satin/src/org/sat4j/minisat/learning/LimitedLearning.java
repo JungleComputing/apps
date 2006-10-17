@@ -41,7 +41,8 @@ import org.sat4j.minisat.core.VarActivityListener;
  * 
  * @author leberre
  */
-public class LimitedLearning implements LearningStrategy, Serializable, Cloneable {
+public class LimitedLearning implements LearningStrategy, Serializable,
+        Cloneable {
 
     private static final long serialVersionUID = 1L;
 
@@ -65,7 +66,7 @@ public class LimitedLearning implements LearningStrategy, Serializable, Cloneabl
 
         maxpercent = percent;
 
-	// For satin/cloning:
+        // For satin/cloning:
         none = new NoLearningButHeuristics();
         all = new MiniSATLearning();
     }
@@ -113,7 +114,7 @@ public class LimitedLearning implements LearningStrategy, Serializable, Cloneabl
     @Override
     public String toString() {
         return "Limit learning to clauses of size smaller or equal to "
-                + maxpercent + "% of the number of variables";
+            + maxpercent + "% of the number of variables";
     }
 
     public void setVarActivityListener(VarActivityListener s) {
@@ -122,20 +123,18 @@ public class LimitedLearning implements LearningStrategy, Serializable, Cloneabl
     }
 
     @Override
-    public Object clone()
-    {
-	LimitedLearning clone;
+    public Object clone() {
+        LimitedLearning clone;
 
-	try {
-	    clone = (LimitedLearning) super.clone();
-	}
-	catch (CloneNotSupportedException e) {
-	    throw new InternalError(e.toString());
-	}
+        try {
+            clone = (LimitedLearning) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError(e.toString());
+        }
 
-	clone.none = (NoLearningButHeuristics) this.none.clone();
-	clone.all = (MiniSATLearning) this.all.clone();
+        clone.none = (NoLearningButHeuristics) this.none.clone();
+        clone.all = (MiniSATLearning) this.all.clone();
 
-	return clone;
+        return clone;
     }
 }

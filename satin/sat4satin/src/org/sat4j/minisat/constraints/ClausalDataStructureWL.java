@@ -19,7 +19,7 @@ import org.sat4j.specs.IVecInt;
  *         Window - Preferences - Java - Code Generation - Code and Comments
  */
 public class ClausalDataStructureWL extends AbstractDataStructureFactory
-    implements Cloneable {
+        implements Cloneable {
 
     private static final long serialVersionUID = 1L;
 
@@ -44,16 +44,16 @@ public class ClausalDataStructureWL extends AbstractDataStructureFactory
     public Object clone() {
         ClausalDataStructureWL clone;
 
-	clone = (ClausalDataStructureWL) super.clone();
-	clone.lits = (ILits) clone.lits.clone();
-	// need private version of the tmp array in case we are multithreading:
-	clone.tmp = new Vec<Propagatable>();
+        clone = (ClausalDataStructureWL) super.clone();
+        clone.lits = (ILits) clone.lits.clone();
+        // need private version of the tmp array in case we are multithreading:
+        clone.tmp = new Vec<Propagatable>();
 
-	if (false) {
-	    System.out.println("CDSWL " + this + " clone " + clone +
-			       " lits " + this.lits + " clone " + clone.lits);
-	}
+        if (false) {
+            System.out.println("CDSWL " + this + " clone " + clone + " lits "
+                + this.lits + " clone " + clone.lits);
+        }
 
-	return clone;
+        return clone;
     }
 }

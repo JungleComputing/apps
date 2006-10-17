@@ -299,9 +299,9 @@ public class VecInt implements Serializable, IVecInt {
 
     @Override
     public Object clone() {
-	VecInt clone = new VecInt(this.myarray.length);
-	copyTo(clone);
-	return clone;
+        VecInt clone = new VecInt(this.myarray.length);
+        copyTo(clone);
+        return clone;
     }
 
     /**
@@ -332,9 +332,9 @@ public class VecInt implements Serializable, IVecInt {
     }
 
     public void moveTo(int dest, int source) {
-        myarray[dest]=myarray[source];
+        myarray[dest] = myarray[source];
     }
-    
+
     public void moveTo(int[] dest) {
         System.arraycopy(myarray, 0, dest, 0, nbelem);
         nbelem = 0;
@@ -492,7 +492,7 @@ public class VecInt implements Serializable, IVecInt {
         nbelem = i;
     }
 
-     /*
+    /*
      * (non-Javadoc)
      * 
      * @see java.lang.Object#equals(java.lang.Object)

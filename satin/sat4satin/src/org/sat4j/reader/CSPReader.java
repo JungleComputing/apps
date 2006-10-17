@@ -45,11 +45,11 @@ public class CSPReader implements Reader {
     }
 
     public IProblem parseInstance(String filename)
-            throws FileNotFoundException, ParseFormatException, IOException,
-            ContradictionException {
+        throws FileNotFoundException, ParseFormatException, IOException,
+        ContradictionException {
         if (filename.endsWith(".gz")) {
             parseInstance(new LineNumberReader(new InputStreamReader(
-                    new GZIPInputStream(new FileInputStream(filename)))));
+                new GZIPInputStream(new FileInputStream(filename)))));
         } else {
             parseInstance(new LineNumberReader(new FileReader(filename)));
         }
@@ -57,13 +57,13 @@ public class CSPReader implements Reader {
     }
 
     public void parseInstance(LineNumberReader in) throws ParseFormatException,
-            ContradictionException {
+        ContradictionException {
         solver.reset();
         try {
             readProblem(in);
         } catch (NumberFormatException e) {
             throw new ParseFormatException("integer value expected on line "
-                    + in.getLineNumber(), e);
+                + in.getLineNumber(), e);
         }
     }
 
@@ -79,7 +79,7 @@ public class CSPReader implements Reader {
     private void readProblem(LineNumberReader in) throws ContradictionException {
         Scanner input = new Scanner(in);
         // discard problem name
-        System.out.println("c reading problem "+input.nextLine());
+        System.out.println("c reading problem " + input.nextLine());
         // read number of domain
         System.out.println("c reading domains");
         int nbdomain = input.nextInt();
@@ -95,16 +95,16 @@ public class CSPReader implements Reader {
         System.out.println("c reading variables");
         int nbvar = input.nextInt();
         vars = new Var[nbvar];
-        int nbvarstocreate=0;
+        int nbvarstocreate = 0;
         for (int i = 0; i < nbvar; i++) {
             // read var number
             int varnum = input.nextInt();
-            assert varnum==i;
+            assert varnum == i;
             // read var domain
             int vardom = input.nextInt();
             vars[varnum] = new Var(domains[vardom], nbvarstocreate);
-            nbvarstocreate+=domains[vardom].length;
-        }    
+            nbvarstocreate += domains[vardom].length;
+        }
         solver.newVar(nbvarstocreate);
         for (int i = 0; i < nbvar; i++) {
             vars[i].toClause(solver);
@@ -172,8 +172,6 @@ public class CSPReader implements Reader {
     }
 }
 
-
-
 class Var {
 
     Map<Integer, Integer> mapping = new HashMap<Integer, Integer>();
@@ -207,7 +205,7 @@ class Var {
 
     int findValue(int[] model) {
         for (Map.Entry<Integer, Integer> entry : mapping.entrySet()) {
-            if ( model[entry.getValue()-1]==entry.getValue()) {
+            if (model[entry.getValue() - 1] == entry.getValue()) {
                 return entry.getKey();
             }
         }
@@ -219,7 +217,7 @@ interface Relation {
     void addTuple(int index, int[] tuple);
 
     public void toClause(ISolver solver, Var[] vars)
-            throws ContradictionException;
+        throws ContradictionException;
 
     int arity();
 }
@@ -242,7 +240,7 @@ class AllowedRelation implements Relation {
     }
 
     public void toClause(ISolver solver, Var[] vars)
-            throws ContradictionException {
+        throws ContradictionException {
         // need to find all the tuples that are not expressed here.
         clause = new VecInt();
         int[] tuple = new int[vars.length];
@@ -250,7 +248,7 @@ class AllowedRelation implements Relation {
     }
 
     private void find(int[] tuple, int n, Var[] vars, ISolver solver)
-            throws ContradictionException {
+        throws ContradictionException {
         if (n == vars.length) {
             if (notPresent(tuple)) {
                 clause.clear();
@@ -277,7 +275,7 @@ class AllowedRelation implements Relation {
         // initial number
         int i = 0;
         int j = 0;
-        while (i<tuples.length&&j < tuple.length) {
+        while (i < tuples.length && j < tuple.length) {
             if (tuples[i][j] < tuple[j]) {
                 i++;
                 j = 0;
@@ -288,7 +286,7 @@ class AllowedRelation implements Relation {
             }
             j++;
         }
-        return (j!=tuple.length);
+        return (j != tuple.length);
     }
 
     public int arity() {
@@ -312,7 +310,7 @@ class ForbiddenRelation implements Relation {
     }
 
     public void toClause(ISolver solver, Var[] vars)
-            throws ContradictionException {
+        throws ContradictionException {
         IVecInt clause = new VecInt();
         for (int i = 0; i < tuples.length; i++) {
             clause.clear();

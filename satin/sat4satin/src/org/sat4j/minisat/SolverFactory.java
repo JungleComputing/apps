@@ -77,15 +77,16 @@ public class SolverFactory extends ASolverFactory {
     public static ISolver newMiniLearningHeap() {
         return newMiniLearningHeap(new MixedDataStructureDaniel());
     }
-    
+
     public static ISolver newMiniLearningHeapEZSimp() {
         LimitedLearning learning = new LimitedLearning(10);
-        Solver solver = new Solver(new FirstUIP(), learning, new MixedDataStructureDaniel(),new VarOrderHeap());
+        Solver solver = new Solver(new FirstUIP(), learning,
+            new MixedDataStructureDaniel(), new VarOrderHeap());
         learning.setSolver(solver);
         solver.setSimplifier(solver.SIMPLE_SIMPLIFICATION);
         return solver;
     }
-    
+
     /**
      * @param n
      *            the maximal size of the clauses to learn as a percentage of
@@ -118,7 +119,7 @@ public class SolverFactory extends ASolverFactory {
     public static ISolver newMiniLearningHeap(DataStructureFactory dsf) {
         return newMiniLearning(dsf, new VarOrderHeap());
     }
-    
+
     /**
      * @return a default minilearning solver using a specific data structure
      *         described in Lawrence Ryan thesis to handle binary clauses.
@@ -131,7 +132,7 @@ public class SolverFactory extends ASolverFactory {
     public static ISolver newMiniLearning2Heap() {
         return newMiniLearningHeap(new MixedDataStructureWithBinary());
     }
-    
+
     /**
      * @return a default minilearning solver using a specific data structures
      *         described in Lawrence Ryan thesis to handle binary and ternary
@@ -162,7 +163,7 @@ public class SolverFactory extends ASolverFactory {
 
     public static ISolver newMiniLearning2NewOrder() {
         return newMiniLearning(new MixedDataStructureWithBinary(),
-                new MyOrder());
+            new MyOrder());
     }
 
     /**
@@ -197,7 +198,8 @@ public class SolverFactory extends ASolverFactory {
      */
     public static ISolver newMiniLearning(DataStructureFactory dsf, int n) {
         LimitedLearning learning = new LimitedLearning(n);
-	Solver solver = new Solver(new FirstUIP(), learning, dsf,new VarOrder());
+        Solver solver = new Solver(new FirstUIP(), learning, dsf,
+            new VarOrder());
         learning.setSolver(solver);
         return solver;
     }
@@ -213,8 +215,7 @@ public class SolverFactory extends ASolverFactory {
      *         data structure, the FirstUIP clause generator and order as
      *         heuristics.
      */
-    public static ISolver newMiniLearning(DataStructureFactory dsf,
-            IOrder order) {
+    public static ISolver newMiniLearning(DataStructureFactory dsf, IOrder order) {
         LimitedLearning learning = new LimitedLearning(10);
         Solver solver = new Solver(new FirstUIP(), learning, dsf, order);
         learning.setSolver(solver);
@@ -225,26 +226,27 @@ public class SolverFactory extends ASolverFactory {
         return newMiniLearningEZSimp(new MixedDataStructureDaniel());
     }
 
-//    public static ISolver newMiniLearning2EZSimp() {
-//        return newMiniLearningEZSimp(new MixedDataStructureWithBinary());
-//    }
-    
+    //    public static ISolver newMiniLearning2EZSimp() {
+    //        return newMiniLearningEZSimp(new MixedDataStructureWithBinary());
+    //    }
+
     public static ISolver newMiniLearningEZSimp(DataStructureFactory dsf) {
         LimitedLearning learning = new LimitedLearning(10);
-        Solver solver = new Solver(new FirstUIP(), learning, dsf,new VarOrder());
+        Solver solver = new Solver(new FirstUIP(), learning, dsf,
+            new VarOrder());
         learning.setSolver(solver);
         solver.setSimplifier(solver.SIMPLE_SIMPLIFICATION);
         return solver;
     }
-    
+
     /**
      * @return a default MiniLearning without restarts.
      */
     public static ISolver newMiniLearningNoRestarts() {
         LimitedLearning learning = new LimitedLearning(10);
         Solver solver = new Solver(new FirstUIP(), learning,
-                new MixedDataStructureDaniel(), new SearchParams(
-                        Integer.MAX_VALUE),new VarOrder());
+            new MixedDataStructureDaniel(),
+            new SearchParams(Integer.MAX_VALUE), new VarOrder());
         learning.setSolver(solver);
         return solver;
     }
@@ -258,7 +260,7 @@ public class SolverFactory extends ASolverFactory {
     public static ISolver newActiveLearning() {
         ActiveLearning learning = new ActiveLearning();
         Solver s = new Solver(new FirstUIP(), learning,
-                new MixedDataStructureDaniel(),new VarOrder());
+            new MixedDataStructureDaniel(), new VarOrder());
         learning.setOrder(s.getOrder());
         learning.setSolver(s);
         return s;
@@ -277,8 +279,8 @@ public class SolverFactory extends ASolverFactory {
     public static ISolver newMiniSATNoRestarts() {
         MiniSATLearning learning = new MiniSATLearning();
         Solver solver = new Solver(new FirstUIP(), learning,
-                new MixedDataStructureDaniel(), new SearchParams(
-                        Integer.MAX_VALUE),new VarOrder());
+            new MixedDataStructureDaniel(),
+            new SearchParams(Integer.MAX_VALUE), new VarOrder());
         learning.setDataStructureFactory(solver.getDSFactory());
         learning.setVarActivityListener(solver);
         return solver;
@@ -289,70 +291,64 @@ public class SolverFactory extends ASolverFactory {
      * @return MiniSAT with limited restarts, as specified using attributes
      */
     public static ISolver newMiniSATLimitedRestarts() {
-	SearchParams pars;
+        SearchParams pars;
 
-	Properties props = new Properties(System.getProperties());
+        Properties props = new Properties(System.getProperties());
 
-	double varDecay =
-	    (new Double(props.getProperty("varDecay", "0.95"))).doubleValue();
-	System.out.println("Using varDecay: " + varDecay);
+        double varDecay = (new Double(props.getProperty("varDecay", "0.95")))
+            .doubleValue();
+        System.out.println("Using varDecay: " + varDecay);
 
-	double claDecay =
-	    (new Double(props.getProperty("claDecay", "0.999"))).doubleValue();
-	System.out.println("Using claDecay: " + claDecay);
+        double claDecay = (new Double(props.getProperty("claDecay", "0.999")))
+            .doubleValue();
+        System.out.println("Using claDecay: " + claDecay);
 
-	double conflictInc =
-	   (new Double(props.getProperty("conflictInc", "1.5"))).doubleValue();
-	System.out.println("Using conflictInc: " + conflictInc);
+        double conflictInc = (new Double(props
+            .getProperty("conflictInc", "1.5"))).doubleValue();
+        System.out.println("Using conflictInc: " + conflictInc);
 
-	double learntInc =
-	    (new Double(props.getProperty("learntInc", "1.1"))).doubleValue();
-	System.out.println("Using learntInc: " + learntInc);
+        double learntInc = (new Double(props.getProperty("learntInc", "1.1")))
+            .doubleValue();
+        System.out.println("Using learntInc: " + learntInc);
 
-	double learntConstraint =
-	    (new Double(props.getProperty("learntConstraint",
-					  "0.5"))).doubleValue();
-	System.out.println("Using learntConstraint: " + learntConstraint);
+        double learntConstraint = (new Double(props.getProperty(
+            "learntConstraint", "0.5"))).doubleValue();
+        System.out.println("Using learntConstraint: " + learntConstraint);
 
-	int conflictInit = 
-	    Integer.parseInt(props.getProperty("conflictInit", "100"));
-	System.out.println("Using conflictInit: " + conflictInit);
+        int conflictInit = Integer.parseInt(props.getProperty("conflictInit",
+            "100"));
+        System.out.println("Using conflictInit: " + conflictInit);
 
-	String varOrder = props.getProperty("varOrder", "default");
-	System.out.println("Using varOrder: " + varOrder);
+        String varOrder = props.getProperty("varOrder", "default");
+        System.out.println("Using varOrder: " + varOrder);
 
-	IOrder order;
-	DataStructureFactory dsf;
-	if (varOrder.equals("heap")) {
-	    dsf = new MixedDataStructureDaniel();
-	    order = new VarOrderHeap();
-	} else if (varOrder.equals("myorder")) {
-	    order = new MyOrder();
-	    dsf = new MixedDataStructureWithBinary();
-	} else if (varOrder.equals("pure")) {
-	    dsf = new MixedDataStructureDaniel();
-	    order = new PureOrder();
-	} else if (varOrder.equals("jw")) {
-	    order = new JWOrder();
-	    dsf = new MixedDataStructureWithBinaryAndTernary();
-	} else if (varOrder.equals("varorder")) {
-	    dsf = new MixedDataStructureWithBinary();
-	    order = new VarOrder();
-	} else { // default like MiniSAT2Heap:
-	    dsf = new MixedDataStructureWithBinary();
-	    order = new VarOrderHeap();
-	}
+        IOrder order;
+        DataStructureFactory dsf;
+        if (varOrder.equals("heap")) {
+            dsf = new MixedDataStructureDaniel();
+            order = new VarOrderHeap();
+        } else if (varOrder.equals("myorder")) {
+            order = new MyOrder();
+            dsf = new MixedDataStructureWithBinary();
+        } else if (varOrder.equals("pure")) {
+            dsf = new MixedDataStructureDaniel();
+            order = new PureOrder();
+        } else if (varOrder.equals("jw")) {
+            order = new JWOrder();
+            dsf = new MixedDataStructureWithBinaryAndTernary();
+        } else if (varOrder.equals("varorder")) {
+            dsf = new MixedDataStructureWithBinary();
+            order = new VarOrder();
+        } else { // default like MiniSAT2Heap:
+            dsf = new MixedDataStructureWithBinary();
+            order = new VarOrderHeap();
+        }
 
-	pars = new SearchParams(varDecay, claDecay,
-				conflictInc, learntInc,
-				learntConstraint, conflictInit);
+        pars = new SearchParams(varDecay, claDecay, conflictInc, learntInc,
+            learntConstraint, conflictInit);
 
         MiniSATLearning learning = new MiniSATLearning();
-        Solver solver = new Solver(new FirstUIP(),
-				   learning,
-				   dsf,
-				   pars,
-				   order);
+        Solver solver = new Solver(new FirstUIP(), learning, dsf, pars, order);
         learning.setDataStructureFactory(solver.getDSFactory());
         learning.setVarActivityListener(solver);
         return solver;
@@ -381,7 +377,8 @@ public class SolverFactory extends ASolverFactory {
      */
     public static ISolver newMiniSAT(DataStructureFactory dsf) {
         MiniSATLearning learning = new MiniSATLearning();
-        Solver solver = new Solver(new FirstUIP(), learning, dsf,new VarOrder());
+        Solver solver = new Solver(new FirstUIP(), learning, dsf,
+            new VarOrder());
         learning.setDataStructureFactory(solver.getDSFactory());
         learning.setVarActivityListener(solver);
         return solver;
@@ -393,7 +390,7 @@ public class SolverFactory extends ASolverFactory {
     public static ISolver newMiniSATHeap() {
         return newMiniSATHeap(new MixedDataStructureDaniel());
     }
-    
+
     /**
      * @return MiniSAT with a special data structure from Lawrence Ryan thesis
      *         for managing binary clauses.
@@ -409,15 +406,16 @@ public class SolverFactory extends ASolverFactory {
     public static ISolver newMiniSAT23Heap() {
         return newMiniSATHeap(new MixedDataStructureWithBinaryAndTernary());
     }
-    
+
     public static ISolver newMiniSATHeap(DataStructureFactory dsf) {
         MiniSATLearning learning = new MiniSATLearning();
-        Solver solver = new Solver(new FirstUIP(), learning, dsf,new VarOrderHeap());
+        Solver solver = new Solver(new FirstUIP(), learning, dsf,
+            new VarOrderHeap());
         learning.setDataStructureFactory(solver.getDSFactory());
         learning.setVarActivityListener(solver);
         return solver;
     }
-    
+
     /**
      * @return MiniSAT with data strcutures to handle cardinality constraints.
      */
@@ -432,7 +430,7 @@ public class SolverFactory extends ASolverFactory {
     public static ISolver newMinimalOPBMax() {
         MiniSATLearning learning = new MiniSATLearning();
         Solver solver = new Solver(new FirstUIP(), learning,
-                new PBMaxDataStructure(),new VarOrder());
+            new PBMaxDataStructure(), new VarOrder());
         learning.setDataStructureFactory(solver.getDSFactory());
         learning.setVarActivityListener(solver);
         return solver;
@@ -445,7 +443,7 @@ public class SolverFactory extends ASolverFactory {
     public static ISolver newMiniOPBMax() {
         MiniSATLearning learning = new MiniSATLearning();
         Solver solver = new PBSolver(new FirstUIP(), learning,
-                new PBMaxDataStructure(),new VarOrder());
+            new PBMaxDataStructure(), new VarOrder());
         learning.setDataStructureFactory(solver.getDSFactory());
         learning.setVarActivityListener(solver);
         return solver;
@@ -458,7 +456,7 @@ public class SolverFactory extends ASolverFactory {
     public static ISolver newMinimalOPBMin() {
         MiniSATLearning learning = new MiniSATLearning();
         Solver solver = new Solver(new FirstUIP(), learning,
-                new PBMinDataStructure(),new VarOrder());
+            new PBMinDataStructure(), new VarOrder());
         learning.setDataStructureFactory(solver.getDSFactory());
         learning.setVarActivityListener(solver);
         return solver;
@@ -471,7 +469,7 @@ public class SolverFactory extends ASolverFactory {
     public static ISolver newMiniOPBMin() {
         MiniSATLearning learning = new MiniSATLearning();
         Solver solver = new PBSolver(new FirstUIP(), learning,
-                new PBMinDataStructure(),new VarOrder());
+            new PBMinDataStructure(), new VarOrder());
         learning.setDataStructureFactory(solver.getDSFactory());
         learning.setVarActivityListener(solver);
         return solver;
@@ -483,7 +481,7 @@ public class SolverFactory extends ASolverFactory {
     public static ISolver newRelsat() {
         MiniSATLearning learning = new MiniSATLearning();
         Solver solver = new Solver(new DecisionUIP(), learning,
-                new MixedDataStructureDaniel(),new VarOrder());
+            new MixedDataStructureDaniel(), new VarOrder());
         learning.setDataStructureFactory(solver.getDSFactory());
         learning.setVarActivityListener(solver);
         return solver;
@@ -496,7 +494,7 @@ public class SolverFactory extends ASolverFactory {
     public static ISolver newBackjumping() {
         NoLearningButHeuristics learning = new NoLearningButHeuristics();
         Solver solver = new Solver(new FirstUIP(), learning,
-                new MixedDataStructureDaniel(),new VarOrder());
+            new MixedDataStructureDaniel(), new VarOrder());
         learning.setVarActivityListener(solver);
         return solver;
     }
@@ -510,8 +508,8 @@ public class SolverFactory extends ASolverFactory {
     public static ISolver newMini3SAT() {
         LimitedLearning learning = new FixedLengthLearning(3);
         Solver solver = new Solver(new FirstUIP(), learning,
-                new MixedDataStructureWithBinaryAndTernary(), new SearchParams(
-                        Integer.MAX_VALUE),new VarOrder());
+            new MixedDataStructureWithBinaryAndTernary(), new SearchParams(
+                Integer.MAX_VALUE), new VarOrder());
         learning.setSolver(solver);
         solver.setOrder(new JWOrder());
         return solver;
@@ -524,23 +522,22 @@ public class SolverFactory extends ASolverFactory {
     public static ISolver newMini3SATb() {
         MiniSATLearning learning = new MiniSATLearning();
         Solver solver = new Solver(new FirstUIP(), learning,
-                new MixedDataStructureWithBinaryAndTernary(), new SearchParams(
-                        Integer.MAX_VALUE),new VarOrder());
+            new MixedDataStructureWithBinaryAndTernary(), new SearchParams(
+                Integer.MAX_VALUE), new VarOrder());
         learning.setDataStructureFactory(solver.getDSFactory());
         learning.setVarActivityListener(solver);
         solver.setOrder(new JWOrder());
         return solver;
     }
-    
+
     @Override
     public ISolver defaultSolver() {
         return newMiniSAT2Heap();
     }
-    
+
     @Override
     public ISolver lightSolver() {
         return newMini3SAT();
     }
-
 
 }

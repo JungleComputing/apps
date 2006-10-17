@@ -129,7 +129,7 @@ public interface IVec<T> extends Iterable<T> {
      * @param source the index of the source
      */
     void moveTo(int dest, int source);
-    
+
     /*
      * @param comparator
      */

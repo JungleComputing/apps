@@ -48,7 +48,7 @@ public class MoreThanSAT {
                 System.out.println("BackBone:" + backbone);
                 System.out.println("Counting solutions...");
                 System.out.println("Number of solutions : "
-                        + sc.countSolutions());
+                    + sc.countSolutions());
             } else {
                 System.out.println("Unsatisfiable !");
             }

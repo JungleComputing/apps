@@ -48,7 +48,7 @@ public final class IntQueue implements Serializable {
      * @param x the element to add
      */
     public void insert(final int x) {
-       // ensure(size + 1);
+        // ensure(size + 1);
         assert size < myarray.length;
         myarray[size++] = x;
     }

@@ -39,7 +39,7 @@ public class CardDimacsReader extends DimacsReader {
      */
     @Override
     protected void readConstrs(LineNumberReader in) throws IOException,
-            ParseFormatException, ContradictionException {
+        ParseFormatException, ContradictionException {
         int lit;
         String line;
         StringTokenizer stk;
@@ -68,7 +68,7 @@ public class CardDimacsReader extends DimacsReader {
             }
             if (line.startsWith("%") && expectedNbOfConstr == realNbOfClauses) {
                 System.out
-                        .println("Ignoring the rest of the file (SATLIB format");
+                    .println("Ignoring the rest of the file (SATLIB format");
                 break;
             }
             stk = new StringTokenizer(line);
@@ -101,13 +101,12 @@ public class CardDimacsReader extends DimacsReader {
         }
         if (expectedNbOfConstr != realNbOfClauses) {
             throw new ParseFormatException("wrong nbclauses parameter. Found "
-                    + realNbOfClauses + ", " + expectedNbOfConstr + " expected");
+                + realNbOfClauses + ", " + expectedNbOfConstr + " expected");
         }
     }
 
     private void readCardinalityConstr(String token, StringTokenizer stk,
-            IVecInt literals) throws ContradictionException,
-            ParseFormatException {
+        IVecInt literals) throws ContradictionException, ParseFormatException {
         int card = Integer.parseInt(stk.nextToken());
         int lit = Integer.parseInt(stk.nextToken());
         if (lit == 0) {

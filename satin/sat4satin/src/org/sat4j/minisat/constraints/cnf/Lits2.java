@@ -57,10 +57,10 @@ public class Lits2 extends Lits implements ILits2, Cloneable {
         }
         if (binclauses[p] == null) {
             binclauses[p] = new BinaryClauses(this, p);
-	    if (watches[p ^ 1] == null) {
-		// created lazily after clone
-		watches[p ^ 1] = new Vec<Propagatable>();
-	    }
+            if (watches[p ^ 1] == null) {
+                // created lazily after clone
+                watches[p ^ 1] = new Vec<Propagatable>();
+            }
             watches[p ^ 1].insertFirstWithShifting(binclauses[p]);
         }
         binclauses[p].addBinaryClause(q);
@@ -68,49 +68,45 @@ public class Lits2 extends Lits implements ILits2, Cloneable {
 
     @Override
     public Object clone() {
-	final boolean debug = false;
-	Lits2 clone;
+        final boolean debug = false;
+        Lits2 clone;
 
-	clone = (Lits2) super.clone();
+        clone = (Lits2) super.clone();
 
-	if (debug) {
-	    System.out.println("Lits2 clone " + clone +
-			       " orig super " + super.toString() +
-			       ", orig " + this +
-			       " watches clone " + clone.watches +
-			       " orig " + this.watches);
-	}
+        if (debug) {
+            System.out.println("Lits2 clone " + clone + " orig super "
+                + super.toString() + ", orig " + this + " watches clone "
+                + clone.watches + " orig " + this.watches);
+        }
 
-	if (this.binclauses != null) {
-	    clone.binclauses = new BinaryClauses[2 * nVars() + 2];
-	    if (debug) {
-		System.out.println("Lits2: already binclauses " +
-				   this.binclauses +
-				   " cloned: " + clone.binclauses);
-	    }
+        if (this.binclauses != null) {
+            clone.binclauses = new BinaryClauses[2 * nVars() + 2];
+            if (debug) {
+                System.out.println("Lits2: already binclauses "
+                    + this.binclauses + " cloned: " + clone.binclauses);
+            }
 
-	    for (int p = 0; p < clone.binclauses.length; p++) {
-		if (this.binclauses[p] != null) {
-		    clone.binclauses[p] =
-			(BinaryClauses) binclauses[p].clone();
-		    clone.binclauses[p].updateVoc(clone);
-		    if (clone.watches[p ^ 1] == null) {
-			// created lazily after clone
-			clone.watches[p ^ 1] = new Vec<Propagatable>();
-		    }
-		    clone.watches[p ^ 1].
-			insertFirstWithShifting(clone.binclauses[p]);
+            for (int p = 0; p < clone.binclauses.length; p++) {
+                if (this.binclauses[p] != null) {
+                    clone.binclauses[p] = (BinaryClauses) binclauses[p].clone();
+                    clone.binclauses[p].updateVoc(clone);
+                    if (clone.watches[p ^ 1] == null) {
+                        // created lazily after clone
+                        clone.watches[p ^ 1] = new Vec<Propagatable>();
+                    }
+                    clone.watches[p ^ 1]
+                        .insertFirstWithShifting(clone.binclauses[p]);
 
-		    if (debug) {
-			System.out.println("now " + clone.watches[p ^ 1].size()
-					   + " watches for bin-clause lit " + p
-					   + " at " + clone.binclauses[p] + 
-					   " was " + this.binclauses[p]);
-		    }
-		}
-	    }
-	}
+                    if (debug) {
+                        System.out.println("now " + clone.watches[p ^ 1].size()
+                            + " watches for bin-clause lit " + p + " at "
+                            + clone.binclauses[p] + " was "
+                            + this.binclauses[p]);
+                    }
+                }
+            }
+        }
 
-	return clone;
+        return clone;
     }
 }

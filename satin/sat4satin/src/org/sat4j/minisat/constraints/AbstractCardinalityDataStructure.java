@@ -27,21 +27,21 @@ public abstract class AbstractCardinalityDataStructure extends
      */
     @Override
     public Constr createPseudoBooleanConstraint(IVecInt literals,
-            IVec<BigInteger> coefs, boolean moreThan, BigInteger degree)
-            throws ContradictionException {
+        IVec<BigInteger> coefs, boolean moreThan, BigInteger degree)
+        throws ContradictionException {
         BigInteger diff = reduceToCard(coefs, literals);
         degree = degree.add(diff);
         assert allAtOne(coefs);
         if (moreThan) {
             return AtLeast.atLeastNew(solver, getVocabulary(), literals, degree
-                    .intValue());
+                .intValue());
         }
         for (int i = 0; i < literals.size(); i++) {
             literals.set(i, literals.get(i) ^ 1);
         }
         return AtLeast.atLeastNew(solver, getVocabulary(), literals, coefs
-                .size()
-                - degree.intValue());
+            .size()
+            - degree.intValue());
     }
 
     private boolean allAtOne(IVec<BigInteger> v) {

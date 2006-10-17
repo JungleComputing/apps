@@ -18,5 +18,5 @@ import org.sat4j.specs.IVecInt;
  */
 public interface IInternalPBConstraintCreator {
     public abstract IConstr createUnregisteredPseudoBooleanConstraint(
-            IVecInt literals, IVec<BigInteger> coefs, BigInteger degree);
+        IVecInt literals, IVec<BigInteger> coefs, BigInteger degree);
 }

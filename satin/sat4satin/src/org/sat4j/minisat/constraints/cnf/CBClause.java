@@ -35,7 +35,7 @@ public class CBClause implements Constr, Undoable, Serializable {
     private long status = 0L;
 
     public static CBClause brandNewClause(UnitPropagationListener s, ILits voc,
-            IVecInt literals) {
+        IVecInt literals) {
         CBClause c = new CBClause(literals, voc);
         c.register();
         return c;
@@ -252,7 +252,7 @@ public class CBClause implements Constr, Undoable, Serializable {
     }
 
     public void setStatus(long st) {
-	status = st;
+        status = st;
     }
 
     public long getStatus() {
@@ -261,11 +261,11 @@ public class CBClause implements Constr, Undoable, Serializable {
 
     @Override
     public Object clone() {
-	// TODO: deep copy
-	try {
-	    return super.clone();
-	} catch (CloneNotSupportedException e) {
-	    throw new InternalError(e.toString());
-	}
+        // TODO: deep copy
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError(e.toString());
+        }
     }
 }

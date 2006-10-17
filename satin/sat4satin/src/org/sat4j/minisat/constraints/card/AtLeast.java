@@ -82,7 +82,7 @@ public class AtLeast implements Constr, Undoable, Serializable {
     }
 
     public static AtLeast atLeastNew(UnitPropagationListener s, ILits voc,
-            IVecInt ps, int n) throws ContradictionException {
+        IVecInt ps, int n) throws ContradictionException {
         if (ps.size() < n) {
             throw new ContradictionException();
         }
@@ -283,7 +283,7 @@ public class AtLeast implements Constr, Undoable, Serializable {
     }
 
     public void setStatus(long st) {
-	status = st;
+        status = st;
     }
 
     public long getStatus() {
@@ -292,11 +292,11 @@ public class AtLeast implements Constr, Undoable, Serializable {
 
     @Override
     public Object clone() {
-	// TODO: deep copy
-	try {
-	    return super.clone();
-	} catch (CloneNotSupportedException e) {
-	    throw new InternalError(e.toString());
-	}
+        // TODO: deep copy
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError(e.toString());
+        }
     }
 }

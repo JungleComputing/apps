@@ -34,8 +34,8 @@ public class PBSolver extends Solver {
      * @param dsf
      */
     public PBSolver(AssertingClauseGenerator acg, LearningStrategy learner,
-            DataStructureFactory dsf,IOrder order) {
-        super(acg, learner, dsf,order);
+        DataStructureFactory dsf, IOrder order) {
+        super(acg, learner, dsf, order);
     }
 
     @Override
@@ -112,8 +112,8 @@ public class PBSolver extends Solver {
 
         // On construit la contrainte assertive et on la reference
         WatchPb resConstr = (WatchPb) dsfactory
-                .createUnregisteredPseudoBooleanConstraint(resLits, resCoefs,
-                        resDegree);
+            .createUnregisteredPseudoBooleanConstraint(resLits, resCoefs,
+                resDegree);
 
         outLearntRef.obj = resConstr;
         // logger.fine("Contrainte apprise : " + resConstr);

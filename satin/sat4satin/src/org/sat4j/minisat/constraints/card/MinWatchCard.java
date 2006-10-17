@@ -241,8 +241,8 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
      * @throws ContradictionException
      */
     public static MinWatchCard minWatchCardNew(UnitPropagationListener s,
-            ILits voc, IVecInt ps, boolean moreThan, int degree)
-            throws ContradictionException {
+        ILits voc, IVecInt ps, boolean moreThan, int degree)
+        throws ContradictionException {
 
         degree += linearisation(voc, ps);
 
@@ -252,7 +252,7 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
             for (int i = 0; i < ps.size(); i++) {
                 if (!s.enqueue(ps.get(i))) {
                     throw new ContradictionException(
-                            "Contradiction avec le litt?ral impliqu?.");
+                        "Contradiction avec le litt?ral impliqu?.");
                 }
             }
             return null;
@@ -291,7 +291,7 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
                 for (int i = 0; i < retour.lits.length; i++) {
                     if (!s.enqueue(retour.lits[i])) {
                         throw new ContradictionException(
-                                "Contradiction avec le litt?ral impliqu?.");
+                            "Contradiction avec le litt?ral impliqu?.");
                     }
                 }
                 return null;
@@ -359,7 +359,7 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
 
             // On met en queue les litt?raux impliqu?s
             for (int i = 0; i <= degree; i++) {
-                if ((p != (lits[i] ^ 1)) &&!s.enqueue(lits[i], this)) {
+                if ((p != (lits[i] ^ 1)) && !s.enqueue(lits[i], this)) {
                     return false;
                 }
             }
@@ -477,7 +477,7 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
     }
 
     public void setStatus(long st) {
-	status = st;
+        status = st;
     }
 
     public long getStatus() {
@@ -486,11 +486,11 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
 
     @Override
     public Object clone() {
-	// TODO: deep copy
-	try {
-	    return super.clone();
-	} catch (CloneNotSupportedException e) {
-	    throw new InternalError(e.toString());
-	}
+        // TODO: deep copy
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError(e.toString());
+        }
     }
 }

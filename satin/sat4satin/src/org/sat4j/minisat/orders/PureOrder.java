@@ -48,7 +48,7 @@ public class PureOrder extends VarOrder implements Serializable, Cloneable {
             int nblits = 2 * lits.nVars();
             for (int i = 1; i <= nblits; i++) {
                 if (lits.isUnassigned(i) && lits.watches(i).size() > 0
-                        && lits.watches(i ^ 1).size() == 0) {
+                    && lits.watches(i ^ 1).size() == 0) {
                     return i;
                 }
             }
@@ -56,23 +56,23 @@ public class PureOrder extends VarOrder implements Serializable, Cloneable {
         // not found: using normal order
         return super.select();
     }
-    
+
     @Override
     public String toString() {
-        return "tries to first branch on a single phase watched unassigned variable (pure literal if using a CB data structure) else VSIDS from MiniSAT"; 
+        return "tries to first branch on a single phase watched unassigned variable (pure literal if using a CB data structure) else VSIDS from MiniSAT";
     }
 
     @Override
     public Object clone() {
-	PureOrder clone;
+        PureOrder clone;
 
-	// try {
-	    clone = (PureOrder) super.clone();
-	// }
-	// catch (CloneNotSupportedException e) {
-	//    throw new InternalError(e.toString());
-	// }
+        // try {
+        clone = (PureOrder) super.clone();
+        // }
+        // catch (CloneNotSupportedException e) {
+        //    throw new InternalError(e.toString());
+        // }
 
-	return clone;
+        return clone;
     }
 }

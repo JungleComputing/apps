@@ -19,7 +19,7 @@ import org.sat4j.specs.IVecInt;
  *         Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
 public class MixedDataStructureWithBinary extends MixedDataStructureDaniel
-    implements Cloneable {
+        implements Cloneable {
 
     private static final long serialVersionUID = 1L;
 
@@ -37,10 +37,10 @@ public class MixedDataStructureWithBinary extends MixedDataStructureDaniel
      */
     @Override
     public ILits getVocabulary() {
-	if (false) {
-	    System.out.println("MDSWB " + this + ": getVoc: " + lits +
-			       "(mlits " + mlits + ")");
-	}
+        if (false) {
+            System.out.println("MDSWB " + this + ": getVoc: " + lits
+                + "(mlits " + mlits + ")");
+        }
         return lits;
     }
 
@@ -79,18 +79,18 @@ public class MixedDataStructureWithBinary extends MixedDataStructureDaniel
 
     @Override
     public Object clone() {
-	MixedDataStructureWithBinary clone;
+        MixedDataStructureWithBinary clone;
 
-	clone = (MixedDataStructureWithBinary) super.clone();
+        clone = (MixedDataStructureWithBinary) super.clone();
 
-	// super has now cloned lits/mlits, so restore connection:
-	clone.mlits = (ILits2) clone.lits;
+        // super has now cloned lits/mlits, so restore connection:
+        clone.mlits = (ILits2) clone.lits;
 
-	if (false) {
-	    System.out.println("MDSWB " + this + " clone: " + clone +
-			       " mlits: " + clone.mlits + " old " + mlits);
-	}
+        if (false) {
+            System.out.println("MDSWB " + this + " clone: " + clone
+                + " mlits: " + clone.mlits + " old " + mlits);
+        }
 
-	return clone;
+        return clone;
     }
 }

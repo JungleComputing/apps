@@ -114,22 +114,22 @@ public class DimacsReader implements Reader, Serializable {
      *             if the input stream does not comply with the DIMACS format.
      */
     protected void readProblemLine(LineNumberReader in) throws IOException,
-            ParseFormatException {
+        ParseFormatException {
 
         String line = in.readLine();
 
         if (line == null) {
             throw new ParseFormatException(
-                    "premature end of file: <p cnf ...> expected  on line "
-                            + in.getLineNumber());
+                "premature end of file: <p cnf ...> expected  on line "
+                    + in.getLineNumber());
         }
         StringTokenizer stk = new StringTokenizer(line);
 
         if (!(stk.hasMoreTokens() && stk.nextToken().equals("p")
-                && stk.hasMoreTokens() && stk.nextToken().equals("cnf"))) {
+            && stk.hasMoreTokens() && stk.nextToken().equals("cnf"))) {
             throw new ParseFormatException(
-                    "problem line expected (p cnf ...) on line "
-                            + in.getLineNumber());
+                "problem line expected (p cnf ...) on line "
+                    + in.getLineNumber());
         }
 
         int vars;
@@ -155,7 +155,7 @@ public class DimacsReader implements Reader, Serializable {
      *             si le probl?me est trivialement inconsistant.
      */
     protected void readConstrs(LineNumberReader in) throws IOException,
-            ParseFormatException, ContradictionException {
+        ParseFormatException, ContradictionException {
         String line;
 
         int realNbOfConstr = 0;
@@ -183,7 +183,7 @@ public class DimacsReader implements Reader, Serializable {
             }
             if (line.startsWith("%") && expectedNbOfConstr == realNbOfConstr) {
                 System.out
-                        .println("Ignoring the rest of the file (SATLIB format");
+                    .println("Ignoring the rest of the file (SATLIB format");
                 break;
             }
             boolean added = handleConstr(line, literals);
@@ -193,12 +193,12 @@ public class DimacsReader implements Reader, Serializable {
         }
         if (checkConstrNb && expectedNbOfConstr != realNbOfConstr) {
             throw new ParseFormatException("wrong nbclauses parameter. Found "
-                    + realNbOfConstr + ", " + expectedNbOfConstr + " expected");
+                + realNbOfConstr + ", " + expectedNbOfConstr + " expected");
         }
     }
 
     protected boolean handleConstr(String line, IVecInt literals)
-            throws ContradictionException {
+        throws ContradictionException {
         int lit;
         boolean added = false;
         Scanner scan;
@@ -234,17 +234,14 @@ public class DimacsReader implements Reader, Serializable {
      *             si le probl?me est trivialement inconsitant
      */
     public IProblem parseInstance(String filename)
-            throws FileNotFoundException, ParseFormatException, IOException,
-            ContradictionException {
+        throws FileNotFoundException, ParseFormatException, IOException,
+        ContradictionException {
 
         if (filename.endsWith(".gz")) {
-            parseInstance(
-                new LineNumberReader(
-                    new InputStreamReader(
-                        new GZIPInputStream(new FileInputStream(filename)))));
+            parseInstance(new LineNumberReader(new InputStreamReader(
+                new GZIPInputStream(new FileInputStream(filename)))));
         } else {
-            parseInstance(
-                new LineNumberReader(new FileReader(filename)));
+            parseInstance(new LineNumberReader(new FileReader(filename)));
         }
         return solver;
     }
@@ -258,7 +255,7 @@ public class DimacsReader implements Reader, Serializable {
      *             si le probl?me est trivialement inconsitant
      */
     public void parseInstance(LineNumberReader in) throws ParseFormatException,
-            ContradictionException {
+        ContradictionException {
         solver.reset();
         try {
             skipComments(in);
@@ -268,7 +265,7 @@ public class DimacsReader implements Reader, Serializable {
             throw new ParseFormatException(e);
         } catch (NumberFormatException e) {
             throw new ParseFormatException("integer value expected on line "
-                    + in.getLineNumber(), e);
+                + in.getLineNumber(), e);
         }
     }
 

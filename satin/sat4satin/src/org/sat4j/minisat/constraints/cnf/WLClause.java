@@ -66,7 +66,6 @@ public final class WLClause implements Constr, Serializable, Cloneable {
     /* Added for global learning: */
     private long status = 0L;
 
-
     /**
      * Creates a new basic clause
      * 
@@ -86,31 +85,29 @@ public final class WLClause implements Constr, Serializable, Cloneable {
     private final boolean debug = false;
 
     public void setVoc(ILits voc) {
-	// Used for updating voc after clone()
+        // Used for updating voc after clone()
 
-	if (debug) {
-	    System.out.println("clause " + this + 
-			       ": updating voc " + this.voc + " to " + voc);
-	}
+        if (debug) {
+            System.out.println("clause " + this + ": updating voc " + this.voc
+                + " to " + voc);
+        }
 
         this.voc = voc;
     }
 
     @Override
-    public Object clone()
-    {
+    public Object clone() {
         WLClause clone;
 
-	try {
-	    clone = (WLClause) super.clone();
-	}
-	catch (CloneNotSupportedException e) {
-	    throw new InternalError(e.toString());
-	}
+        try {
+            clone = (WLClause) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new InternalError(e.toString());
+        }
 
-	clone.lits = clone.lits.clone();
+        clone.lits = clone.lits.clone();
 
-	return clone;
+        return clone;
     }
 
     public int getId() {
@@ -141,7 +138,7 @@ public final class WLClause implements Constr, Serializable, Cloneable {
      *             if discovered by unit propagation
      */
     public static IVecInt sanityCheck(IVecInt ps, ILits voc,
-            UnitPropagationListener s) throws ContradictionException {
+        UnitPropagationListener s) throws ContradictionException {
         // si un litt???ral de ps est vrai, retourner vrai
         // enlever les litt???raux falsifi???s de ps
         for (int i = 0; i < ps.size();) {
@@ -195,7 +192,7 @@ public final class WLClause implements Constr, Serializable, Cloneable {
      *             when detected by unit propagation
      */
     static boolean propagationCheck(IVecInt ps, UnitPropagationListener s)
-            throws ContradictionException {
+        throws ContradictionException {
         if (ps.size() == 0) {
             throw new ContradictionException("Creating Empty clause ?");
         } else if (ps.size() == 1) {
@@ -224,11 +221,9 @@ public final class WLClause implements Constr, Serializable, Cloneable {
      */
     public void register() {
         assert lits.length > 1;
-    if (!nondeterministic) {
-	java.util.Arrays.sort(lits);
-    }
-    else
-        if (learnt) {
+        if (!nondeterministic) {
+            java.util.Arrays.sort(lits);
+        } else if (learnt) {
             // prendre un deuxieme litt???ral ??? surveiller
             int maxi = 1;
             int maxlevel = voc.getLevel(lits[1]);
@@ -263,7 +258,7 @@ public final class WLClause implements Constr, Serializable, Cloneable {
      *         (tautology for example)
      */
     public static WLClause brandNewClause(UnitPropagationListener s, ILits voc,
-            IVecInt literals) {
+        IVecInt literals) {
         WLClause c = new WLClause(literals, voc);
         c.register();
         return c;
@@ -277,9 +272,9 @@ public final class WLClause implements Constr, Serializable, Cloneable {
     public void calcReason(int p, IVecInt outReason) {
         assert outReason.size() == 0;
         // Debug:
-	if (p != ILits.UNDEFINED && p != lits[0]) {
-	    System.out.println("unexpected clause for lit " + p + ": " + this);
-	}
+        if (p != ILits.UNDEFINED && p != lits[0]) {
+            System.out.println("unexpected clause for lit " + p + ": " + this);
+        }
         assert (p == ILits.UNDEFINED) || (p == lits[0]);
         for (int i = (p == ILits.UNDEFINED) ? 0 : 1; i < lits.length; i++) {
             assert voc.isFalsified(lits[i]);
@@ -322,42 +317,42 @@ public final class WLClause implements Constr, Serializable, Cloneable {
             lits[1] = p ^ 1;
         }
         assert lits[1] == (p ^ 1);
-//        // Si le premier litt???ral est satisfait, la clause est satisfaite
-//        if (voc.isSatisfied(lits[0])) {
-//            // reinsert la clause dans la liste des clauses surveillees
-//            voc.watch(p, this);
-//            return true;
-//        }
+        //        // Si le premier litt???ral est satisfait, la clause est satisfaite
+        //        if (voc.isSatisfied(lits[0])) {
+        //            // reinsert la clause dans la liste des clauses surveillees
+        //            voc.watch(p, this);
+        //            return true;
+        //        }
 
         // Recherche un nouveau litt???ral ??? regarder
-    if (nondeterministic) {
-        for (int i = 2; i < lits.length; i++) {
-            if (!voc.isFalsified(lits[i])) {
-                lits[1] = lits[i];
-                lits[i] = p ^ 1;
+        if (nondeterministic) {
+            for (int i = 2; i < lits.length; i++) {
+                if (!voc.isFalsified(lits[i])) {
+                    lits[1] = lits[i];
+                    lits[i] = p ^ 1;
+                    voc.watch(lits[1] ^ 1, this);
+                    return true;
+                }
+            }
+        } else {
+            int litmin = -1;
+            int imin = -1;
+            for (int i = 2; i < lits.length; i++) {
+                if (!voc.isFalsified(lits[i])) {
+                    if (lits[i] < litmin || litmin < 0) {
+                        imin = i;
+                        litmin = lits[i];
+                    }
+                }
+            }
+
+            if (imin > 0) {
+                lits[1] = lits[imin];
+                lits[imin] = p ^ 1;
                 voc.watch(lits[1] ^ 1, this);
                 return true;
             }
         }
-    } else {
-	int litmin = -1;
-	int imin = -1;
-        for (int i = 2; i < lits.length; i++) {
-            if (!voc.isFalsified(lits[i])) {
-		if (lits[i] < litmin || litmin < 0) {
-		    imin = i;
-		    litmin = lits[i];
-		}
-            }
-        }
-
-	if (imin > 0) {
-	    lits[1] = lits[imin];
-	    lits[imin] = p ^ 1;
-	    voc.watch(lits[1] ^ 1, this);
-	    return true;
-	}
-    }
         assert voc.isFalsified(lits[1]);
         // La clause est unitaire ou nulle
         voc.watch(p, this);
@@ -389,13 +384,13 @@ public final class WLClause implements Constr, Serializable, Cloneable {
             stb.append(voc.valueToString(lits[i]));
             stb.append("]");
         }
-	// stb.append(" id " + id);
-	if (learnt()) {
-	    stb.append(" learnt");
-	    if (locked()) {
-		stb.append(" locked");
-	    }
-	}
+        // stb.append(" id " + id);
+        if (learnt()) {
+            stb.append(" learnt");
+            if (locked()) {
+                stb.append(" locked");
+            }
+        }
         return stb.toString();
     }
 
@@ -435,7 +430,7 @@ public final class WLClause implements Constr, Serializable, Cloneable {
 
     /* Added for global learning: */
     public void setStatus(long st) {
-	status = st;
+        status = st;
     }
 
     /* Added for global learning: */

@@ -117,7 +117,7 @@ public interface ISolver extends IProblem {
      */
 
     IConstr addAtMost(IVecInt literals, int degree)
-            throws ContradictionException;
+        throws ContradictionException;
 
     /**
      * Create a cardinality constraint of the type "at least n of those literals
@@ -135,7 +135,7 @@ public interface ISolver extends IProblem {
      * @see #removeConstr(IConstr)
      */
     IConstr addAtLeast(IVecInt literals, int degree)
-            throws ContradictionException;
+        throws ContradictionException;
 
     /**
      * Create a Pseudo-Boolean constraint of the type "at least n of those
@@ -158,8 +158,8 @@ public interface ISolver extends IProblem {
      *         is falsified after unit propagation 
      * @see #removeConstr(IConstr)
      */
-    IConstr addPseudoBoolean(IVecInt lits, IVec<BigInteger> coeffs, boolean moreThan,
-            BigInteger d) throws ContradictionException;
+    IConstr addPseudoBoolean(IVecInt lits, IVec<BigInteger> coeffs,
+        boolean moreThan, BigInteger d) throws ContradictionException;
 
     /**
      * To set the internal timeout of the solver. When the timeout is reached, a

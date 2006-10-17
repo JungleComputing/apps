@@ -52,7 +52,7 @@ public class MixableCBClause extends CBClause {
     }
 
     public static CBClause brandNewClause(UnitPropagationListener s, ILits voc,
-            IVecInt literals) {
+        IVecInt literals) {
         CBClause c = new MixableCBClause(literals, voc);
         c.register();
         return c;
