@@ -115,10 +115,12 @@ public class OPBReader2005 implements Reader, Serializable {
         assert !(coeffs.size() == 0);
         assert lits.size() == coeffs.size();
 
-        if (operator.equals("<=") || operator.equals("="))
+        if (operator.equals("<=") || operator.equals("=")) {
             solver.addPseudoBoolean(lits, coeffs, false, d);
-        if (operator.equals(">=") || operator.equals("="))
+        }
+        if (operator.equals(">=") || operator.equals("=")) {
             solver.addPseudoBoolean(lits, coeffs, true, d);
+        }
     }
 
     /**
@@ -187,8 +189,9 @@ public class OPBReader2005 implements Reader, Serializable {
         }
 
         c = in.read();
-        if (c == -1)
+        if (c == -1) {
             eofReached = true;
+        }
 
         return (char) c;
     }
@@ -224,8 +227,9 @@ public class OPBReader2005 implements Reader, Serializable {
     private void skipSpaces() throws IOException {
         char c;
 
-        while (Character.isWhitespace(c = get()))
+        while (Character.isWhitespace(c = get())) {
             ;
+        }
 
         putback(c);
     }
@@ -242,8 +246,9 @@ public class OPBReader2005 implements Reader, Serializable {
 
         skipSpaces();
 
-        while (!Character.isWhitespace(c = get()) && !eof())
+        while (!Character.isWhitespace(c = get()) && !eof()) {
             s.append(c);
+        }
 
         return s.toString();
     }
@@ -262,12 +267,14 @@ public class OPBReader2005 implements Reader, Serializable {
         s.setLength(0);
 
         c = get();
-        if (c == '-' || Character.isDigit(c))
+        if (c == '-' || Character.isDigit(c)) {
             s.append(c);
         // note: BigInteger don't like a '+' before the number, we just skip it
+        }
 
-        while (Character.isDigit(c = get()) && !eof())
+        while (Character.isDigit(c = get()) && !eof()) {
             s.append(c);
+        }
 
         putback(c);
     }
@@ -287,8 +294,9 @@ public class OPBReader2005 implements Reader, Serializable {
 
         // first char (must be a letter or underscore)
         c = get();
-        if (eof())
+        if (eof()) {
             return false;
+        }
 
         if (!Character.isLetter(c) && c != '_') {
             putback(c);
@@ -300,12 +308,13 @@ public class OPBReader2005 implements Reader, Serializable {
         // next chars (must be a letter, a digit or an underscore)
         while (true) {
             c = get();
-            if (eof())
+            if (eof()) {
                 break;
+            }
 
-            if (Character.isLetter(c) || Character.isDigit(c) || c == '_')
+            if (Character.isLetter(c) || Character.isDigit(c) || c == '_') {
                 s.append(c);
-            else {
+            } else {
                 putback(c);
                 break;
             }
@@ -326,14 +335,17 @@ public class OPBReader2005 implements Reader, Serializable {
         skipSpaces();
 
         c = get();
-        if (eof())
+        if (eof()) {
             return null;
+        }
 
-        if (c == '=')
+        if (c == '=') {
             return "=";
+        }
 
-        if (c == '>' && get() == '=')
+        if (c == '>' && get() == '=') {
             return ">=";
+        }
 
         return null;
     }
@@ -352,21 +364,24 @@ public class OPBReader2005 implements Reader, Serializable {
 
         // get the number of variables and constraints
         c = get();
-        if (c != '*')
+        if (c != '*') {
             throw new ParseFormatException(
                     "First line of input file should be a comment");
+        }
 
         s = readWord();
-        if (eof() || !s.equals("#variable="))
+        if (eof() || !s.equals("#variable=")) {
             throw new ParseFormatException(
                     "First line should contain #variable= as first keyword");
+        }
 
         nbVars = Integer.parseInt(readWord());
 
         s = readWord();
-        if (eof() || !s.equals("#constraint="))
+        if (eof() || !s.equals("#constraint=")) {
             throw new ParseFormatException(
                     "First line should contain #constraint= as second keyword");
+        }
 
         nbConstr = Integer.parseInt(readWord());
 
@@ -412,12 +427,14 @@ public class OPBReader2005 implements Reader, Serializable {
 
         skipSpaces();
         c = get();
-        if (c != '*')
+        if (c != '*') {
             throw new ParseFormatException(
                     "'*' expected between a coefficient and a variable");
+        }
 
-        if (!readIdentifier(var))
+        if (!readIdentifier(var)) {
             throw new ParseFormatException("identifier expected");
+        }
     }
 
     /**
@@ -452,20 +469,21 @@ public class OPBReader2005 implements Reader, Serializable {
 
                 skipSpaces();
                 c = get();
-                if (c == ';')
+                if (c == ';') {
                     break; // end of objective
-
-                else if (c == '-' || c == '+' || Character.isDigit(c))
+                } else if (c == '-' || c == '+' || Character.isDigit(c)) {
                     putback(c);
-                else
+                } else {
                     throw new ParseFormatException(
                             "unexpected character in objective function");
+                }
             }
 
             endObjective();
-        } else
+        } else {
             throw new ParseFormatException(
                     "input format error: 'min:' expected");
+        }
     }
 
     /**
@@ -493,33 +511,36 @@ public class OPBReader2005 implements Reader, Serializable {
                 // relational operator found
                 putback(c);
                 break;
-            } else if (c == '-' || c == '+' || Character.isDigit(c))
+            } else if (c == '-' || c == '+' || Character.isDigit(c)) {
                 putback(c);
-            else {
+            } else {
                 throw new ParseFormatException(
                         "unexpected character in constraint");
             }
         }
 
-        if (eof())
+        if (eof()) {
             throw new ParseFormatException(
                     "unexpected EOF before end of constraint");
+        }
 
         String relop;
-        if ((relop = readRelOp()) != null)
+        if ((relop = readRelOp()) != null) {
             constraintRelOp(relop);
-        else
+        } else {
             throw new ParseFormatException(
                     "unexpected relational operator in constraint");
+        }
 
         readInteger(coeff);
         constraintRightTerm(new BigInteger(coeff.toString()));
 
         skipSpaces();
         c = get();
-        if (eof() || c != ';')
+        if (eof() || c != ';') {
             throw new ParseFormatException(
                     "semicolon expected at end of constraint");
+        }
 
         endConstraint();
     }
@@ -549,8 +570,9 @@ public class OPBReader2005 implements Reader, Serializable {
         // read constraints
         while (!eof()) {
             skipSpaces();
-            if (eof())
+            if (eof()) {
                 break;
+            }
 
             readConstraint();
         }
@@ -598,8 +620,9 @@ public class OPBReader2005 implements Reader, Serializable {
     }
 
     public ObjectiveFunction getObjectiveFunction() {
-        if (hasObjFunc)
+        if (hasObjFunc) {
             return new ObjectiveFunction(getVars(), getCoeffs());
+        }
         return null;
     }
 

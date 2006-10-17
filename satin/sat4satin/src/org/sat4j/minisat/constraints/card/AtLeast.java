@@ -83,8 +83,9 @@ public class AtLeast implements Constr, Undoable, Serializable {
 
     public static AtLeast atLeastNew(UnitPropagationListener s, ILits voc,
             IVecInt ps, int n) throws ContradictionException {
-        if (ps.size() < n)
+        if (ps.size() < n) {
             throw new ContradictionException();
+        }
         int degree = n;
         for (int i = 0; i < ps.size();) {
             // on verifie si le litteral est affecte
@@ -133,10 +134,12 @@ public class AtLeast implements Constr, Undoable, Serializable {
             return null;
         }
 
-        if (ps.size() < degree)
+        if (ps.size() < degree) {
             throw new ContradictionException();
-        if (degree == 0)
+        }
+        if (degree == 0) {
             return null;
+        }
 
         return new AtLeast(voc, ps, degree);
     }
@@ -161,14 +164,15 @@ public class AtLeast implements Constr, Undoable, Serializable {
         // remet la clause dans la liste des clauses regardees
         voc.watch(p, this);
 
-        if (counter == n)
+        if (counter == n) {
             return false;
+        }
 
         counter++;
         voc.undos(p).push(this);
 
         // If no more can be false, enqueue the rest:
-        if (counter == n)
+        if (counter == n) {
             for (int q : lits) {
                 if (voc.isUnassigned(q)) {
                     if (!s.enqueue(q, this)) {
@@ -176,6 +180,7 @@ public class AtLeast implements Constr, Undoable, Serializable {
                     }
                 }
             }
+        }
         return true;
     }
 
@@ -285,6 +290,7 @@ public class AtLeast implements Constr, Undoable, Serializable {
         return status;
     }
 
+    @Override
     public Object clone() {
 	// TODO: deep copy
 	try {

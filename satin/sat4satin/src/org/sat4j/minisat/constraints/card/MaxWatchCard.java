@@ -83,8 +83,9 @@ public class MaxWatchCard implements Constr, Undoable, Serializable {
 
         // On simplifie ps
         int[] index = new int[voc.nVars() * 2 + 2];
-        for (int i = 0; i < index.length; i++)
+        for (int i = 0; i < index.length; i++) {
             index[i] = 0;
+        }
         // On repertorie les litt?raux utiles
         for (int i = 0; i < ps.size(); i++) {
             if (index[ps.get(i) ^ 1] != 0) {
@@ -100,8 +101,9 @@ public class MaxWatchCard implements Constr, Undoable, Serializable {
                 index[ps.get(ind)]--;
                 ind++;
             } else {
-                if ((ps.get(ind) & 1) != 0)
+                if ((ps.get(ind) & 1) != 0) {
                     this.degree--;
+                }
                 ps.set(ind, ps.last());
                 ps.pop();
             }
@@ -218,11 +220,12 @@ public class MaxWatchCard implements Constr, Undoable, Serializable {
         if (ps.size() == 0) {
             throw new ContradictionException("Cr?ation d'une clause vide");
         } else if (ps.size() == degree) {
-            for (int i = 0; i < ps.size(); i++)
+            for (int i = 0; i < ps.size(); i++) {
                 if (!s.enqueue(ps.get(i))) {
                     throw new ContradictionException(
                             "Contradiction avec le litt?ral impliqu?.");
                 }
+            }
             return null;
         }
 
@@ -230,12 +233,14 @@ public class MaxWatchCard implements Constr, Undoable, Serializable {
         outclause = new MaxWatchCard(voc, ps, moreThan, degree);
 
         // Si le degr? est insufisant
-        if (outclause.degree <= 0)
+        if (outclause.degree <= 0) {
             return null;
+        }
 
         // Si il n'y a aucune chance de satisfaire la contrainte
-        if (outclause.watchCumul < outclause.degree)
+        if (outclause.watchCumul < outclause.degree) {
             throw new ContradictionException("Contrainte non-satisfiable");
+        }
 
         // Si les litt?raux observ?s sont impliqu?s
         if (outclause.watchCumul == outclause.degree) {
@@ -284,8 +289,9 @@ public class MaxWatchCard implements Constr, Undoable, Serializable {
         assert !voc.isFalsified(p);
 
         // Si le litt?ral p est impliqu?
-        if (this.watchCumul == this.degree)
+        if (this.watchCumul == this.degree) {
             return false;
+        }
 
         // On met en place la mise ? jour du compteur
         voc.undos(p).push(this);
@@ -342,8 +348,9 @@ public class MaxWatchCard implements Constr, Undoable, Serializable {
             // On d?cr?mente si l'espoir n'est pas fond?
             if (voc.isUnassigned(lits[i++])) {
                 curr--;
-                if (curr < this.degree)
+                if (curr < this.degree) {
                     return false;
+                }
             }
         }
 
@@ -419,6 +426,7 @@ public class MaxWatchCard implements Constr, Undoable, Serializable {
         return status;
     }
 
+    @Override
     public Object clone() {
 	// TODO: deep copy
 	try {

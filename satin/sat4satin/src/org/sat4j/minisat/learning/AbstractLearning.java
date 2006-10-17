@@ -32,6 +32,7 @@ abstract class AbstractLearning implements LearningStrategy, Serializable, Clone
         }
     }
 
+    @Override
     public Object clone()
     {
 	try {

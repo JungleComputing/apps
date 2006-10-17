@@ -121,6 +121,7 @@ public class LimitedLearning implements LearningStrategy, Serializable, Cloneabl
         all.setVarActivityListener(s);
     }
 
+    @Override
     public Object clone()
     {
 	LimitedLearning clone;

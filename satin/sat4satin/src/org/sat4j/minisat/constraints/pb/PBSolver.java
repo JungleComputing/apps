@@ -72,16 +72,19 @@ public class PBSolver extends Solver {
                 // logger.fine("No reason for " + Lits.toString(litImplied));
             }
             // On remonte l'arbre des implications
-            if (trail.size() == 1)
+            if (trail.size() == 1) {
                 break;
+            }
             undoOne();
             if (decisionLevel() > 0) {
                 litImplied = trail.last();
-                if (voc.getLevel(litImplied) != currentLevel)
+                if (voc.getLevel(litImplied) != currentLevel) {
                     trailLim.pop();
+                }
                 currentLevel = voc.getLevel(litImplied);
-            } else
+            } else {
                 break;
+            }
             assert currentLevel == decisionLevel();
             assert litImplied > 1;
         }

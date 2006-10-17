@@ -134,6 +134,7 @@ public class SearchParams implements Serializable {
         return stb.toString();
     }
 
+    @Override
     public Object clone()
     {
 	SearchParams clone;

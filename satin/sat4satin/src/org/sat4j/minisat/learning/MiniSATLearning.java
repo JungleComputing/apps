@@ -43,6 +43,7 @@ public class MiniSATLearning extends AbstractLearning implements Serializable, C
         this.dsf = dsf;
     }
 
+    @Override
     public void init() {
 
     }
@@ -53,12 +54,14 @@ public class MiniSATLearning extends AbstractLearning implements Serializable, C
      * @see org.sat4j.minisat.LearningScheme#learns(org.sat4j.minisat.Solver,
      *      org.sat4j.minisat.datatype.Vec)
      */
+    @Override
     public void learns(Constr constr) {
         // va contenir une nouvelle clause ou null si la clause est unitaire
         claBumpActivity(constr);
         dsf.learnConstraint(constr);
     }
 
+    @Override
     public Object clone()
     {
 	MiniSATLearning clone;

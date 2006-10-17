@@ -161,10 +161,12 @@ public class Lits implements Serializable, Cloneable, ILits {
     }
 
     public String valueToString(int lit) {
-        if (isUnassigned(lit))
+        if (isUnassigned(lit)) {
             return "?";
-        if (isSatisfied(lit))
+        }
+        if (isSatisfied(lit)) {
             return "T";
+        }
 	return "F";
     }
 
@@ -242,6 +244,7 @@ public class Lits implements Serializable, Cloneable, ILits {
         return realnVars;
     }
 
+    @Override
     public Object clone() {
 	Lits clone;
 
@@ -252,8 +255,8 @@ public class Lits implements Serializable, Cloneable, ILits {
 	    throw new InternalError(e.toString());
 	}
 
-        clone.pool = (boolean[]) this.pool.clone();
-        clone.level = (int[]) this.level.clone();
+        clone.pool = this.pool.clone();
+        clone.level = this.level.clone();
         // clone.truthValue = (Lbool[]) this.truthValue.clone();
 	// Actually need a shallow copy of the truthValues themselves,
 	// since we don't want multiple TRUE/FALSE/UNDEF objects

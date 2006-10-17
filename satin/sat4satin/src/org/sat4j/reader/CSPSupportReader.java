@@ -13,21 +13,25 @@ class CSPSupportReader extends CSPReader {
         super(solver);
     }
 
+    @Override
     protected void manageAllowedTuples(int relnum, int[] domains, int nbtuples) {
-        if (domains.length==2)
+        if (domains.length==2) {
             relations[relnum] = new SupportAllowedRelation(domains, nbtuples);
-        else 
+        } else {
             relations[relnum] = new AllowedRelation(domains, nbtuples);
+        }
     }
 }
 
 class SupportAllowedRelation extends AllowedRelation {
     SupportAllowedRelation(int[] domains, int nbtuples) {
         super(domains, nbtuples);
-        if (domains.length!=2)
+        if (domains.length!=2) {
             throw new UnsupportedOperationException("Works only for binary constraints");
+        }
     }
 
+    @Override
     public void toClause(ISolver solver, Var[] vars) throws ContradictionException {
         Map<Integer,IVecInt> supportsa = new HashMap<Integer,IVecInt>();
         Map<Integer,IVecInt> supportsb = new HashMap<Integer,IVecInt>();
@@ -58,8 +62,9 @@ class SupportAllowedRelation extends AllowedRelation {
         for (Map.Entry<Integer,IVecInt> entry : supports.entrySet()) {
             clause.clear();
             clause.push(-v.translate(entry.getKey()));
-            for (int i : entry.getValue())
+            for (int i : entry.getValue()) {
                 clause.push(i);
+            }
             solver.addClause(clause);
         }
     }

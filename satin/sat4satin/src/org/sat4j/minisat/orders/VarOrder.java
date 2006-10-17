@@ -280,6 +280,7 @@ public class VarOrder implements Serializable, Cloneable, IOrder {
         lastVar = 1;
     }
 
+    @Override
     public Object clone() {
 	VarOrder clone;
 
@@ -290,9 +291,9 @@ public class VarOrder implements Serializable, Cloneable, IOrder {
 	    throw new InternalError(e.toString());
 	}
 
-	clone.activity = (double[]) this.activity.clone();
-	clone.order    = (int[]) this.order.clone();
-	clone.varpos   = (int[]) this.varpos.clone();
+	clone.activity = this.activity.clone();
+	clone.order    = this.order.clone();
+	clone.varpos   = this.varpos.clone();
 	// lits is set by setLits() after cloning
 
 	return clone;

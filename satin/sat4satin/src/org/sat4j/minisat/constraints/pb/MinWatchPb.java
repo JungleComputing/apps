@@ -241,9 +241,11 @@ public class MinWatchPb extends WatchPb implements Serializable {
     protected int nbOfWatched() {
         int retour = 0;
         for (int ind = 0; ind < this.watched.length; ind++) {
-            for (int i = 0; i < watchingCount; i++)
-                if (watching[i] == ind)
+            for (int i = 0; i < watchingCount; i++) {
+                if (watching[i] == ind) {
                     assert watched[ind];
+                }
+            }
             retour += (this.watched[ind]) ? 1 : 0;
         }
         return retour;
@@ -265,8 +267,9 @@ public class MinWatchPb extends WatchPb implements Serializable {
         // Recherche de l'indice du litt???ral p
         int pIndiceWatching = 0;
         while (pIndiceWatching < watchingCount
-                && (lits[watching[pIndiceWatching]] ^ 1) != p)
+                && (lits[watching[pIndiceWatching]] ^ 1) != p) {
             pIndiceWatching++;
+        }
         int pIndice = watching[pIndiceWatching];
 
         assert p == (lits[pIndice] ^ 1);
@@ -275,20 +278,21 @@ public class MinWatchPb extends WatchPb implements Serializable {
         // Recherche du coefficient maximal parmi ceux des litt???raux
         // observ???s
         BigInteger maxCoef = BigInteger.ZERO;
-        for (int i = 0; i < watchingCount; i++)
+        for (int i = 0; i < watchingCount; i++) {
             if (coefs[watching[i]].compareTo(maxCoef) > 0
                     && watching[i] != pIndice) {
                 maxCoef = coefs[watching[i]];
             }
+        }
 
         assert learnt || maxCoef.signum() != 0;
         // DLB assert maxCoef!=0;
 
         // Recherche de la compensation
         int ind;
-        if (watchingCount >= size())
+        if (watchingCount >= size()) {
             ind = lits.length;
-        else {
+        } else {
             ind = 0;
             while (ind < lits.length
                     && watchCumul.subtract(coefs[pIndice]).subtract(maxCoef)
@@ -300,8 +304,9 @@ public class MinWatchPb extends WatchPb implements Serializable {
                     watching[watchingCount++] = ind;
                     voc.watch(lits[ind] ^ 1, this);
                     // Si on obtient un nouveau coefficient maximum
-                    if (coefs[ind].compareTo(maxCoef) > 0)
+                    if (coefs[ind].compareTo(maxCoef) > 0) {
                         maxCoef = coefs[ind];
+                    }
                 }
                 ind++;
             }
@@ -364,8 +369,9 @@ public class MinWatchPb extends WatchPb implements Serializable {
     public void undo(int p) {
         voc.watch(p, this);
         int pIndice = 0;
-        while ((lits[pIndice] ^ 1) != p)
+        while ((lits[pIndice] ^ 1) != p) {
             pIndice++;
+        }
 
         assert pIndice < lits.length;
 
@@ -408,6 +414,7 @@ public class MinWatchPb extends WatchPb implements Serializable {
         return status;
     }
 
+    @Override
     public Object clone() {
 	// TODO: deep copy
 	try {

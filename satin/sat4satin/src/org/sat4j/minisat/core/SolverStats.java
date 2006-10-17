@@ -116,6 +116,7 @@ public class SolverStats implements Serializable, Cloneable {
 	cloneOverhead = 0.0;
     }
     
+    @Override
     public Object clone() {
         SolverStats clone;
 

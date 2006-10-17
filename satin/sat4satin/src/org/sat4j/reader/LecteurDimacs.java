@@ -83,13 +83,15 @@ public class LecteurDimacs implements Reader, Serializable {
         }
         s.reset();
         char car = passerCommentaire();
-        if (nbLit == 0)
+        if (nbLit == 0) {
             throw new IOException(
                     "DIMACS non valide (nombre de Literaux non valide)");
+        }
         s.newVar(nbLit);
         car = passerEspaces();
-        if (car == EOF)
+        if (car == EOF) {
             throw new IOException("DIMACS non valide (o? sont les clauses ?)");
+        }
         ajouterClauses(car);
         in.close();
         return s;
@@ -103,11 +105,13 @@ public class LecteurDimacs implements Reader, Serializable {
             if (car == 'p') {
                 car = lectureNombreLiteraux();
             }
-            if (car != 'c' && car != 'p')
+            if (car != 'c' && car != 'p') {
                 break; /* fin des commentaires */
+            }
             car = nextLine(); /* on passe la ligne de commentaire */
-            if (car == EOF)
+            if (car == EOF) {
                 break;
+            }
         }
         return car;
     }
@@ -119,12 +123,14 @@ public class LecteurDimacs implements Reader, Serializable {
             nbLit = car - '0';
             for (;;) { /* on lit le chiffre repr?sentant le nombre de literaux */
                 car = (char) in.read();
-                if (car < '0' || car > '9')
+                if (car < '0' || car > '9') {
                     break;
+                }
                 nbLit = 10 * nbLit + (car - '0');
             }
-            if (car != EOF)
+            if (car != EOF) {
                 nextLine(); /* on lit la fin de la ligne */
+            }
         }
         return car;
     }
@@ -140,14 +146,15 @@ public class LecteurDimacs implements Reader, Serializable {
             if (car == '-') {
                 neg = true;
                 car = (char) in.read();
-            } else if (car == '+')
+            } else if (car == '+') {
                 car = (char) in.read();
-            else /* on le 1er chiffre du literal */
+            } else /* on le 1er chiffre du literal */
             if (car >= '0' && car <= '9') {
                 val = car - '0';
                 car = (char) in.read();
-            } else
+            } else {
                 break;
+            }
             /* on lit la suite du literal */
             while (car >= '0' && car <= '9') {
                 val = (val * 10) + car - '0';
@@ -163,18 +170,21 @@ public class LecteurDimacs implements Reader, Serializable {
                 neg = false;
                 val = 0; /* on reinitialise les variables */
             }
-            if (car != EOF)
+            if (car != EOF) {
                 car = passerEspaces();
-            if (car == EOF)
+            }
+            if (car == EOF) {
                 break; /* on a lu tout le fichier */
+            }
         }
     }
 
     /** passe tout les caract?res d'espacement (espace ou \n) */
     private char passerEspaces() throws IOException {
         char car;
-        while ((car = (char) in.read()) == ' ' || car == '\n')
+        while ((car = (char) in.read()) == ' ' || car == '\n') {
             ;
+        }
         return car;
     }
 

@@ -256,6 +256,7 @@ public class Vec<T> implements Serializable, Cloneable, IVec<T> {
         ncopy.nbelem = nsize;
     }
 
+    @Override
     public Vec<T> clone() {
         Vec<T> clone;
 
@@ -329,8 +330,9 @@ public class Vec<T> implements Serializable, Cloneable, IVec<T> {
         for (i = from; i < to - 1; i++) {
             best_i = i;
             for (j = i + 1; j < to; j++) {
-                if (cmp.compare(myarray[j], myarray[best_i]) < 0)
+                if (cmp.compare(myarray[j], myarray[best_i]) < 0) {
                     best_i = j;
+                }
             }
             tmp = myarray[i];
             myarray[i] = myarray[best_i];
@@ -340,25 +342,25 @@ public class Vec<T> implements Serializable, Cloneable, IVec<T> {
 
     void sort(int from, int to, Comparator<T> cmp) {
         int width = to - from;
-        if (to - from <= 15)
+        if (to - from <= 15) {
             selectionSort(from, to, cmp);
-
-        else {
+        } else {
             T pivot = myarray[rand.nextInt(width) + from];
             T tmp;
             int i = from - 1;
             int j = to;
 
             for (;;) {
-                do
+                do {
                     i++;
-                while (cmp.compare(myarray[i], pivot) < 0);
-                do
+                } while (cmp.compare(myarray[i], pivot) < 0);
+                do {
                     j--;
-                while (cmp.compare(pivot, myarray[j]) < 0);
+                } while (cmp.compare(pivot, myarray[j]) < 0);
 
-                if (i >= j)
+                if (i >= j) {
                     break;
+                }
 
                 tmp = myarray[i];
                 myarray[i] = myarray[j];
@@ -381,8 +383,9 @@ public class Vec<T> implements Serializable, Cloneable, IVec<T> {
         int i, j;
         T last;
 
-        if (nbelem == 0)
+        if (nbelem == 0) {
             return;
+        }
 
         sort(0, nbelem, cmp);
 
@@ -415,8 +418,9 @@ public class Vec<T> implements Serializable, Cloneable, IVec<T> {
     public boolean equals(Object obj) {
         if (obj instanceof IVec) {
             IVec<?> v = (IVec<?>) obj;
-            if (v.size() != size())
+            if (v.size() != size()) {
                 return false;
+            }
             for (int i = 0; i < size(); i++) {
                 if (!v.get(i).equals(get(i))) {
                     return false;
@@ -450,8 +454,9 @@ public class Vec<T> implements Serializable, Cloneable, IVec<T> {
             }
 
             public T next() {
-                if (i == nbelem)
+                if (i == nbelem) {
                     throw new NoSuchElementException();
+                }
                 return myarray[i++];
             }
 

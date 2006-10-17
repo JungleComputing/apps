@@ -52,8 +52,9 @@ public class Heap implements Serializable, Cloneable {
             int child = right(i) < heap.size()
                     && comp(heap.get(right(i)), heap.get(left(i))) ? right(i)
                     : left(i);
-            if (!comp(heap.get(child), x))
+            if (!comp(heap.get(child), x)) {
                 break;
+            }
             heap.set(i, heap.get(child));
             indices.set(heap.get(i), i);
             i = child;
@@ -104,8 +105,9 @@ public class Heap implements Serializable, Cloneable {
         indices.set(heap.get(1), 1);
         indices.set(r, 0);
         heap.pop();
-        if (heap.size() > 1)
+        if (heap.size() > 1) {
             percolateDown(1);
+        }
         return r;
     }
 
@@ -123,6 +125,7 @@ public class Heap implements Serializable, Cloneable {
         this.activity = activity;
     }
 
+    @Override
     public Object clone() {
 	Heap clone;
 

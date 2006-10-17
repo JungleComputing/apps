@@ -259,6 +259,7 @@ public class CBClause implements Constr, Undoable, Serializable {
         return status;
     }
 
+    @Override
     public Object clone() {
 	// TODO: deep copy
 	try {

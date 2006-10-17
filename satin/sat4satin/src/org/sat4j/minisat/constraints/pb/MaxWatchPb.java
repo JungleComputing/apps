@@ -162,7 +162,9 @@ public class MaxWatchPb extends WatchPb implements Serializable {
         MaxWatchPb outclause = new MaxWatchPb(voc, litsVec, coefsVec, moreThan,
             degree);
 
-        if (outclause.degree.signum() <= 0) return null;
+        if (outclause.degree.signum() <= 0) {
+            return null;
+        }
         outclause.computeWatches();
         outclause.computePropagation(s);
 
@@ -186,8 +188,9 @@ public class MaxWatchPb extends WatchPb implements Serializable {
 
         // Si le litteral est implique il y a un conflit
         int indiceP = 0;
-        while ((lits[indiceP] ^ 1) != p)
+        while ((lits[indiceP] ^ 1) != p) {
             indiceP++;
+        }
 
         BigInteger coefP = coefs[indiceP];
 
@@ -230,8 +233,9 @@ public class MaxWatchPb extends WatchPb implements Serializable {
      */
     public void remove() {
         for (int i = 0; i < lits.length; i++) {
-            if (!voc.isFalsified(lits[i]))
+            if (!voc.isFalsified(lits[i])) {
                 voc.watches(lits[i] ^ 1).remove(this);
+            }
         }
     }
 
@@ -243,8 +247,9 @@ public class MaxWatchPb extends WatchPb implements Serializable {
      */
     public void undo(int p) {
         int indiceP = 0;
-        while ((lits[indiceP] ^ 1) != p)
+        while ((lits[indiceP] ^ 1) != p) {
             indiceP++;
+        }
 
         assert coefs[indiceP].signum() > 0;
 

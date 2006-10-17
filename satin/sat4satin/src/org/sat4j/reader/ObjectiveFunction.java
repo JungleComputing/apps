@@ -34,16 +34,19 @@ public class ObjectiveFunction {
         BigInteger tempDegree = BigInteger.ZERO;
 
         for (int i = 0; i < vars.size(); i++) {
-            if (varInModel(vars.get(i), model))
+            if (varInModel(vars.get(i), model)) {
                 tempDegree = tempDegree.add(coeffs.get(i));
+            }
         }
         return tempDegree;
     }
 
     private boolean varInModel(int var, int[] model) {
-        for (int i = 0; i < model.length; i++)
-            if (var == model[i])
+        for (int i = 0; i < model.length; i++) {
+            if (var == model[i]) {
                 return true;
+            }
+        }
         return false;
     }
 

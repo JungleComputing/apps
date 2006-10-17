@@ -30,8 +30,9 @@ public class ClausalDataStructureWL extends AbstractDataStructureFactory
      */
     public Constr createClause(IVecInt literals) throws ContradictionException {
         IVecInt v = WLClause.sanityCheck(literals, getVocabulary(), solver);
-        if (v == null)
+        if (v == null) {
             return null;
+        }
         return WLClause.brandNewClause(solver, getVocabulary(), v);
     }
 
@@ -39,6 +40,7 @@ public class ClausalDataStructureWL extends AbstractDataStructureFactory
         return new WLClause(literals, getVocabulary());
     }
 
+    @Override
     public Object clone() {
         ClausalDataStructureWL clone;
 

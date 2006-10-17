@@ -225,6 +225,7 @@ public class BinaryClauses implements Constr, Cloneable, Serializable {
         voc = newvoc;
     }
 
+    @Override
     public String toString() {
         StringBuffer stb = new StringBuffer();
 
@@ -247,6 +248,7 @@ public class BinaryClauses implements Constr, Cloneable, Serializable {
         return status;
     }
 
+    @Override
     public Object clone() {
         BinaryClauses clone;
 

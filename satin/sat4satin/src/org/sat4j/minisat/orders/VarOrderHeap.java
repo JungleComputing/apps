@@ -150,8 +150,9 @@ public class VarOrderHeap implements IOrder, Serializable, Cloneable {
      * @param x
      */
     public void undo(int x) {
-        if (!heap.inHeap(x))
+        if (!heap.inHeap(x)) {
             heap.insert(x);
+        }
     }
 
     /**
@@ -163,8 +164,9 @@ public class VarOrderHeap implements IOrder, Serializable, Cloneable {
         int var = p >> 1;
         updateActivity(var);
         phase[var] = p;
-        if (heap.inHeap(var))
+        if (heap.inHeap(var)) {
             heap.increase(var);
+        }
     }
 
     protected void updateActivity(final int var) {
@@ -240,6 +242,7 @@ public class VarOrderHeap implements IOrder, Serializable, Cloneable {
         }
     }
 
+    @Override
     public Object clone() {
 	VarOrderHeap clone;
 
@@ -250,8 +253,8 @@ public class VarOrderHeap implements IOrder, Serializable, Cloneable {
 	    throw new InternalError(e.toString());
 	}
 	
-	clone.activity = (double[]) this.activity.clone();
-	clone.phase    = (int []) this.phase.clone();
+	clone.activity = this.activity.clone();
+	clone.phase    = this.phase.clone();
 	clone.heap     = (Heap) this.heap.clone();
 	clone.heap.setActivity(clone.activity);
 	// lits is set by setLits() after cloning
@@ -259,6 +262,7 @@ public class VarOrderHeap implements IOrder, Serializable, Cloneable {
 	return clone;
     }
 
+    @Override
     public String toString() {
         return "VSIDS like heuristics from MiniSAT using a heap";
     }

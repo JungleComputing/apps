@@ -42,6 +42,7 @@ public class NoLearningNoHeuristics extends AbstractLearning implements Serializ
 
     private static final long serialVersionUID = 1L;
 
+    @Override
     public void init() {
 
     }
@@ -52,6 +53,7 @@ public class NoLearningNoHeuristics extends AbstractLearning implements Serializ
      * @see org.sat4j.minisat.LearningScheme#learns(org.sat4j.minisat.Solver,
      *      org.sat4j.minisat.datatype.Vec)
      */
+    @Override
     public void learns(Constr reason) {
     }
 

@@ -133,16 +133,19 @@ public abstract class WatchPb implements Constr, Undoable {
             }
             bigDegree = bigDegree.negate();
         }
-        for (int i = 0; i < bc.length; i++)
+        for (int i = 0; i < bc.length; i++) {
             if (bc[i].signum() < 0) {
                 lits[i] = lits[i] ^ 1;
                 bc[i] = bc[i].negate();
                 bigDegree = bigDegree.add(bc[i]);
             }
-        if (bigDegree.signum() > 0)
+        }
+        if (bigDegree.signum() > 0) {
             bigDegree = mpb.addCoeffNewConstraint(lits, bc, bigDegree);
-        if (bigDegree.signum() > 0)
+        }
+        if (bigDegree.signum() > 0) {
             bigDegree = mpb.saturation();
+        }
         int size = mpb.size();
         lits = new int[size];
         this.coefs = new BigInteger[size];
@@ -164,12 +167,14 @@ public abstract class WatchPb implements Constr, Undoable {
         BigInteger slack = BigInteger.ZERO;
         for (int i = 0; i < lits.length; i++) {
             if ((coefs[i].signum() > 0)
-                    && ((!voc.isFalsified(lits[i]) || voc.getLevel(lits[i]) >= dl)))
+                    && ((!voc.isFalsified(lits[i]) || voc.getLevel(lits[i]) >= dl))) {
                 slack = slack.add(coefs[i]);
+            }
         }
         slack = slack.subtract(degree);
-        if (slack.signum() < 0)
+        if (slack.signum() < 0) {
             return false;
+        }
         for (int i = 0; i < lits.length; i++) {
             if ((coefs[i].signum() > 0)
                     && (voc.isUnassigned(lits[i]) || voc.getLevel(lits[i]) >= dl)
@@ -289,9 +294,11 @@ public abstract class WatchPb implements Constr, Undoable {
     public BigInteger recalcLeftSide(BigInteger[] coefs) {
         BigInteger poss = BigInteger.ZERO;
         // Pour chaque litteral
-        for (int i = 0; i < coefs.length; i++)
-            if ((coefs[i].signum() > 0) && (!voc.isFalsified(lits[i])))
+        for (int i = 0; i < coefs.length; i++) {
+            if ((coefs[i].signum() > 0) && (!voc.isFalsified(lits[i]))) {
                 poss = poss.add(coefs[i]);
+            }
+        }
         return poss;
     }
 
@@ -381,8 +388,9 @@ public abstract class WatchPb implements Constr, Undoable {
         // alors il s'agit d'une clause
         if (indLit == coefs.length && degree.signum() > 0) {
             degree = BigInteger.ONE;
-            for (int i = 0; i < coefs.length; i++)
+            for (int i = 0; i < coefs.length; i++) {
                 coefs[i] = degree;
+            }
         }
 
         // logger.finer("After normalizing " + this.toString());
@@ -419,8 +427,9 @@ public abstract class WatchPb implements Constr, Undoable {
         for (i = from; i < to - 1; i++) {
             best_i = i;
             for (j = i + 1; j < to; j++) {
-                if (coefs[j].compareTo(coefs[best_i]) > 0)
+                if (coefs[j].compareTo(coefs[best_i]) > 0) {
                     best_i = j;
+                }
             }
             tmp = coefs[i];
             coefs[i] = coefs[best_i];
@@ -488,10 +497,9 @@ public abstract class WatchPb implements Constr, Undoable {
      */
     protected void sort(int from, int to) {
         int width = to - from;
-        if (to - from <= 15)
+        if (to - from <= 15) {
             selectionSort(from, to);
-
-        else {
+        } else {
             BigInteger pivot = coefs[rand.nextInt(width) + from];
             BigInteger tmp;
             int i = from - 1;
@@ -499,15 +507,16 @@ public abstract class WatchPb implements Constr, Undoable {
             int tmp2;
 
             for (;;) {
-                do
+                do {
                     i++;
-                while (coefs[i].compareTo(pivot) > 0);
-                do
+                } while (coefs[i].compareTo(pivot) > 0);
+                do {
                     j--;
-                while (pivot.compareTo(coefs[j]) > 0);
+                } while (pivot.compareTo(coefs[j]) > 0);
 
-                if (i >= j)
+                if (i >= j) {
                     break;
+                }
 
                 tmp = coefs[i];
                 coefs[i] = coefs[j];
@@ -583,19 +592,22 @@ public abstract class WatchPb implements Constr, Undoable {
         // le niveau le plus haut dans l'arbre ou la contrainte est assertive
         for (int i = 0; i < lits.length; i++) {
             litLevel = voc.getLevel(lits[i]);
-            if (litLevel < borneMax && litLevel > borneMin)
-                if (isAssertive(litLevel))
+            if (litLevel < borneMax && litLevel > borneMin) {
+                if (isAssertive(litLevel)) {
                     borneMax = litLevel;
-                else
+                } else {
                     borneMin = litLevel;
+                }
+            }
         }
         // on retourne le niveau immediatement inferieur ? borneMax
         // pour lequel la contrainte possede un literal
         int retour = 0;
         for (int i = 0; i < lits.length; i++) {
             litLevel = voc.getLevel(lits[i]);
-            if (litLevel > retour && litLevel < borneMax)
+            if (litLevel > retour && litLevel < borneMax) {
                 retour = litLevel;
+            }
         }
         return retour;
     }
@@ -632,8 +644,9 @@ public abstract class WatchPb implements Constr, Undoable {
 
     protected static IVec<BigInteger> toVecBigInt(IVecInt vec) {
         IVec<BigInteger> bigVec = new Vec<BigInteger>(vec.size());
-        for (int i = 0; i < vec.size(); ++i)
+        for (int i = 0; i < vec.size(); ++i) {
             bigVec.push(BigInteger.valueOf(vec.get(i)));
+        }
         return bigVec;
     }
 

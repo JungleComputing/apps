@@ -53,13 +53,15 @@ class Conflict extends MapPb {
         BigInteger degreeCons = wpb.getDegree();
         int[] litsCons = wpb.getLits();
 
-        for (int i = 0; i < coefsCons.length; i++)
+        for (int i = 0; i < coefsCons.length; i++) {
             assert coefsCons[i].signum() > 0;
+        }
 
         // Recherche de l'indice du litteral implique
         int ind = -1;
-        while (litsCons[++ind] != litImplied)
+        while (litsCons[++ind] != litImplied) {
             ;
+        }
 
         assert litsCons[ind] == litImplied;
         assert coefsCons[ind] != BigInteger.ZERO;
@@ -148,9 +150,11 @@ class Conflict extends MapPb {
     BigInteger slackConflict() {
         BigInteger poss = BigInteger.ZERO;
         // Pour chaque litteral
-        for (Integer i : coefs.keySet())
-            if (coefs.get(i).signum() != 0 && !voc.isFalsified(i))
+        for (Integer i : coefs.keySet()) {
+            if (coefs.get(i).signum() != 0 && !voc.isFalsified(i)) {
                 poss = poss.add(coefs.get(i));
+            }
+        }
         return poss.subtract(degree);
     }
 
@@ -162,17 +166,20 @@ class Conflict extends MapPb {
         BigInteger slack = BigInteger.ZERO;
         for (Integer i : coefs.keySet()) {
             if ((coefs.get(i).signum() > 0)
-                    && (((!voc.isFalsified(i)) || voc.getLevel(i) >= dl)))
+                    && (((!voc.isFalsified(i)) || voc.getLevel(i) >= dl))) {
                 slack = slack.add(coefs.get(i));
+            }
         }
         slack = slack.subtract(degree);
-        if (slack.signum() < 0)
+        if (slack.signum() < 0) {
             return false;
+        }
         for (Integer i : coefs.keySet()) {
             if ((coefs.get(i).signum() > 0)
                     && (voc.isUnassigned(i) || voc.getLevel(i) >= dl)
-                    && (slack.subtract(coefs.get(i)).signum() < 0))
+                    && (slack.subtract(coefs.get(i)).signum() < 0)) {
                 return true;
+            }
         }
         return false;
     }
@@ -205,19 +212,23 @@ class Conflict extends MapPb {
         assert degreeBis.compareTo(BigInteger.ONE) > 0;
         // Recherche d'un litt?ral non assign?
         int lit = -1;
-        for (int ind = 0; (ind < lits.length) && (lit == -1); ind++)
+        for (int ind = 0; (ind < lits.length) && (lit == -1); ind++) {
             if (coefsBis[ind].signum() != 0 && voc.isUnassigned(lits[ind])) {
                 assert coefsBis[ind].compareTo(degreeBis) < 0;
                 lit = ind;
             }
+        }
 
         // Sinon, recherche d'un litteral satisfait
-        if (lit == -1)
-            for (int ind = 0; (ind < lits.length) && (lit == -1); ind++)
+        if (lit == -1) {
+            for (int ind = 0; (ind < lits.length) && (lit == -1); ind++) {
                 if ((coefsBis[ind].signum() != 0)
                         && (voc.isSatisfied(lits[ind]))
-                        && (ind != indLitImplied))
+                        && (ind != indLitImplied)) {
                     lit = ind;
+                }
+            }
+        }
 
         // on a trouve un litteral
         assert lit != -1;
@@ -232,17 +243,20 @@ class Conflict extends MapPb {
         assert degUpdate.signum() > 0;
         BigInteger minimum = degUpdate;
         for (int i = 0; i < coefsBis.length; i++) {
-            if (coefsBis[i].signum() > 0)
+            if (coefsBis[i].signum() > 0) {
                 minimum = minimum.min(coefsBis[i]);
+            }
             coefsBis[i] = degUpdate.min(coefsBis[i]);
         }
         if (minimum.equals(degUpdate) && !degUpdate.equals(BigInteger.ONE)) {
             // on a obtenu une clause
             // plus de reduction possible
             degUpdate = BigInteger.ONE;
-            for (int i = 0; i < coefsBis.length; i++)
-                if (coefsBis[i].signum() > 0)
+            for (int i = 0; i < coefsBis.length; i++) {
+                if (coefsBis[i].signum() > 0) {
                     coefsBis[i] = degUpdate;
+                }
+            }
         }
 
         assert coefsBis[indLitImplied].signum() > 0;

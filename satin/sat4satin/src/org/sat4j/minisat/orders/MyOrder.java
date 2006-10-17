@@ -90,6 +90,7 @@ public class MyOrder extends VarOrder implements Serializable, Cloneable {
         return "Init VSIDS order using a POSIT-like static order on 2 and 3 clauses."; 
     }
 
+    @Override
     public Object clone() {
 	MyOrder clone;
 

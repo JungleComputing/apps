@@ -87,8 +87,9 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
 
         // On simplifie ps
         int[] index = new int[voc.nVars() * 2 + 2];
-        for (int i = 0; i < index.length; i++)
+        for (int i = 0; i < index.length; i++) {
             index[i] = 0;
+        }
         // On repertorie les litt?raux utiles
         for (int i = 0; i < ps.size(); i++) {
             if (index[ps.get(i) ^ 1] != 0) {
@@ -104,8 +105,9 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
                 index[ps.get(ind)]--;
                 ind++;
             } else {
-                if ((ps.get(ind) & 1) != 0)
+                if ((ps.get(ind) & 1) != 0) {
                     this.degree--;
+                }
                 ps.set(ind, ps.last());
                 ps.pop();
             }
@@ -247,11 +249,12 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
         if (ps.size() == 0) {
             throw new ContradictionException("Cr?ation d'une clause vide");
         } else if (ps.size() == degree) {
-            for (int i = 0; i < ps.size(); i++)
+            for (int i = 0; i < ps.size(); i++) {
                 if (!s.enqueue(ps.get(i))) {
                     throw new ContradictionException(
                             "Contradiction avec le litt?ral impliqu?.");
                 }
+            }
             return null;
         }
 
@@ -260,8 +263,9 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
 
         retour.normalize();
 
-        if (degree <= 0)
+        if (degree <= 0) {
             return null;
+        }
 
         // On observe degre+1 litt?raux
         int indSwap = retour.lits.length;
@@ -284,11 +288,12 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
         if (retour.watchCumul <= retour.degree) {
             // Si l'on a les litt?rux impliqu?s
             if (retour.watchCumul == retour.degree) {
-                for (int i = 0; i < retour.lits.length; i++)
+                for (int i = 0; i < retour.lits.length; i++) {
                     if (!s.enqueue(retour.lits[i])) {
                         throw new ContradictionException(
                                 "Contradiction avec le litt?ral impliqu?.");
                     }
+                }
                 return null;
             }
             throw new ContradictionException("Contrainte non-satisfiable");
@@ -333,13 +338,15 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
 
         // Recherche du litt?ral falsifi?
         int indFalsified = -1;
-        while ((lits[++indFalsified] ^ 1) != p)
+        while ((lits[++indFalsified] ^ 1) != p) {
             ;
+        }
 
         // Recherche du litt?ral swap
         int indSwap = degree + 1;
-        while (indSwap < lits.length && voc.isFalsified(lits[indSwap]))
+        while (indSwap < lits.length && voc.isFalsified(lits[indSwap])) {
             indSwap++;
+        }
 
         // Mise ? jour de la contrainte
         if (indSwap == lits.length) {
@@ -351,9 +358,11 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
             voc.undos(p).push(this);
 
             // On met en queue les litt?raux impliqu?s
-            for (int i = 0; i <= degree; i++)
-                if ((p != (lits[i] ^ 1)) &&!s.enqueue(lits[i], this))
+            for (int i = 0; i <= degree; i++) {
+                if ((p != (lits[i] ^ 1)) &&!s.enqueue(lits[i], this)) {
                     return false;
+                }
+            }
 
             return true;
         }
@@ -394,10 +403,13 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
      */
     public boolean simplify() {
         // Calcule de la valeur actuelle
-        for (int i = 0, count = 0; i < lits.length; i++)
-            if (voc.isSatisfied(lits[i]))
-                if (++count == degree)
+        for (int i = 0, count = 0; i < lits.length; i++) {
+            if (voc.isSatisfied(lits[i])) {
+                if (++count == degree) {
                     return true;
+                }
+            }
+        }
 
         return false;
     }
@@ -472,6 +484,7 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
         return status;
     }
 
+    @Override
     public Object clone() {
 	// TODO: deep copy
 	try {

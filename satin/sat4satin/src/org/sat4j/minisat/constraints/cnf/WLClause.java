@@ -96,6 +96,7 @@ public final class WLClause implements Constr, Serializable, Cloneable {
         this.voc = voc;
     }
 
+    @Override
     public Object clone()
     {
         WLClause clone;
@@ -107,7 +108,7 @@ public final class WLClause implements Constr, Serializable, Cloneable {
 	    throw new InternalError(e.toString());
 	}
 
-	clone.lits = (int[]) clone.lits.clone();
+	clone.lits = clone.lits.clone();
 
 	return clone;
     }
@@ -174,8 +175,9 @@ public final class WLClause implements Constr, Serializable, Cloneable {
             }
         }
 
-        if (propagationCheck(ps, s))
+        if (propagationCheck(ps, s)) {
             return null;
+        }
 
         return ps;
     }

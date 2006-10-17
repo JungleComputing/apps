@@ -495,8 +495,9 @@ public class Solver
             preason.clear();
             assert confl != null;
             confl.calcReason(p, preason);
-            if (confl.learnt())
+            if (confl.learnt()) {
                 claBumpActivity(confl);
+            }
 
             // Trace reason for p
             for (int j = 0; j < preason.size(); j++) {
@@ -667,11 +668,12 @@ public class Solver
             if (r == null) {
                 outLearnt.moveTo(j++, i);
             } else {
-                for (int k = 1; k < r.size(); k++)
+                for (int k = 1; k < r.size(); k++) {
                     if (!seen[r.get(k) >> 1] && (voc.getLevel(r.get(k)) != 0)) {
                         outLearnt.moveTo(j++, i);
                         break;
                     }
+                }
             }
         }
         outLearnt.shrink(i - j);
@@ -772,11 +774,12 @@ public class Solver
      */
     public void claBumpActivity(Constr confl) {
         confl.incActivity(claInc);
-        if (confl.getActivity() > CLAUSE_RESCALE_BOUND)
+        if (confl.getActivity() > CLAUSE_RESCALE_BOUND) {
             claRescalActivity();
 //        for (int i = 0; i < confl.size(); i++) {
 //            varBumpActivity(confl.get(i));
 //        }
+        }
     }
 
     public void varBumpActivity(int p) {

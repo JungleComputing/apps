@@ -116,8 +116,9 @@ public class CardDimacsReader extends DimacsReader {
             } else if (token.equals(">=")) {
                 solver.addAtLeast(literals, card);
             }
-        } else
+        } else {
             throw new ParseFormatException();
+        }
     }
 
 }

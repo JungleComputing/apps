@@ -42,6 +42,7 @@ public class NoLearningButHeuristics extends AbstractLearning implements Seriali
 
     private static final long serialVersionUID = 1L;
 
+    @Override
     public void init() {
 
     }
@@ -52,10 +53,12 @@ public class NoLearningButHeuristics extends AbstractLearning implements Seriali
      * @see org.sat4j.minisat.LearningScheme#learns(org.sat4j.minisat.Solver,
      *      org.sat4j.minisat.datatype.Vec)
      */
+    @Override
     public void learns(Constr reason) {
         claBumpActivity(reason);
     }
 
+    @Override
     public Object clone()
     {
         NoLearningButHeuristics clone;

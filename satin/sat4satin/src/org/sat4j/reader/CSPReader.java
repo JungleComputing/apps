@@ -152,8 +152,9 @@ public class CSPReader implements Reader {
 
     private Var[] intToVar(int[] variables) {
         Var[] nvars = new Var[variables.length];
-        for (int i = 0; i < variables.length; i++)
+        for (int i = 0; i < variables.length; i++) {
             nvars[i] = vars[variables[i]];
+        }
         return nvars;
     }
 
@@ -164,8 +165,9 @@ public class CSPReader implements Reader {
 
     private int[] readArrayOfInt(Scanner input, int size) {
         int[] tab = new int[size];
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i < size; i++) {
             tab[i] = input.nextInt();
+        }
         return tab;
     }
 }
@@ -180,8 +182,9 @@ class Var {
 
     Var(int[] domain, int startid) {
         this.domain = domain;
-        for (int i = 0; i < domain.length; i++)
+        for (int i = 0; i < domain.length; i++) {
             mapping.put(domain[i], ++startid);
+        }
     }
 
     int[] domain() {
@@ -194,8 +197,9 @@ class Var {
 
     void toClause(ISolver solver) throws ContradictionException {
         IVecInt clause = new VecInt();
-        for (int key : mapping.keySet())
+        for (int key : mapping.keySet()) {
             clause.push(mapping.get(key));
+        }
         // System.err.println("Adding clause: # " + clause + " = 1 ");
         solver.addClause(clause);
         solver.addAtMost(clause, 1);
@@ -203,8 +207,9 @@ class Var {
 
     int findValue(int[] model) {
         for (Map.Entry<Integer, Integer> entry : mapping.entrySet()) {
-            if ( model[entry.getValue()-1]==entry.getValue())
-                    return entry.getKey();
+            if ( model[entry.getValue()-1]==entry.getValue()) {
+                return entry.getKey();
+            }
         }
         throw new RuntimeException("BIG PROBLEM: no value for a var!");
     }
@@ -278,8 +283,9 @@ class AllowedRelation implements Relation {
                 j = 0;
                 continue;
             }
-            if (tuples[i][j] > tuple[j])
+            if (tuples[i][j] > tuple[j]) {
                 return true;
+            }
             j++;
         }
         return (j!=tuple.length);

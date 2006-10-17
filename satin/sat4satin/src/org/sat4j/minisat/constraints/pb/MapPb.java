@@ -44,8 +44,9 @@ class MapPb {
         // on a appris une clause
         if (minimum.equals(degree) && minimum.compareTo(BigInteger.ONE) > 0) {
             degree = BigInteger.ONE;
-            for (Integer i : coefs.keySet())
+            for (Integer i : coefs.keySet()) {
                 coefs.put(i, BigInteger.ONE);
+            }
         }
 
         return degree;

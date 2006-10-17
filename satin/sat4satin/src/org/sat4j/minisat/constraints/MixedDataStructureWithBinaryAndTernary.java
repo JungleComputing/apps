@@ -48,8 +48,9 @@ public class MixedDataStructureWithBinaryAndTernary extends
     @Override
     public Constr createClause(IVecInt literals) throws ContradictionException {
         IVecInt v = WLClause.sanityCheck(literals, lits, solver);
-        if (v == null)
+        if (v == null) {
             return null;
+        }
         if (v.size() == 2) {
             mlits.binaryClauses(v.get(0), v.get(1));
             return null;
@@ -79,6 +80,7 @@ public class MixedDataStructureWithBinaryAndTernary extends
         }
     }
 
+    @Override
     public Object clone() {
 	MixedDataStructureWithBinaryAndTernary clone;
 

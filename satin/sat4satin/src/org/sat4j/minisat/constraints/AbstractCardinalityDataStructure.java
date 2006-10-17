@@ -46,8 +46,9 @@ public abstract class AbstractCardinalityDataStructure extends
 
     private boolean allAtOne(IVec<BigInteger> v) {
         for (int i = 0; i < v.size(); i++) {
-            if (!v.get(i).equals(BigInteger.ONE))
+            if (!v.get(i).equals(BigInteger.ONE)) {
                 return false;
+            }
         }
         return true;
     }

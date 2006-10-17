@@ -27,8 +27,9 @@ public abstract class AbstractPBDataStructureFactory extends
 
     public Constr createClause(IVecInt literals) throws ContradictionException {
         IVecInt v = WLClause.sanityCheck(literals, getVocabulary(), solver);
-        if (v == null)
+        if (v == null) {
             return null;
+        }
         IVecInt coefs = new VecInt(v.size(), 1);
         return constraintFactory(v, coefs, true, 1);
     }

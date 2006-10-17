@@ -66,6 +66,7 @@ public class Lits2 extends Lits implements ILits2, Cloneable {
         binclauses[p].addBinaryClause(q);
     }
 
+    @Override
     public Object clone() {
 	final boolean debug = false;
 	Lits2 clone;

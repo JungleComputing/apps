@@ -271,8 +271,9 @@ public class VecInt implements Serializable, IVecInt {
 
     public boolean contains(int e) {
         for (int i = 0; i < nbelem; i++) {
-            if (myarray[i] == e)
+            if (myarray[i] == e) {
                 return true;
+            }
         }
         return false;
     }
@@ -296,6 +297,7 @@ public class VecInt implements Serializable, IVecInt {
         ncopy.nbelem = nsize;
     }
 
+    @Override
     public Object clone() {
 	VecInt clone = new VecInt(this.myarray.length);
 	copyTo(clone);
@@ -421,8 +423,9 @@ public class VecInt implements Serializable, IVecInt {
         for (i = from; i < to - 1; i++) {
             best_i = i;
             for (j = i + 1; j < to; j++) {
-                if (myarray[j] < myarray[best_i])
+                if (myarray[j] < myarray[best_i]) {
                     best_i = j;
+                }
             }
             tmp = myarray[i];
             myarray[i] = myarray[best_i];
@@ -432,25 +435,25 @@ public class VecInt implements Serializable, IVecInt {
 
     void sort(int from, int to) {
         int width = to - from;
-        if (to - from <= 15)
+        if (to - from <= 15) {
             selectionSort(from, to);
-
-        else {
+        } else {
             int pivot = myarray[rand.nextInt(width) + from];
             int tmp;
             int i = from - 1;
             int j = to;
 
             for (;;) {
-                do
+                do {
                     i++;
-                while (myarray[i] < pivot);
-                do
+                } while (myarray[i] < pivot);
+                do {
                     j--;
-                while (pivot < myarray[j]);
+                } while (pivot < myarray[j]);
 
-                if (i >= j)
+                if (i >= j) {
                     break;
+                }
 
                 tmp = myarray[i];
                 myarray[i] = myarray[j];
@@ -472,8 +475,9 @@ public class VecInt implements Serializable, IVecInt {
     public void sortUnique() {
         int i, j;
         int last;
-        if (nbelem == 0)
+        if (nbelem == 0) {
             return;
+        }
 
         sort(0, nbelem);
         i = 1;
@@ -497,8 +501,9 @@ public class VecInt implements Serializable, IVecInt {
     public boolean equals(Object obj) {
         if (obj instanceof IVecInt) {
             IVecInt v = (IVecInt) obj;
-            if (v.size() != size())
+            if (v.size() != size()) {
                 return false;
+            }
             for (int i = 0; i < size(); i++) {
                 if (v.get(i) != get(i)) {
                     return false;
@@ -569,8 +574,9 @@ public class VecInt implements Serializable, IVecInt {
             }
 
             public Integer next() {
-                if (i == nbelem)
+                if (i == nbelem) {
                     throw new NoSuchElementException();
+                }
                 return myarray[i++];
             }
 

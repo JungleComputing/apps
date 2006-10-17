@@ -138,6 +138,7 @@ public class JWOrder extends VarOrder implements Serializable, Cloneable {
         return "Jeroslow-Wang static like heuristics updated when new clauses are learnt"; 
     }
 
+    @Override
     public Object clone() {
 	JWOrder clone;
 

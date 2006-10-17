@@ -28,8 +28,9 @@ public class ClausalDataStructureCBWL extends AbstractDataStructureFactory {
      */
     public Constr createClause(IVecInt literals) throws ContradictionException {
         IVecInt v = WLClause.sanityCheck(literals, getVocabulary(), solver);
-        if (v == null)
+        if (v == null) {
             return null;
+        }
         return MixableCBClause.brandNewClause(solver, getVocabulary(), v);
     }
 

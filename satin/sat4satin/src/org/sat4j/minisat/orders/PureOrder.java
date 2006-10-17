@@ -62,6 +62,7 @@ public class PureOrder extends VarOrder implements Serializable, Cloneable {
         return "tries to first branch on a single phase watched unassigned variable (pure literal if using a CB data structure) else VSIDS from MiniSAT"; 
     }
 
+    @Override
     public Object clone() {
 	PureOrder clone;
 

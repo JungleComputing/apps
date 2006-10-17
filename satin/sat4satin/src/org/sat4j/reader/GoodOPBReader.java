@@ -86,14 +86,18 @@ public class GoodOPBReader implements Reader, Serializable {
 
     void parseLine(String line) throws ContradictionException {
         // Skip commented line
-        if (line.startsWith(COMMENT_SYMBOL))
+        if (line.startsWith(COMMENT_SYMBOL)) {
             return;
-        if (line.startsWith("p")) // ignore p cnf with pbchaff format
+        }
+        if (line.startsWith("p")) {
             return;
-        if (line.startsWith("min:") || line.startsWith("min :"))
+        }
+        if (line.startsWith("min:") || line.startsWith("min :")) {
             return; // we will use that case later
-        if (line.startsWith("max:") || line.startsWith("max :"))
+        }
+        if (line.startsWith("max:") || line.startsWith("max :")) {
             return; // we will use that case later
+        }
 
         // skip name of constraints:
         int index = line.indexOf(":");

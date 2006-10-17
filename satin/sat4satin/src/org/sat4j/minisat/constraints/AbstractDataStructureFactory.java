@@ -118,6 +118,7 @@ public abstract class AbstractDataStructureFactory implements
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public Object clone() {
 	try {
 	    return super.clone();

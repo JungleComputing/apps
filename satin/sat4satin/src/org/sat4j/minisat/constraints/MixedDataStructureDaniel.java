@@ -31,6 +31,7 @@ public class MixedDataStructureDaniel extends ClausalDataStructureWL {
         return AtLeast.atLeastNew(solver, getVocabulary(), literals, degree);
     }
 
+    @Override
     public Object clone() {
 	MixedDataStructureDaniel clone;
 

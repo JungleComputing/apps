@@ -225,6 +225,7 @@ public class TernaryClauses implements Constr, Serializable {
         return status;
     }
 
+    @Override
     public Object clone() {
         TernaryClauses clone;
 
