@@ -11,7 +11,7 @@ import org.sat4j.core.VecInt;
  * @author Kees Verstoep (versto@cs.vu.nl)
  */
 public class SolverSpawner extends SatinObject implements Serializable,
-        Cloneable, solverSpawnerInterface {
+        Cloneable, SolverSpawnerInterface {
     public SolverSpawner() {
     }
 
