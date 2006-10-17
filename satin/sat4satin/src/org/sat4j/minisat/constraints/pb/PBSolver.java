@@ -51,7 +51,6 @@ public class PBSolver extends Solver {
 
         int litImplied = trail.last();
         int currentLevel = voc.getLevel(litImplied);
-        int originalLevel = currentLevel;
         assert confl.slackConflict().signum() < 0;
 
         while (!confl.isAssertive(currentLevel)) {

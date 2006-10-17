@@ -1003,7 +1003,7 @@ public class Solver
 
 	// Put the reasons, indexed by variable number, in a hashtable
 	// ignoring the order of the literals (UnorderedVec).
-	Hashtable reasonHash = new Hashtable();
+	Hashtable<UnorderedVec, Integer> reasonHash = new Hashtable<UnorderedVec, Integer>();
 
 	for (int i = 0; i < reasons.size(); i++) {
 	    VecInt rVec = reasons.get(i);
@@ -1098,7 +1098,6 @@ public class Solver
     {
         Solver clone;
 	boolean showClone = false; // true;
-	int showIndex = 0;
 
 	try {
 	    clone = (Solver) super.clone();
@@ -1459,7 +1458,7 @@ public class Solver
     private void
     processGlobalLearnts(SolverState globalState, int iter)
     {
-	Hashtable myLearnedHash = new Hashtable();
+	Hashtable<UnorderedVec, String> myLearnedHash = new Hashtable<UnorderedVec, String>();
 
 	// Too much overhead:
 	if (false) {
@@ -1496,16 +1495,14 @@ public class Solver
 	int took = 0;
 	int avail = 0;
 	int jobs = 0;
-	int numKeys = 0;
 
 	if (startNewLearnts == 0) {
 	    startNewLearnts = learnts.size();
 	}
 	learntFrom = new Vec<String>();
 
-	Enumeration keys = globalState.learnedHash.keys();
+	Enumeration<String> keys = globalState.learnedHash.keys();
 	while (keys.hasMoreElements()) {
-	    numKeys = 0;
 	    String key = (String) keys.nextElement();
 	    // Vec<Constr> learn = null;
 	    Vec<VecInt> newLearnt = null;
@@ -2348,7 +2345,7 @@ public class Solver
 			   globalState.globalConflicts +
 			   " max " + nofConflicts);
 	// Print job stats
-	Enumeration jobs = globalState.timeVec.elements();
+	Enumeration<TimeInfo> jobs = globalState.timeVec.elements();
 	long firsttime = -1;
 	long maxtime = 0;
 	TimeInfo tiMax = null;
@@ -2488,7 +2485,6 @@ public class Solver
 	} else {
 	    for (int i = 0; i < constrs.size(); i++) {
 		Constr c = constrs.get(i);
-		VecInt cVec = new VecInt(c.size());
 
 		int res = 0;
 		for (int j = 0; j < c.size(); j++) {

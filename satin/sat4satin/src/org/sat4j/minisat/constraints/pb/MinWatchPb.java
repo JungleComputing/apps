@@ -275,12 +275,10 @@ public class MinWatchPb extends WatchPb implements Serializable {
         // Recherche du coefficient maximal parmi ceux des litt???raux
         // observ???s
         BigInteger maxCoef = BigInteger.ZERO;
-        int maxIndice = 0;
         for (int i = 0; i < watchingCount; i++)
             if (coefs[watching[i]].compareTo(maxCoef) > 0
                     && watching[i] != pIndice) {
                 maxCoef = coefs[watching[i]];
-                maxIndice = 0;
             }
 
         assert learnt || maxCoef.signum() != 0;

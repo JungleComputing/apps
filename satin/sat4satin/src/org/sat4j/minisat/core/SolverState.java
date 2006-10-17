@@ -27,7 +27,7 @@ public final class SolverState
     Lbool status;
     long globalConflicts;
     Hashtable learnedHash;
-    Vector timeVec;
+    Vector<TimeInfo> timeVec;
     Vec<VecInt> allConstrs;
     int iter;
 
@@ -43,7 +43,7 @@ public final class SolverState
 	wasSet = false;
 	globalConflicts = 0;
 	learnedHash = new Hashtable();
-	timeVec = new Vector();
+	timeVec = new Vector<TimeInfo>();
 	iter++;
 	// leave allConstrs alone
     }

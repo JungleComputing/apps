@@ -42,7 +42,6 @@ public class SolverSpawner
 	      SolverState globalState, Vec<VecInt> reasons)
     {
 	SolverResult res;
-	long begintime = System.currentTimeMillis();
 
 	// System.out.println("recSearch: solver iter " +
 	//                    solver.satinSearchIter +
@@ -66,7 +65,6 @@ public class SolverSpawner
 
 	if (solver.satinUseSharedObjects) {
 	    // New begintime to account for combined subjobs
-	    begintime = System.currentTimeMillis();
 	} else {
 	    // Divide the allowed number of conflicts evenly
 	    // over children, plus some correction factor

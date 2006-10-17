@@ -33,7 +33,6 @@ public class ObjectiveFunction {
     public BigInteger calculateDegree(int[] model) {
         BigInteger tempDegree = BigInteger.ZERO;
 
-        int indice;
         for (int i = 0; i < vars.size(); i++) {
             if (varInModel(vars.get(i), model))
                 tempDegree = tempDegree.add(coeffs.get(i));

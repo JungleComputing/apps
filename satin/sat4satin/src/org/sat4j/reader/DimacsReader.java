@@ -156,9 +156,7 @@ public class DimacsReader implements Reader, Serializable {
      */
     protected void readConstrs(LineNumberReader in) throws IOException,
             ParseFormatException, ContradictionException {
-        int lit;
         String line;
-        Scanner scan;
 
         int realNbOfConstr = 0;
 

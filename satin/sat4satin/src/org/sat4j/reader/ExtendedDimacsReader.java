@@ -120,9 +120,8 @@ public class ExtendedDimacsReader extends DimacsReader {
             int nbparam = scan.nextInt();
             assert nbparam != 0;
             assert nbparam == -1 || gateType >= ATLEAST;
-            int k = -1;
             for (int i = 0; i < nbparam; i++) {
-                k = scan.nextInt();
+                scan.nextInt();
             }
             // readI/O until reaching ending 0
             int y = scan.nextInt();
