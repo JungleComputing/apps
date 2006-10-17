@@ -1,5 +1,5 @@
 /**
- * You can run the sequential version by setting the othello.threshold value to a big number (i.e. 1000). 
+ * You can run the sequential version by setting the othello.spawnThreshold value to a big number (i.e. 1000). 
  * You can get a version that only uses a local transposition table (the old "par" version)
  * by setting the othello.replicatedDepth larger than the search depth.
  */

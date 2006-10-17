@@ -1,0 +1,68 @@
+#!/bin/sh
+depth=0;
+#dir=/home2/versto/Projects/SAT/SATLIB/longmult/BMC-dimacs-examples-0.0/unsatisfiable;
+#dir=/home2/versto/Projects/SAT/SATLIB/UF75.325.100
+#dir=/home2/versto/Projects/SAT/SATLIB/UF250.1065.100
+#dir=/home2/versto/Projects/SAT/SATLIB/UUF225.960.100
+#dir=../sat/examples/uuf100.430.1000
+dir=/home2/versto/Projects/SAT/SATLIB/FPGA_SWB_UNS/
+defopts=""
+#defopts="$defopts -Dmaxdecisiondepth=300"
+defopts="$defopts -Dmaxdecisiondepth=400"
+#defopts="$defopts -Dmaxspawndepth=50"
+defopts="$defopts -Dmaxspawndepth=100"
+defopts="$defopts -Dclone=cloning"
+#defopts="$defopts -Dclone=sun"
+defopts="$defopts -Dusearrays=1"
+defopts="$defopts -DconflictInc=4"
+#defopts="$defopts -DconflictInit=5000000"
+#defopts="$defopts -Dfixes=1"
+solver=MiniSATLimitedRestarts
+#solver=MiniSAT2Heap
+#prunopts="-reserve 144958"
+prunopts=""
+#prunopts="-o split"
+
+jvmopts="-Xms800M -Xmx800M"
+#jvmopts="-Xms800M -Xmx800M -ea"
+satinopts="-satin-stats -satin-tcp -satin-closed"
+for i in `range 1 1`; do
+    echo $i;
+    #for problem in longmult14.dimacs; do
+    #for problem in longmult15.dimacs; do
+    #for problem in `(cd $dir; ls *cnf*)`; do
+    #for problem in uf250-020.cnf; do
+    #for problem in  fpga10_12_uns_rcr.cnf fpga10_13_uns_rcr.cnf; do
+    for problem in  fpga10_13_uns_rcr.cnf; do
+    #for problem in  uuf225-01.cnf; do
+    #for problem in uuf100-01.cnf.gz; do
+      for fixes in 0; do
+	#for learn in 0 5 10 15 20 30; do
+	#for learn in 0; do
+	#for learn in 0 10; do
+	for learn in 0 5 20 30 40; do
+	    #for learntC in 0.5; do
+	    #Hack: costraints not all counted due to binary opt!!
+	    for learntC in 64.0; do
+		#for iter in 3000; do
+		for iter in 1000 2000 4000; do
+		    for nodes in 32; do
+			out="$problem-iter$iter-fixes$fixes-learn$learn-learntC$learntC-$solver-$nodes.out"
+			echo $out
+			opts="$defopts"
+			opts="$opts -Dfixes=$fixes"
+			opts="$opts -Dmaxdepth=$depth"
+			opts="$opts -Dmaxlearnsize=$learn"
+			opts="$opts -Dmaxiter=$iter"
+			opts="$opts -DlearntConstraint=$learntC"
+			prun $prunopts -v -1 -t 900 ~/ibis/bin/ibis-prun $nodes $jvmopts $opts \
+			    org/sat4j/Lanceur $solver \
+			    $dir/$problem $satinopts >> $out 2>&1 </dev/null;
+			grep CPU $out | tail -1
+		    done;
+		done;
+	    done;
+	done;
+      done;
+    done;
+done

@@ -1,0 +1,31 @@
+#!/bin/sh -x
+classpath=":build:/home2/versto/Projects/Ibis/ibis-current-gosia/ibis/classlibs:/home2/versto/Projects/Ibis/ibis-current-gosia/ibis/build/ibis.jar:/home2/versto/Projects/Ibis/ibis-current-gosia/ibis/3rdparty/log4j-1.2.9.jar:/home2/versto/Projects/Ibis/ibis-current-gosia/ibis/3rdparty/junit.jar:/home2/versto/Projects/Ibis/ibis-current-gosia/ibis/3rdparty/ibis-util.jar:/home2/versto/Projects/Ibis/ibis-current-gosia/ibis/3rdparty/ibis-connect.jar:/home2/versto/Projects/Ibis/ibis-current-gosia/ibis/3rdparty/cpptasks-1.0-cvs.jar:/home2/versto/Projects/Ibis/ibis-current-gosia/ibis/3rdparty/cpptasks-1.0b1.jar:/home2/versto/Projects/Ibis/ibis-current-gosia/ibis/3rdparty/colobus.jar:/home2/versto/Projects/Ibis/ibis-current-gosia/ibis/3rdparty/bcel-5.1.jar:/home2/versto/Projects/Ibis/ibis-current-gosia/ibis/3rdparty/ant-contrib-0.4.jar:.:"
+#hostname=`hostname`
+hostname=fs0.das2.cs.vu.nl
+port=64538
+key="$hostname-$$"
+#prof="-server -Xprof:cpu=samples,depth=5"
+#prof="-server -Xrunhprof:cpu=times,depth=6,thread=y,heap=sites"
+#prof="-server -agentlib:hprof=cpu=samples,depth=6,thread=y,heap=sites"
+#prof="-agentlib:hprof=cpu=samples,depth=6,thread=y,heap=sites"
+prof="-agentlib:hprof=cpu=samples,depth=7,thread=y,heap=sites"
+#problem=/home2/versto/Projects/SAT/SATLIB/longmult/BMC-dimacs-examples-0.0/unsatisfiable/longmult13.dimacs
+problem=/home2/versto/Projects/SAT/SATLIB/FPGA_SWB_UNS/fpga10_12_uns_rcr.cnf
+opts=""
+opts="$opts -Dmaxdepth=0"
+#opts="$opts -Dmaxiter=1000000"
+#opts="$opts -Dmaxiter=5000000"
+opts="$opts -Dclone=cloning"
+opts="$opts -Dusearrays=1"
+opts="$opts -Dmaxlearnsize=0"
+opts="$opts -DconflictInc=10"
+#opts="$opts -DconflictInit=500000"
+opts="$opts -DconflictInit=5000000"
+opts="$opts -Dprofiling=1"
+# Experiments:
+opts="$opts -DlearntConstraint=16"
+#opts="$opts -DvarOrder=default"
+opts="$opts -DvarOrder=heap"
+#opts="$opts -DvarOrder=pure"
+#opts="$opts -DvarOrder=myorder"
+/usr/local/sun-java/jdk1.5.0_04/bin/java $prof -Djava.library.path=/home2/versto/Projects/Ibis/ibis-current-gosia/ibis/build/lib:.:/usr/local/mpich/mpich-gm-gcc/lib:/usr/local/package/sge/lib/lx24-x86:/usr/local/globus/globus-3.2/lib:/usr/local/intel/compiler81/lib: -Dibis.library.path=/home2/versto/Projects/Ibis/ibis-current-gosia/ibis/build/lib -Dibis.pool.host_number=0 -Dibis.pool.total_hosts=1 -Dibis.pool.host_names=$hostname  -Dibis.name_server.key=$key -Dibis.name_server.port=$port -Dibis.name_server.host=$hostname -Xbootclasspath/p:$classpath -classpath $classpath -Xmx1024M -Xms1024M $opts org/sat4j/Lanceur -l minisat MiniSATLimitedRestarts $problem -satin-stats -satin-tcp

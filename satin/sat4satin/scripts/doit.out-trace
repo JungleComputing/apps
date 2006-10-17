@@ -1,0 +1,2 @@
+#!/bin/sh
+egrep 'start writeObj|finished writeObj' out-ibis.6-Output | awk '{ if ($2 == "finished") indent--; for (i = 0; i < indent; i++) printf "  "; if ($2 == "start") indent++;  print $2, $6 }'

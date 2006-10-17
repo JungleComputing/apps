@@ -1,0 +1,20 @@
+<project
+    name="ibis.apps.satin.sat4satin"
+    default="build"
+    basedir=".">
+
+    <property environment="env"/>
+
+    <property name="ibis"        location="${env.IBIS_HOME}"/>
+    <property name="build"       value="build"/>
+
+    <property name="satinc-flags" value=""/>
+    <property name="satin-classes" value="org.sat4j.Lanceur,org.sat4j.minisat.core.SolverSpawner org.sat4j.minisat.core.Solver,org.sat4j.minisat.core.SolverState"/>
+
+    <property name="ibis-run-args" value="-Dsatin.closed"/>
+    <property name="test-par-run" value="Lanceur"/>
+    <property name="test-seq-run" value="Lanceur"/>
+
+    <import file="${ibis}/build-files/apps/build-satin-app.xml"/>
+
+</project>

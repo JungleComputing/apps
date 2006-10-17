@@ -1,0 +1,1 @@
+prun -v -1 -t 3600 /home2/versto/ibis/bin/ibis-prun 16 -Xms800M -Xmx800M -Dmaxdecisiondepth=400 -Dmaxspawndepth=100 -Dusearrays=1 -Dsatin.so=true -Dsatin.ft=false -Dfixes=36 -Dclone=ibis -Dmaxdepth=0 -Dmaxlearnsize=0 -Dmaxiter=10000 -Dsharedclauses=0 -ea -esa org/sat4j/Lanceur MiniLearningHeap fpga.in/fpga10_11_uns_rcr.cnf  -satin-stats -satin-tcp -satin-closed
