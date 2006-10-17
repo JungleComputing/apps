@@ -4,7 +4,7 @@
  * 
  * Based on the original minisat specification from:
  * 
- * An extensible SAT solver. Niklas E�n and Niklas S�rensson.
+ * An extensible SAT solver. Niklas Een and Niklas Serensson.
  * Proceedings of the Sixth International Conference on Theory 
  * and Applications of Satisfiability Testing, LNCS 2919, 
  * pp 502-518, 2003.
@@ -170,13 +170,13 @@ public class VecInt implements Serializable, IVecInt {
     }
 
     /**
-     * Construit un vecteur contenant de taille size rempli � l'aide de size
+     * Construit un vecteur contenant de taille size rempli e l'aide de size
      * pad.
      * 
      * @param size
      *            la taille du vecteur
      * @param pad
-     *            l'objet servant � remplir le vecteur
+     *            l'objet servant e remplir le vecteur
      */
     public VecInt(int size, int pad) {
         myarray = new int[size];
@@ -208,7 +208,7 @@ public class VecInt implements Serializable, IVecInt {
     }
 
     /**
-     * d�pile le dernier �l�ment du vecteur. Si le vecteur est vide, ne
+     * depile le dernier element du vecteur. Si le vecteur est vide, ne
      * fait rien.
      */
     public IVecInt pop() {
@@ -278,7 +278,7 @@ public class VecInt implements Serializable, IVecInt {
     }
 
     /**
-     * C'est op�rations devraient se faire en temps constant. Ce n'est pas le
+     * C'est operations devraient se faire en temps constant. Ce n'est pas le
      * cas ici.
      * 
      * @param copy

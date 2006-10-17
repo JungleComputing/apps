@@ -4,7 +4,7 @@
  * 
  * Based on the original minisat specification from:
  * 
- * An extensible SAT solver. Niklas E�n and Niklas S�rensson.
+ * An extensible SAT solver. Niklas En and Niklas Srensson.
  * Proceedings of the Sixth International Conference on Theory 
  * and Applications of Satisfiability Testing, LNCS 2919, 
  * pp 502-518, 2003.
@@ -60,13 +60,13 @@ public class Vec<T> implements Serializable, Cloneable, IVec<T> {
     }
 
     /**
-     * Construit un vecteur contenant de taille size rempli � l'aide de size
+     * Construit un vecteur contenant de taille size rempli  l'aide de size
      * pad.
      * 
      * @param size
      *            la taille du vecteur
      * @param pad
-     *            l'objet servant � remplir le vecteur
+     *            l'objet servant  remplir le vecteur
      */
     @SuppressWarnings("unchecked")
     public Vec(int size, T pad) {
@@ -241,7 +241,7 @@ public class Vec<T> implements Serializable, Cloneable, IVec<T> {
     }
 
     /**
-     * Ces op�rations devraient se faire en temps constant. Ce n'est pas le
+     * Ces operations devraient se faire en temps constant. Ce n'est pas le
      * cas ici.
      * 
      * @param copy

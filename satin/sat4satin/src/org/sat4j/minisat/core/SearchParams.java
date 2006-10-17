@@ -4,7 +4,7 @@
  * 
  * Based on the original minisat specification from:
  * 
- * An extensible SAT solver. Niklas E�n and Niklas S�rensson.
+ * An extensible SAT solver. Niklas Een and Niklas Serensson.
  * Proceedings of the Sixth International Conference on Theory 
  * and Applications of Satisfiability Testing, LNCS 2919, 
  * pp 502-518, 2003.
@@ -31,12 +31,11 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 
 /*
- * Created on 29 oct. 2003 To change the template for this generated file go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ * Created on 29 oct. 2003 
  */
 
 /**
- * @author leberre Structure de donn�es permettant de configurer le prouveur.
+ * @author leberre Structure de donnees permettant de configurer le prouveur.
  */
 public class SearchParams implements Serializable {
 
@@ -124,10 +123,10 @@ public class SearchParams implements Serializable {
             try {
                 stb.append(field.get(this));
             } catch (IllegalArgumentException e) {
-                // TODO Bloc catch auto-généré
+                // TODO Bloc catch auto-genere
                 e.printStackTrace();
             } catch (IllegalAccessException e) {
-                // TODO Bloc catch auto-généré
+                // TODO Bloc catch auto-genere
                 e.printStackTrace();
             }
             stb.append(" ");

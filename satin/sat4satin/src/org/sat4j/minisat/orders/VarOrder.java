@@ -4,7 +4,7 @@
  * 
  * Based on the original minisat specification from:
  * 
- * An extensible SAT solver. Niklas E�n and Niklas S�rensson.
+ * An extensible SAT solver. Niklas Een and Niklas Serensson.
  * Proceedings of the Sixth International Conference on Theory 
  * and Applications of Satisfiability Testing, LNCS 2919, 
  * pp 502-518, 2003.
@@ -54,12 +54,12 @@ public class VarOrder implements Serializable, Cloneable, IOrder {
     private static final double VAR_RESCALE_BOUND = 1 / VAR_RESCALE_FACTOR;
 
     /**
-     * mesure heuristique de l'activit� d'une variable.
+     * mesure heuristique de l'activite d'une variable.
      */
     protected double[] activity = new double[1];
 
     /**
-     * Derni�re variable choisie
+     * Derniere variable choisie
      */
     protected int lastVar = 1;
 
@@ -71,7 +71,7 @@ public class VarOrder implements Serializable, Cloneable, IOrder {
     private double varDecay = 1.0;
 
     /**
-     * incr�ment pour l'activit� des variables.
+     * increment pour l'activite des variables.
      */
     private double varInc = 1.0;
 
@@ -299,10 +299,10 @@ public class VarOrder implements Serializable, Cloneable, IOrder {
     }
 
     /**
-     * Affiche les litt�raux dans l'ordre de l'heuristique, la valeur de
+     * Affiche les litteraux dans l'ordre de l'heuristique, la valeur de
      * l'activite entre ().
      * 
-     * @return les litt�raux dans l'ordre courant.
+     * @return les litteraux dans l'ordre courant.
      */
     @Override
     public String toString() {

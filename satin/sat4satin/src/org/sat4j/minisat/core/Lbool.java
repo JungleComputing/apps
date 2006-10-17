@@ -4,7 +4,7 @@
  * 
  * Based on the original minisat specification from:
  * 
- * An extensible SAT solver. Niklas E�n and Niklas S�rensson.
+ * An extensible SAT solver. Niklas Een and Niklas Serensson.
  * Proceedings of the Sixth International Conference on Theory 
  * and Applications of Satisfiability Testing, LNCS 2919, 
  * pp 502-518, 2003.
@@ -28,19 +28,19 @@
 package org.sat4j.minisat.core;
 
 /*
- * Created on 9 oct. 2003 Probl�me : comment rendre opposite final ?
+ * Created on 9 oct. 2003 Probleme : comment rendre opposite final ?
  */
 
 /**
- * @author leberre Cette classe repr�sente les valeurs bool�ennes qui
- *         peuvent �tre associ�es aux litt�raux.
+ * @author leberre Cette classe represente les valeurs booleennes qui
+ *         peuvent etre associees aux litteraux.
  */
 public enum Lbool {
 
     FALSE("F"), TRUE("T"), UNDEFINED("U");
 
     static {
-        // on cr�e ici les r�gles de la n�gation
+        // on cree ici les regles de la negation
         FALSE.opposite = TRUE;
         TRUE.opposite = FALSE;
         UNDEFINED.opposite = UNDEFINED;
@@ -51,9 +51,9 @@ public enum Lbool {
     }
 
     /**
-     * N�gation bool�enne
+     * Negation booleenne
      * 
-     * @return la n�gation de la valeur bool�nne. La n�gation de la valeur
+     * @return la negation de la valeur boolenne. La negation de la valeur
      *         UNDEFINED est UNDEFINED.
      */
     public Lbool not() {
@@ -61,7 +61,7 @@ public enum Lbool {
     }
 
     /**
-     * Une valeur bool�enne est repr�sent�e par T,F ou U.
+     * Une valeur booleenne est representee par T,F ou U.
      * 
      * @return l'une des trois lettres
      */
@@ -71,12 +71,12 @@ public enum Lbool {
     }
 
     /**
-     * Le symbole repr�sentant la valeur bool�enne
+     * Le symbole representant la valeur booleenne
      */
     private final String symbol;
 
     /**
-     * la valeur bool�enne oppos�e
+     * la valeur booleenne opposee
      */
     private Lbool opposite;
 

@@ -1,5 +1,5 @@
 /*
- * Created on 20 d�c. 2004
+ * Created on 20 dec. 2004
  *
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
@@ -25,7 +25,7 @@ public interface IVecInt extends Iterable<Integer> {
     public abstract void shrinkTo(int newsize);
 
     /**
-     * d�pile le dernier �l�ment du vecteur. Si le vecteur est vide, ne
+     * depile le dernier element du vecteur. Si le vecteur est vide, ne
      * fait rien.
      */
     public abstract IVecInt pop();
@@ -57,7 +57,7 @@ public interface IVecInt extends Iterable<Integer> {
     public abstract boolean contains(int e);
 
     /**
-     * C'est op�rations devraient se faire en temps constant. Ce n'est pas le
+     * C'est operations devraient se faire en temps constant. Ce n'est pas le
      * cas ici.
      * 
      * @param copy

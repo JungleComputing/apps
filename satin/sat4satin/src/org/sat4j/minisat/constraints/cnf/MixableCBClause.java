@@ -1,8 +1,6 @@
 /*
- * Créé le 4 févr. 2005
+ * Cree le 4 fevr. 2005
  *
- * TODO Pour changer le modèle de ce fichier généré, allez à :
- * Fenêtre - Préférences - Java - Style de code - Modèles de code
  */
 package org.sat4j.minisat.constraints.cnf;
 
@@ -28,7 +26,7 @@ public class MixableCBClause extends CBClause {
      */
     public MixableCBClause(IVecInt ps, ILits voc) {
         super(ps, voc);
-        // TODO Raccord de constructeur auto-généré
+        // TODO Raccord de constructeur auto-genere
     }
 
     /*
@@ -50,7 +48,7 @@ public class MixableCBClause extends CBClause {
      */
     public MixableCBClause(IVecInt ps, ILits voc, boolean learnt) {
         super(ps, voc, learnt);
-        // TODO Raccord de constructeur auto-généré
+        // TODO Raccord de constructeur auto-genere
     }
 
     public static CBClause brandNewClause(UnitPropagationListener s, ILits voc,

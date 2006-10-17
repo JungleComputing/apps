@@ -7,28 +7,28 @@ public interface IOrder {
     void setLits(ILits lits);
 
     /**
-     * Appel�e quand une nouvelle variable est cr��e.
+     * Appelee quand une nouvelle variable est creee.
      */
     void newVar();
 
     /**
-     * Appel�e lorsque plusieurs variables sont cr��es
+     * Appelee lorsque plusieurs variables sont creees
      * 
      * @param howmany
-     *            le nombre de variables cr��es
+     *            le nombre de variables creees
      */
     void newVar(int howmany);
 
     /**
-     * S�lectionne une nouvelle variable, non affect�e, ayant l'activit�
-     * la plus �lev�e.
+     * Selectionne une nouvelle variable, non affectee, ayant l'activite
+     * la plus elevee.
      * 
-     * @return Lit.UNDEFINED si aucune variable n'est trouv�e
+     * @return Lit.UNDEFINED si aucune variable n'est trouvee
      */
     int select();
 
     /**
-     * M�thode appel�e quand la variable x est d�saffect�e.
+     * Methode appelee quand la variable x est desaffectee.
      * 
      * @param x
      */

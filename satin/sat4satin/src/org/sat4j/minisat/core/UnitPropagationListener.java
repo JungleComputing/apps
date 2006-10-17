@@ -4,7 +4,7 @@
  * 
  * Based on the original minisat specification from:
  * 
- * An extensible SAT solver. Niklas E�n and Niklas S�rensson.
+ * An extensible SAT solver. Niklas Een and Niklas Serensson.
  * Proceedings of the Sixth International Conference on Theory 
  * and Applications of Satisfiability Testing, LNCS 2919, 
  * pp 502-518, 2003.
@@ -43,13 +43,13 @@ public interface UnitPropagationListener {
     public abstract boolean enqueue(int p);
 
     /**
-     * Satisfait un litt�ral
+     * Satisfait un litteral
      * 
      * @param p
-     *            le litt�ral
+     *            le litteral
      * @param from
-     *            la raison de satisfaire le litt�ral
-     * @return true si tout se passe bien, false si un conflit appara�t.
+     *            la raison de satisfaire le litteral
+     * @return true si tout se passe bien, false si un conflit apparaet.
      */
     public abstract boolean enqueue(int p, Constr from);
 }

@@ -4,7 +4,7 @@
  * 
  * Based on the original minisat specification from:
  * 
- * An extensible SAT solver. Niklas E�n and Niklas S�rensson.
+ * An extensible SAT solver. Niklas Een and Niklas Serensson.
  * Proceedings of the Sixth International Conference on Theory 
  * and Applications of Satisfiability Testing, LNCS 2919, 
  * pp 502-518, 2003.
@@ -52,14 +52,14 @@ public class VarOrderHeap implements IOrder, Serializable, Cloneable {
     private static final double VAR_RESCALE_BOUND = 1 / VAR_RESCALE_FACTOR;
 
     /**
-     * mesure heuristique de l'activit� d'une variable.
+     * mesure heuristique de l'activite d'une variable.
      */
     protected double[] activity = new double[1];
 
     private double varDecay = 1.0;
 
     /**
-     * incr�ment pour l'activit� des variables.
+     * increment pour l'activite des variables.
      */
     private double varInc = 1.0;
 
@@ -82,26 +82,26 @@ public class VarOrderHeap implements IOrder, Serializable, Cloneable {
     }
 
     /**
-     * Appel�e quand une nouvelle variable est cr��e.
+     * Appelee quand une nouvelle variable est creee.
      */
     public void newVar() {
         newVar(1);
     }
 
     /**
-     * Appel�e lorsque plusieurs variables sont cr��es
+     * Appelee lorsque plusieurs variables sont creees
      * 
      * @param howmany
-     *            le nombre de variables cr��es
+     *            le nombre de variables creees
      */
     public void newVar(int howmany) {
     }
 
     /**
-     * S�lectionne une nouvelle variable, non affect�e, ayant l'activit�
-     * la plus �lev�e.
+     * Selectionne une nouvelle variable, non affectee, ayant l'activite
+     * la plus elevee.
      * 
-     * @return Lit.UNDEFINED si aucune variable n'est trouv�e
+     * @return Lit.UNDEFINED si aucune variable n'est trouvee
      */
     public int select() {
         while (!heap.empty()) {
@@ -145,7 +145,7 @@ public class VarOrderHeap implements IOrder, Serializable, Cloneable {
     }
 
     /**
-     * M�thode appel�e quand la variable x est d�saffect�e.
+     * Methode appelee quand la variable x est desaffectee.
      * 
      * @param x
      */
@@ -155,7 +155,7 @@ public class VarOrderHeap implements IOrder, Serializable, Cloneable {
     }
 
     /**
-     * Appel�e lorsque l'activit� de la variable x a chang�.
+     * Appelee lorsque l'activite de la variable x a change.
      * 
      * @param p a literal
      */

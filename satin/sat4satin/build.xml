@@ -5,21 +5,16 @@
 
     <property environment="env"/>
 
-    <property name="ibis"        location="${env.IBIS_ROOT}"/>
+    <property name="ibis"        location="${env.IBIS_HOME}"/>
     <property name="build"       value="build"/>
 
-    <property name="main-class" value="org.sat4j.Lanceur"/>
-    <property name="satin-main-class" value="${main-class}"/>
-    <property name="satinc-flags" value="-verbose org.sat4j.minisat.core.SolverSpawner org.sat4j.minisat.core.Solver"/>
-    <property name="satin-so-classes" value="org.sat4j.minisat.core.SolverState"/>
+    <property name="satinc-flags" value=""/>
+    <property name="satin-classes" value="org.sat4j.Lanceur,org.sat4j.minisat.core.SolverSpawner org.sat4j.minisat.core.Solver,org.sat4j.minisat.core.SolverState"/>
 
-    <property name="test-par-java-args" value="-Dsatin.so=true"/>
-    <property name="test-par-run" value="org/sat4j/Lanceur -satin-closed"/>
-    <property name="test-seq-java-args" value="-Dsatin.so=true"/>
-    <property name="test-seq-run" value="org/sat4j/Lanceur -satin-closed"/>
+    <property name="ibis-run-args" value="-Dsatin.closed"/>
+    <property name="test-par-run" value="Lanceur"/>
+    <property name="test-seq-run" value="Lanceur"/>
 
     <import file="${ibis}/build-files/apps/build-satin-app.xml"/>
 
 </project>
-
-

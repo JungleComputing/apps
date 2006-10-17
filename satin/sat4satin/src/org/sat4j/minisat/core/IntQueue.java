@@ -4,7 +4,7 @@
  *
  * Based on the original minisat specification from:
  *
- * An extensible SAT solver. Niklas E�n and Niklas S�rensson.
+ * An extensible SAT solver. Niklas Een and Niklas Serensson.
  * Proceedings of the Sixth International Conference on Theory 
  * and Applications of Satisfiability Testing, LNCS 2919,
  * pp 502-518, 2003.
@@ -34,7 +34,7 @@ import java.io.Serializable;
  */
 
 /**
- * @author leberre Implantation d'une queue � l'aide d'un tableau
+ * @author leberre Implantation d'une queue e l'aide d'un tableau
  */
 public final class IntQueue implements Serializable {
 
@@ -73,16 +73,16 @@ public final class IntQueue implements Serializable {
     }
 
     /**
-     * Pour conna�tre la taille de la queue.
+     * Pour connaetre la taille de la queue.
      * 
-     * @return le nombre d'�l�ments restant dans la queue
+     * @return le nombre d'elements restant dans la queue
      */
     public int size() {
         return size - first;
     }
 
     /**
-     * Utilis�e pour accro�tre dynamiquement la taille de la queue.
+     * Utilisee pour accroetre dynamiquement la taille de la queue.
      * 
      * @param nsize
      *            la taille maximale de la queue

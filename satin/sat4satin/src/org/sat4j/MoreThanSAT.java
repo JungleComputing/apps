@@ -16,7 +16,7 @@ import org.sat4j.tools.RemiUtils;
 import org.sat4j.tools.SolutionCounter;
 
 /*
- * Created on 21 d�c. 2004
+ * Created on 21 dec. 2004
  *
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
