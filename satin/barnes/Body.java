@@ -10,13 +10,14 @@ strictfp public final class Body implements Cloneable, Comparable, Serializable 
 
     public double mass;
 
-    // these are only used by calculateNewPosition, which is done at the
-    // main node, so they can be transient
+    // These are only used by calculateNewPosition. They are transient
+    // because the NTC version only calculates the new positions on the
+    // master node. The SO version needs to send them separately.
     transient public double vel_x, vel_y, vel_z;
 
     transient public double oldAcc_x, oldAcc_y, oldAcc_z;
 
-    transient public boolean updated = false; //used for debugging
+    // transient public boolean updated = false; //used for debugging
 
     void initialize() {
         mass = 1.0;
@@ -35,27 +36,26 @@ strictfp public final class Body implements Cloneable, Comparable, Serializable 
     }
 
     //copied from the rmi implementation
-    //I used 'newAcc' instead of 'acc' to avoid confusion with this.acc
     public void computeNewPosition(boolean useOldAcc,
-            double newAcc_x, double newAcc_y, double newAcc_z, RunParameters params) {
+            double acc_x, double acc_y, double acc_z, RunParameters params) {
         if (useOldAcc) { // always true, except for first iteration
-            vel_x += (newAcc_x - oldAcc_x) * params.DT_HALF;
-            vel_y += (newAcc_y - oldAcc_y) * params.DT_HALF;
-            vel_z += (newAcc_z - oldAcc_z) * params.DT_HALF;
+            vel_x += (acc_x - oldAcc_x) * params.DT_HALF;
+            vel_y += (acc_y - oldAcc_y) * params.DT_HALF;
+            vel_z += (acc_z - oldAcc_z) * params.DT_HALF;
         }
 
-        pos_x += (newAcc_x * params.DT_HALF + vel_x) * params.DT;
-        pos_y += (newAcc_y * params.DT_HALF + vel_y) * params.DT;
-        pos_z += (newAcc_z * params.DT_HALF + vel_z) * params.DT;
+        pos_x += (acc_x * params.DT_HALF + vel_x) * params.DT;
+        pos_y += (acc_y * params.DT_HALF + vel_y) * params.DT;
+        pos_z += (acc_z * params.DT_HALF + vel_z) * params.DT;
 
-        vel_x += newAcc_x * params.DT;
-        vel_y += newAcc_y * params.DT;
-        vel_z += newAcc_z * params.DT;
+        vel_x += acc_x * params.DT;
+        vel_y += acc_y * params.DT;
+        vel_z += acc_z * params.DT;
 
         //prepare for next call of BodyTreeNode.barnes()
-        oldAcc_x = newAcc_x;
-        oldAcc_y = newAcc_y;
-        oldAcc_z = newAcc_z;
+        oldAcc_x = acc_x;
+        oldAcc_y = acc_y;
+        oldAcc_z = acc_z;
     }
 
     public String toString() {

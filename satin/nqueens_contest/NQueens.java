@@ -47,8 +47,8 @@ final class NQueens extends SatinObject implements NQueensInterface,
         while (bitmap != 0) {
             int bit = -bitmap & bitmap;
             bitmap ^= bit;
-            lnsol += seq_QueenInCorner(y + 1, (left | bit) * 2, down | bit,
-                (right | bit) / 2, bound1, mask, sizee);
+            lnsol += seq_QueenInCorner(y + 1, (left | bit) << 1, down | bit,
+                (right | bit) >> 1, bound1, mask, sizee);
         }
 
         return lnsol;
@@ -82,22 +82,24 @@ final class NQueens extends SatinObject implements NQueensInterface,
             while (bitmap != 0) {
                 final int bit = -bitmap & bitmap;
                 bitmap ^= bit;
-                lnsol += seq_QueenInCorner(y + 1, (left | bit) * 2, down | bit,
-                    (right | bit) / 2, bound1, mask, sizee);
+                lnsol += seq_QueenInCorner(y + 1, (left | bit) << 1, down | bit,
+                    (right | bit) >> 1, bound1, mask, sizee);
             }
 
             return lnsol;
         }
 
         // If where not deep enough, we keep spawning.
-        long[] lnsols = new long[(sizee + 1) * (sizee + 1)];
+        // long[] lnsols = new long[(sizee + 1) * (sizee + 1)];
+        // No, sizee+1 is enough, there are no more positions. (Ceriel)
+        long[] lnsols = new long[sizee+1];
         int it = 0;
 
         while (bitmap != 0) {
             final int bit = -bitmap & bitmap;
             bitmap ^= bit;
             lnsols[it] = spawn_QueenInCorner(y + 1, spawnLevel,
-                (left | bit) * 2, down | bit, (right | bit) / 2, bound1, mask,
+                (left | bit) << 1, down | bit, (right | bit) >> 1, bound1, mask,
                 sizee);
             it++;
         }
@@ -196,7 +198,9 @@ final class NQueens extends SatinObject implements NQueensInterface,
 
         // If where not deep enough, we keep spawning.
         int it = 0;
-        long[] lnsols = new long[N * N];
+        // long[] lnsols = new long[N * N];
+        // No, N is enough, there are no more positions. (Ceriel)
+        long[] lnsols = new long[N];
 
         while (bitmap != 0) {
             int[] boardClone = (int[]) board.clone();
@@ -204,7 +208,7 @@ final class NQueens extends SatinObject implements NQueensInterface,
             boardClone[y] = bit;
             bitmap ^= bit;
             lnsols[it] = spawn_QueenNotInCorner(boardClone, N, spawnLevel,
-                y + 1, (left | bit) * 2, down | bit, (right | bit) / 2, mask,
+                y + 1, (left | bit) << 1, down | bit, (right | bit) >> 1, mask,
                 lastmask, sidemask, bound1, bound2, topbit, endbit);
             it++;
         }
@@ -297,7 +301,7 @@ final class NQueens extends SatinObject implements NQueensInterface,
 
                     int bit = 1 << BOUND1;
                     results[nextResult++] = spawn_QueenInCorner(2, spawnLevel,
-                        (2 | bit) * 2, 1 | bit, bit / 2, BOUND1, MASK, SIZEE);
+                        (2 | bit) << 1, 1 | bit, (2 | bit) >> 1, BOUND1, MASK, SIZEE);
                 }
 
             } else {
@@ -322,7 +326,7 @@ final class NQueens extends SatinObject implements NQueensInterface,
                     }
 
                     results[nextResult++] = spawn_QueenNotInCorner(board, size,
-                        spawnLevel, 1, bit * 2, bit, bit / 2, MASK, LASTMASK,
+                        spawnLevel, 1, bit << 1, bit, bit >> 1, MASK, LASTMASK,
                         SIDEMASK, BOUND1, BOUND2, TOPBIT, ENDBIT);
                 } else {
                     System.out.println("WARNING: skipped " + SELECTED_BOUND);

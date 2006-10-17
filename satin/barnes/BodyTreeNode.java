@@ -1,5 +1,6 @@
 /* $Id$ */
 
+import java.util.ArrayList;
 
 /**
  * This oct tree is designed as follows: A node has two modes: - cell node, with
@@ -20,6 +21,8 @@
  */
 
 /*strictfp*/final class BodyTreeNode implements java.io.Serializable {
+
+    private static ArrayList treeNodeIds = new ArrayList();
 
     BodyTreeNode children[];
 
@@ -51,6 +54,8 @@
 
     // Extra margin of space used around the bodies.
     private static final double DIM_SLACK = 0.00001;
+
+    private transient int treeNodeId;
 
     /**
      * creates a totally empty tree.
@@ -102,6 +107,8 @@
         this.center_z = centerZ;
         this.halfSize = halfSize;
         this.maxTheta = maxTheta;
+        treeNodeId = treeNodeIds.size();
+        treeNodeIds.add(this);
     }
 
     /**
@@ -116,6 +123,9 @@
     public BodyTreeNode(Body[] bodyArray, RunParameters params) {
         double max_x = -1000000.0, max_y = -1000000.0, max_z = -1000000.0, min_x = 1000000.0, min_y = 1000000.0, min_z = 1000000.0;
 
+        treeNodeIds.clear();
+        treeNodeId = 0;
+        treeNodeIds.add(this);
         for (int i = 0; i < bodyArray.length; i++) {
             max_x = Math.max(max_x, bodyArray[i].pos_x);
             max_y = Math.max(max_y, bodyArray[i].pos_y);
@@ -132,6 +142,14 @@
         }
 
         trim();
+    }
+
+    public static BodyTreeNode getTreeNode(int id) {
+        return (BodyTreeNode) treeNodeIds.get(id);
+    }
+
+    public int getId() {
+        return treeNodeId;
     }
 
     private static double calcSquare(double com, double center, double halfSize) {
@@ -403,11 +421,14 @@
      * checking if the tree below 'this' has been cut off. Then the distance
      * calculation is already done during necessarryTree construction
      */
-    public void barnesBody(Body body, double[] totalAcc, RunParameters params) {
+    private void barnesBody(Body body, double[] totalAcc, RunParameters params) {
+        final double pos_x = body.pos_x;
+        final double pos_y = body.pos_y;
+        final double pos_z = body.pos_z;
 
-        double diff_x = com_x - body.pos_x;
-        double diff_y = com_y - body.pos_y;
-        double diff_z = com_z - body.pos_z;
+        double diff_x = com_x - pos_x;
+        double diff_y = com_y - pos_y;
+        double diff_z = com_z - pos_z;
 
         double distsq = diff_x * diff_x + diff_y * diff_y + diff_z * diff_z;
 
@@ -446,9 +467,9 @@
             double dz = 0;
 
             for (int i = 0; i < bodies.length; i++) {
-                diff_x = bodies[i].pos_x - body.pos_x;
-                diff_y = bodies[i].pos_y - body.pos_y;
-                diff_z = bodies[i].pos_z - body.pos_z;
+                diff_x = bodies[i].pos_x - pos_x;
+                diff_y = bodies[i].pos_y - pos_y;
+                diff_z = bodies[i].pos_z - pos_z;
 
                 distsq = diff_x * diff_x + diff_y * diff_y + diff_z * diff_z
                     + params.SOFT_SQ;
@@ -478,7 +499,7 @@
     /**
      * debug version of barnesBody.
      */
-    public void barnesBodyDbg(Body body, double[] totalAcc,
+    private void barnesBodyDbg(Body body, double[] totalAcc,
         boolean debug, RunParameters params) {
         double diff_x, diff_y, diff_z;
         double dist, distsq, factor;

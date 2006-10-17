@@ -19,6 +19,7 @@
 	<antcall target="runseq">
 		<param name="runjob" value="junit.textui.TestRunner Tests"/>
 	</antcall>
+	<antcall inheritRefs="true" target="clean"/>
     </target>
 
     <target name="docs"
