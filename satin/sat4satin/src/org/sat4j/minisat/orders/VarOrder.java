@@ -29,7 +29,6 @@ package org.sat4j.minisat.orders;
 
 import java.io.PrintStream;
 import java.io.Serializable;
-import java.util.Random;
 
 import org.sat4j.minisat.core.ILits;
 import org.sat4j.minisat.core.IOrder;
@@ -86,9 +85,9 @@ public class VarOrder implements Serializable, Cloneable, IOrder {
 
     private long randchoice = 0;
 
-    private Random rand = new Random(12345);
+//    private Random rand = new Random(12345);
 
-    private final static double RANDOM_WALK = 0.05;
+//    private final static double RANDOM_WALK = 0.05;
 
     /* (non-Javadoc)
      * @see org.sat4j.minisat.core.IOrder#setLits(org.sat4j.minisat.core.ILits)

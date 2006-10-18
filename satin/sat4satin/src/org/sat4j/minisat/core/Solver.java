@@ -218,11 +218,11 @@ public class Solver extends SatinObject implements ISolver,
     public int nConstraints() {
         return constrs.size();
     }
-
+/* not used 
     private int nLearnts() {
         return learnts.size();
     }
-
+*/
     public void learn(Constr c) {
         // slistener.learn(c);
 
@@ -648,6 +648,7 @@ public class Solver extends SatinObject implements ISolver,
         simplifier = simp;
     }
 
+    /* not used 
     // Simplify conflict clause (a little):
     private void simpleSimplification(IVecInt outLearnt) {
         int i, j;
@@ -668,7 +669,7 @@ public class Solver extends SatinObject implements ISolver,
         outLearnt.shrink(i - j);
         stats.reducedliterals += (i - j);
     }
-
+*/
     // private void expensiveSimplification(IVecInt outLearn) {
     // // Simplify conflict clause (a lot):
     // //
@@ -989,7 +990,7 @@ public class Solver extends SatinObject implements ISolver,
 
             if (rVec != null) {
                 UnorderedVec uv = new UnorderedVec(rVec);
-                reasonHash.put(uv, (Integer) i);
+                reasonHash.put(uv, i);
             }
         }
 
@@ -1000,7 +1001,7 @@ public class Solver extends SatinObject implements ISolver,
             UnorderedVec uv = new UnorderedVec(constraintToVecInt(c));
             Integer var;
 
-            if ((var = (Integer) reasonHash.get(uv)) != null) {
+            if ((var = reasonHash.get(uv)) != null) {
                 int lit = ((int) var) << 1;
 
                 voc.setReason(lit, c);
@@ -1017,7 +1018,7 @@ public class Solver extends SatinObject implements ISolver,
             UnorderedVec uv = new UnorderedVec(constraintToVecInt(c));
             Integer var;
 
-            if ((var = (Integer) reasonHash.get(uv)) != null) {
+            if ((var = reasonHash.get(uv)) != null) {
                 int lit = ((int) var) << 1;
 
                 voc.setReason(lit, c);
@@ -1103,14 +1104,14 @@ public class Solver extends SatinObject implements ISolver,
 
         clone.trailLim = (IVecInt) this.trailLim.clone();
         if (this.model != null) {
-            clone.model = (int[]) this.model.clone();
+            clone.model = this.model.clone();
         }
         if (showClone) {
             System.out.println(name + ": clone trailLim "
                 + serializedSize(clone));
         }
 
-        clone.seen = (boolean[]) this.seen.clone();
+        clone.seen = this.seen.clone();
         if (showClone) {
             System.out.println(name + ": clone seen " + serializedSize(clone));
         }
@@ -1465,7 +1466,7 @@ public class Solver extends SatinObject implements ISolver,
 
         Enumeration<String> keys = globalState.learnedHash.keys();
         while (keys.hasMoreElements()) {
-            String key = (String) keys.nextElement();
+            String key = keys.nextElement();
             // Vec<Constr> learn = null;
             Vec<VecInt> newLearnt = null;
             int[][] newLearntarr = null;
@@ -2279,7 +2280,7 @@ public class Solver extends SatinObject implements ISolver,
         TimeInfo tiMax = null;
         long totjobs = 0;
         while (jobs.hasMoreElements()) {
-            TimeInfo ti = (TimeInfo) jobs.nextElement();
+            TimeInfo ti = jobs.nextElement();
             if (firsttime == -1) {
                 firsttime = ti.endtime;
             }
