@@ -1312,12 +1312,13 @@ public class Solver extends SatinObject implements ISolver,
 
         clone.fixupAfterClone();
 
-        if (false) {
-            System.out.println(name + ": size " + serializedSize(this)
-                + " clone size " + serializedSize(clone));
-        }
+        long time = System.currentTimeMillis() - begintime;
+        stats.cloneOverhead += time / 1000.0;
 
-        stats.cloneOverhead += (System.currentTimeMillis() - begintime) / 1000.0;
+        if (true) {
+            System.out.println(name + ": size " + serializedSize(this)
+                + " clone size " + serializedSize(clone) + " took " + time + "ms");
+        }
 
         return clone;
     }

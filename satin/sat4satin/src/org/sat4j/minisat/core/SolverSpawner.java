@@ -67,8 +67,6 @@ public class SolverSpawner extends SatinObject implements Serializable,
         SolverStats stats = solver.stats;
         String name = solver.name;
 
-        // Solver s1, s2;
-
         if (solver.decisionLevel() == solver.rootLevel) {
             Solver s1, s2;
 
