@@ -10,6 +10,7 @@
 
     <property name="satinc-flags" value=""/>
     <property name="satin-classes" value="NQueens"/>
+    <property name="main-class" value="NQueens"/>
 
     <import file="${ibis}/build-files/apps/build-satin-app.xml"/>
 
