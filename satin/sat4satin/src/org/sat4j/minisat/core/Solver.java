@@ -1317,7 +1317,7 @@ public class Solver extends SatinObject implements ISolver,
 
         if (true) {
             System.out.println(name + ": size " + serializedSize(this)
-                + " clone size " + serializedSize(clone) + " took " + time + "ms");
+                + " clone size " + serializedSize(clone) + " took " + time + " ms");
         }
 
         return clone;
