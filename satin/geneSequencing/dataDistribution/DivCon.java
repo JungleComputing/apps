@@ -87,18 +87,18 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface,
 
     private Vector createTrivialResult(Vector workUnit) {
         Dsearch_AlgorithmV1 dA = new Dsearch_AlgorithmV1();
-        Vector subResult = new Vector();
+        Vector subResult = null;
 
         try {
             Vector resultUnit;
 
             resultUnit = dA.processUnit(workUnit);
             subResult = processResultUnit(resultUnit);
-        } catch (Throwable thr) {
+      } catch (Throwable thr) {
             System.out
                 .println("Exception in createTrivialResult in DivCon class: "
                     + thr.toString());
-        }
+      }
 
         return subResult;
     }

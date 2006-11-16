@@ -27,11 +27,12 @@ public class ResSeq implements Serializable {
     }
 
     private void getMaximumElements() {
-        Vector newDatabaseSequences = new Vector();
-
         if (databaseSequences.size() >= maxScores) {
-            for (int i = 0; i < maxScores; i++)
+            Vector newDatabaseSequences = new Vector();
+
+            for (int i = 0; i < maxScores; i++) {
                 newDatabaseSequences.add(databaseSequences.get(i));
+            }
 
             databaseSequences = newDatabaseSequences;
         }
