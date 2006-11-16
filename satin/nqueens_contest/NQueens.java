@@ -11,7 +11,7 @@ import java.io.StreamTokenizer;
 final class NQueens extends SatinObject implements NQueensInterface,
         Serializable {
 
-    static final long[] solutions = { 0, 0, 0, 0, 2, 10, 4, 40, 92, 352, 724,
+    static final long[] solutions = { 0, 1, 0, 0, 2, 10, 4, 40, 92, 352, 724,
         2680, 14200, 73712, 365596, 2279184L, 14772512L, 95815104L, 666090624L,
         4968057848L, 39029188884L, 314666222712L, 2691008701644L,
         24233937684440L, 227514171973736L };
