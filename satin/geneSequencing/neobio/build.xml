@@ -1,0 +1,52 @@
+<project name="neobio" default="build" basedir=".">
+	<description>
+      Build file for neobio lib
+    </description>
+	<!-- Global properties -->
+	<property name="src" location="src" />
+	<property name="tmp" location="tmp" />
+	<property name="lib" location="lib" />
+	<property name="doc" location="doc" />
+	<property name="java.debug.value" value="true" />
+	<property name="external" location="external" />
+
+	<target name="init">
+		<!-- Create the time stamp -->
+		<tstamp />
+
+		<!-- Create the build directory structure used by compile -->
+		<mkdir dir="${lib}" />
+		<mkdir dir="${tmp}" />
+		<mkdir dir="${doc}" />
+		<mkdir dir="${doc}/html" />
+		<mkdir dir="${doc}/html/javadoc" />
+	</target>
+
+	<target name="compile" depends="init" description="compile the source ">
+		<!-- Compile the java code from ${src} into ${tmp} -->
+		<javac srcdir="${src}" destdir="${tmp}" debug="on" />
+	</target>
+
+	<target name="javadoc" depends="compile" description="generate all javadocs">
+		<javadoc destdir="${doc}/html/javadoc" access="public" packagenames="neobio.*" sourcepath="${src}" >
+			<link href="http://java.sun.com/j2se/1.4.2/docs/api/" />
+		</javadoc>
+	</target>
+	
+	<target name="neobio" depends="clean,compile,javadoc" description="build the JAR file">
+		<!-- Create the distribution directory -->
+		<mkdir dir="${lib}" />
+
+		<jar jarfile="${lib}/neobio.jar" basedir="${tmp}" />
+		<delete dir="${tmp}" />
+	</target>
+
+	<target name="build" description="build everything" depends="neobio">
+	</target>
+
+	<target name="clean" description="clean up">
+		<delete dir="${tmp}" />
+		<delete dir="${lib}" />
+		<delete dir="${doc}" />
+	</target>
+</project>

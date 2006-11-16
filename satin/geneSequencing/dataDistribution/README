@@ -1,0 +1,21 @@
+The Data Distribution version
+
+Database searching is one of the most fundamental tasks in bioinformatics. Within
+this search two DNA sequences are compared with each other to identify similarities
+and differences between them.
+
+In this version we use the standard data approach for spawning of jobs. The data
+distribution is done in a native way. The data is read out on the root node and
+processed into two vectors. After that it is distributed to leaf nodes. The input data for
+a job consists of parameters for a search algorithm and two vectors with query
+sequences and database sequences.
+
+The input parameters for the program are in the input.txt file.
+
+How to compile the program:
+
+Just run 'ant' with the delivered build.xml file.
+
+How to run the program (a sample of a run command):
+
+prun -v /home/eapikoul/ibis/bin/ibis-prun 10 DsearchDC
