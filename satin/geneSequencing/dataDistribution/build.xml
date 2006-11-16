@@ -12,7 +12,7 @@
 
     <property name="main-class"  value="DsearchDC"/>
 
-    <property name="satin-classes" value="DivCon"/>
+    <property name="satin-classes" value="DsearchDC,DivCon"/>
 
     <import file="${ibis}/build-files/apps/build-satin-app.xml"/>
 
