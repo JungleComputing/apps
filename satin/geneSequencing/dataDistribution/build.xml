@@ -9,6 +9,9 @@
     <property name="build"       value="build"/>
 
     <property name="satinc-flags" value="-keep"/>
+
+    <property name="main-class"  value="DsearchDC"/>
+
     <property name="satin-classes" value="DivCon"/>
 
     <import file="${ibis}/build-files/apps/build-satin-app.xml"/>
