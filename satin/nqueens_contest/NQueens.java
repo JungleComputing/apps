@@ -126,12 +126,12 @@ final class NQueens extends SatinObject implements NQueensInterface,
                 if ((bitmap & lastmask) == 0) {
                     // ... and it is not dealt with earlier
                     board[y] = bitmap;
-                    lnsol += Check(board, sizee, bound1, endbit);
+                    lnsol = Check(board, sizee, bound1, endbit);
                     board[y] = 0;
+                    return lnsol;
                 }
             }
-
-            return lnsol;
+            return 0;
         }
 
         if (y < bound1) {
@@ -140,9 +140,13 @@ final class NQueens extends SatinObject implements NQueensInterface,
             bitmap |= sidemask;
             bitmap ^= sidemask;
         } else if (y == sizee-bound1) {
+            // This is the last opportunity to place the queen on the lower
+            // or upper row. If we do this later, it will not count, because
+            // this case has been dealt with earlier, when bound1 was lower.
             if ((down & sidemask) == 0) {
                 // No queens on the lower or upper row yet.
-                // There should be at least one by now (?)
+                // There should be at least one by now, because this is the
+                // last opportunity to place the second one.
                 return 0;
             }
             if ((down & sidemask) != sidemask) {
@@ -153,15 +157,24 @@ final class NQueens extends SatinObject implements NQueensInterface,
             }
         }
 
+        if (bitmap == 0) {
+            return 0;
+        }
+
+        if (((lastmask | down | (left << (sizee-y)) | (right >> (sizee-y))) & mask) == mask) {
+            // System.out.println("" + y);
+            return 0;
+        }
+
         // Where not done, so recursively compute the rest of the solutions...
-        while (bitmap != 0) {
+        do {
             final int bit = -bitmap & bitmap;
             board[y] = bit;
             bitmap ^= bit;
-            lnsol += seq_QueenNotInCorner(board, sizee, y + 1, (left | bit) << 1,
+            lnsol += seq_QueenNotInCorner(board, sizee, y+1, (left | bit) << 1,
                 down | bit, (right | bit) >> 1, mask, lastmask, sidemask,
                 bound1, endbit);
-        }
+        } while (bitmap != 0);
 
         return lnsol;
     }
@@ -317,9 +330,9 @@ final class NQueens extends SatinObject implements NQueensInterface,
                     ENDBIT /= 2;
                 }
 
-                results[i] = spawn_QueenNotInCorner(board, SIZEE,
-                    spawnLevel, 1, bit << 1, bit, bit >> 1, MASK, LASTMASK,
-                    SIDEMASK, BOUND1, ENDBIT);
+                results[i] = spawn_QueenNotInCorner(board, SIZEE, spawnLevel, 1,
+                        bit << 1, bit, bit >> 1, MASK, LASTMASK, SIDEMASK,
+                        BOUND1, ENDBIT);
             }
         }
 
