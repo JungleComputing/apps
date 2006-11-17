@@ -1,10 +1,10 @@
 //package dsearchDC;
 
-import neobio.alignment.ScoringScheme;
-
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Vector;
-import java.io.*;
+
+import neobio.alignment.ScoringScheme;
 
 public class DivCon extends ibis.satin.SatinObject implements DivConInterface,
         Serializable {
@@ -28,23 +28,21 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface,
         theResult = new ArrayList<ResSeq>();
     }
 
-    public ArrayList<ResSeq> spawn_splitQuerySequences(Vector workUnit) {
+    public ArrayList<ResSeq> spawn_splitQuerySequences(WorkUnit workUnit) {
         ArrayList<ResSeq> result;
 
-        Vector querySequences = (Vector) workUnit.get(3);
-
-        if (querySequences.size() <= threshold) {
+        if (workUnit.querySequences.size() <= threshold) {
             result = spawn_splitDatabaseSequences(workUnit);
             sync();
         } else {
-            int newSplitSize = querySequences.size() / 2;
+            int newSplitSize = workUnit.querySequences.size() / 2;
 
             ArrayList<ResSeq> subRes1 =
                     spawn_splitQuerySequences(
                         splitQuerySequences(0, newSplitSize, workUnit));
             ArrayList<ResSeq> subRes2 =
                     spawn_splitQuerySequences(splitQuerySequences(
-                        newSplitSize, querySequences.size(), workUnit));
+                        newSplitSize, workUnit.querySequences.size(), workUnit));
 
             sync();
 
@@ -54,23 +52,23 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface,
         return result;
     }
 
-    public ArrayList<ResSeq> spawn_splitDatabaseSequences(Vector workUnit) {
+    public ArrayList<ResSeq> spawn_splitDatabaseSequences(WorkUnit workUnit) {
         ArrayList<ResSeq> result;
         int newSplitSize;
 
-        Vector databaseSequences = (Vector) workUnit.get(4);
+//        Vector databaseSequences = (Vector) workUnit.get(4);
 
-        if (databaseSequences.size() <= threshold) {
+        if (workUnit.databaseSequences.size() <= threshold) {
             result = createTrivialResult(workUnit);
         } else {
-            newSplitSize = databaseSequences.size() / 2;
+            newSplitSize = workUnit.databaseSequences.size() / 2;
 
             ArrayList<ResSeq> subResult1 =
-                    spawn_splitDatabaseSequences(splitDatabaseSequencesFirstPart(
+                    spawn_splitDatabaseSequences(splitDatabaseSequences(0,
                         newSplitSize, workUnit));
             ArrayList<ResSeq> subResult2 =
-                    spawn_splitDatabaseSequences(splitDatabaseSequencesSecondPart(
-                        newSplitSize, workUnit));
+                    spawn_splitDatabaseSequences(splitDatabaseSequences(
+                        newSplitSize, workUnit.databaseSequences.size(), workUnit));
 
             sync();
 
@@ -80,7 +78,7 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface,
         return result;
     }
 
-    private ArrayList<ResSeq> createTrivialResult(Vector workUnit) {
+    private ArrayList<ResSeq> createTrivialResult(WorkUnit workUnit) {
         Dsearch_AlgorithmV1 dA = new Dsearch_AlgorithmV1();
         ArrayList<ResSeq> subResult = null;
 
@@ -113,13 +111,7 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface,
     }
 
     public void generateTheResult() {
-        Vector workUnit = new Vector();
-
-        workUnit.add(alignmentAlgorithm);
-        workUnit.add(scoresOrAlignments);
-        workUnit.add(scoringScheme);
-        workUnit.add(querySequences.getSequences());
-        workUnit.add(databaseSequences.getSequences());
+        WorkUnit workUnit = new WorkUnit(alignmentAlgorithm, scoresOrAlignments, scoringScheme, querySequences.getSequences(), databaseSequences.getSequences());
 
         querySequences = null;
         databaseSequences = null;
@@ -164,67 +156,22 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface,
         return theResult;
     }
 
-    private Vector splitQuerySequences(int begin, int end, Vector workUnit) {
+    private WorkUnit splitQuerySequences(int begin, int end, WorkUnit workUnit) {
         Vector newQuerySequences = new Vector();
 
-        Vector querySequences = (Vector) workUnit.get(3);
-        Vector databaseSequences = (Vector) workUnit.get(4);
+        for (int i = begin; i < end; i++)
+            newQuerySequences.add(workUnit.querySequences.get(i));
+
+        return new WorkUnit(workUnit.alignmentAlgorithm, workUnit.scoresOrAlignments, workUnit.scoringScheme, newQuerySequences, workUnit.databaseSequences);
+    }
+
+    private WorkUnit splitDatabaseSequences(int begin, int end, WorkUnit workUnit) {
+        Vector newDatabaseSequences = new Vector();
 
         for (int i = begin; i < end; i++)
-            newQuerySequences.add(querySequences.get(i));
-
-        Vector newWorkUnit = new Vector();
-
-        newWorkUnit.add(workUnit.get(0));
-        newWorkUnit.add(workUnit.get(1));
-        newWorkUnit.add(workUnit.get(2));
-
-        newWorkUnit.add(newQuerySequences);
-        newWorkUnit.add(databaseSequences);
-
-        return newWorkUnit;
-    }
-
-    private Vector splitDatabaseSequencesFirstPart(int size, Vector workUnit) {
-
-        Vector newDatabaseSequences = new Vector();
-        Vector querySequences = (Vector) workUnit.get(3);
-        Vector databaseSequences = (Vector) workUnit.get(4);
-
-        for (int i = 0; i < size; i++)
-            newDatabaseSequences.add(databaseSequences.get(i));
-
-        Vector newWorkUnit = new Vector();
-
-        newWorkUnit.add(workUnit.get(0));
-        newWorkUnit.add(workUnit.get(1));
-        newWorkUnit.add(workUnit.get(2));
-
-        newWorkUnit.add(querySequences);
-        newWorkUnit.add(newDatabaseSequences);
-
-        return newWorkUnit;
-    }
-
-    private Vector splitDatabaseSequencesSecondPart(int size, Vector workUnit) {
-        Vector newDatabaseSequences = new Vector();
-
-        Vector querySequences = (Vector) workUnit.get(3);
-        Vector databaseSequences = (Vector) workUnit.get(4);
-
-        for (int i = size; i < databaseSequences.size(); i++)
-            newDatabaseSequences.add(databaseSequences.get(i));
-
-        Vector newWorkUnit = new Vector();
-
-        newWorkUnit.add(workUnit.get(0));
-        newWorkUnit.add(workUnit.get(1));
-        newWorkUnit.add(workUnit.get(2));
-
-        newWorkUnit.add(querySequences);
-        newWorkUnit.add(newDatabaseSequences);
-
-        return newWorkUnit;
+            newDatabaseSequences.add(workUnit.databaseSequences.get(i));
+        
+        return new WorkUnit(workUnit.alignmentAlgorithm, workUnit.scoresOrAlignments, workUnit.scoringScheme, workUnit.querySequences, newDatabaseSequences);
     }
 
     public void setAlignmentAlgorithm(String alignmentAlgorithm) {
