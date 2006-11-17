@@ -1,9 +1,10 @@
 //package dsearchDC;
 
+import java.util.ArrayList;
 import java.util.Vector;
 
 public interface DivConInterface extends ibis.satin.Spawnable {
-    public Vector spawn_splitQuerySequences(Vector workUnit);
+    public ArrayList<ResSeq> spawn_splitQuerySequences(Vector workUnit);
 
-    public Vector spawn_splitDatabaseSequences(Vector workUnit);
+    public ArrayList<ResSeq> spawn_splitDatabaseSequences(Vector workUnit);
 }

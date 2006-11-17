@@ -10,10 +10,10 @@ public class DsearchDC {
 
     private DivCon dC;
 
-    private Vector theResult;
+    private ArrayList<ResSeq> theResult;
 
     public DsearchDC() {
-        theResult = new Vector();
+        theResult = new ArrayList<ResSeq>();
 
         try {
             iR = new InputReader();

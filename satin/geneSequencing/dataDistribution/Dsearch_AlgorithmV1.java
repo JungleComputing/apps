@@ -9,7 +9,7 @@ public class Dsearch_AlgorithmV1 {
 
     public final int ALIGN_GET_ALIGNMENTS = 2;
 
-    public Vector processUnit(Vector workUnit) throws Throwable {
+    public ArrayList<ResSeq> processUnit(Vector workUnit) throws Throwable {
         Vector querySequences = (Vector) workUnit.get(3);
         Vector databaseSequences = (Vector) workUnit.get(4);
 
@@ -17,8 +17,8 @@ public class Dsearch_AlgorithmV1 {
         int scoresOrAlignments = ((Integer) workUnit.get(1)).intValue();
         ScoringScheme scoringScheme = (ScoringScheme) workUnit.get(2);
 
-        Vector results = new Vector();
-
+        ArrayList<ResSeq> results = new ArrayList<ResSeq>();
+        
         for (int i = 0; i < querySequences.size(); i++) {
             Sequence querySequence = (Sequence) querySequences.get(i);
             String querySequenceBody = querySequence.createSequenceBody();

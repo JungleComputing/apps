@@ -1,6 +1,8 @@
 //package dsearchDC;
 
 import neobio.alignment.ScoringScheme;
+
+import java.util.ArrayList;
 import java.util.Vector;
 import java.io.*;
 
@@ -8,7 +10,7 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface,
         Serializable {
     private int threshold;
 
-    private Vector theResult;
+    private ArrayList<ResSeq> theResult;
 
     private FileSequences querySequences;
 
@@ -23,29 +25,26 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface,
     private ScoringScheme scoringScheme;
 
     public DivCon() {
-        theResult = new Vector();
+        theResult = new ArrayList<ResSeq>();
     }
 
-    public Vector spawn_splitQuerySequences(Vector workUnit) {
-        return splitQuerySequences(workUnit);
-    }
-
-    public Vector splitQuerySequences(Vector workUnit) {
-        Vector result;
+    public ArrayList<ResSeq> spawn_splitQuerySequences(Vector workUnit) {
+        ArrayList<ResSeq> result;
 
         Vector querySequences = (Vector) workUnit.get(3);
 
         if (querySequences.size() <= threshold) {
-            result = splitDatabaseSequences(workUnit);
+            result = spawn_splitDatabaseSequences(workUnit);
+            sync();
         } else {
             int newSplitSize = querySequences.size() / 2;
 
-            Vector subRes1 =
-                    spawn_splitQuerySequences(splitQuerySequencesFirstPart(
-                        newSplitSize, workUnit));
-            Vector subRes2 =
-                    spawn_splitQuerySequences(splitQuerySequencesSecondPart(
-                        newSplitSize, workUnit));
+            ArrayList<ResSeq> subRes1 =
+                    spawn_splitQuerySequences(
+                        splitQuerySequences(0, newSplitSize, workUnit));
+            ArrayList<ResSeq> subRes2 =
+                    spawn_splitQuerySequences(splitQuerySequences(
+                        newSplitSize, querySequences.size(), workUnit));
 
             sync();
 
@@ -55,12 +54,8 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface,
         return result;
     }
 
-    public Vector spawn_splitDatabaseSequences(Vector workUnit) {
-        return splitDatabaseSequences(workUnit);
-    }
-
-    public Vector splitDatabaseSequences(Vector workUnit) {
-        Vector result;
+    public ArrayList<ResSeq> spawn_splitDatabaseSequences(Vector workUnit) {
+        ArrayList<ResSeq> result;
         int newSplitSize;
 
         Vector databaseSequences = (Vector) workUnit.get(4);
@@ -70,10 +65,10 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface,
         } else {
             newSplitSize = databaseSequences.size() / 2;
 
-            Vector subResult1 =
+            ArrayList<ResSeq> subResult1 =
                     spawn_splitDatabaseSequences(splitDatabaseSequencesFirstPart(
                         newSplitSize, workUnit));
-            Vector subResult2 =
+            ArrayList<ResSeq> subResult2 =
                     spawn_splitDatabaseSequences(splitDatabaseSequencesSecondPart(
                         newSplitSize, workUnit));
 
@@ -85,14 +80,12 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface,
         return result;
     }
 
-    private Vector createTrivialResult(Vector workUnit) {
+    private ArrayList<ResSeq> createTrivialResult(Vector workUnit) {
         Dsearch_AlgorithmV1 dA = new Dsearch_AlgorithmV1();
-        Vector subResult = null;
+        ArrayList<ResSeq> subResult = null;
 
         try {
-            Vector resultUnit;
-
-            resultUnit = dA.processUnit(workUnit);
+            ArrayList<ResSeq> resultUnit = dA.processUnit(workUnit);
             subResult = processResultUnit(resultUnit);
       } catch (Throwable thr) {
             System.out
@@ -103,13 +96,13 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface,
         return subResult;
     }
 
-    private Vector processResultUnit(Vector resultUnit) {
-        Vector subResult = new Vector();
+    private ArrayList<ResSeq> processResultUnit(ArrayList<ResSeq> resultUnit) {
+        ArrayList<ResSeq> subResult = new ArrayList<ResSeq>();
 
         for (int i = 0; i < resultUnit.size(); i++) {
             ResSeq resSeq;
 
-            resSeq = (ResSeq) resultUnit.get(i);
+            resSeq = resultUnit.get(i);
             resSeq.setMaximumScores(maxScores);
             resSeq.processDatabaseSeqs();
 
@@ -136,22 +129,22 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface,
         sync();
     }
 
-    private Vector combineSubResults(Vector subResult1, Vector subResult2) {
-        Vector main = subResult1;
-        Vector additional = subResult2;
+    private ArrayList<ResSeq> combineSubResults(ArrayList<ResSeq> subResult1, ArrayList<ResSeq> subResult2) {
+        ArrayList<ResSeq> main = subResult1;
+        ArrayList<ResSeq> additional = subResult2;
 
         for (int i = 0; i < additional.size(); i++)
-            main = processSubResults((ResSeq) additional.get(i), main);
+            main = processSubResults(additional.get(i), main);
 
-        Vector res = new Vector(main);
+        ArrayList<ResSeq> res = new ArrayList<ResSeq>(main);
 
         return res;
     }
 
-    private Vector processSubResults(ResSeq resSeq, Vector main) {
+    private ArrayList<ResSeq> processSubResults(ResSeq resSeq, ArrayList<ResSeq> main) {
         boolean flag = false;
         for (int i = 0; i < main.size(); i++) {
-            ResSeq resSeqMain = (ResSeq) main.get(i);
+            ResSeq resSeqMain = main.get(i);
 
             String name = resSeq.getQuerySequence().getSequenceName();
             String nameMain = resSeqMain.getQuerySequence().getSequenceName();
@@ -167,17 +160,17 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface,
         return main;
     }
 
-    public Vector getTheResult() {
+    public ArrayList<ResSeq> getTheResult() {
         return theResult;
     }
 
-    private Vector splitQuerySequencesFirstPart(int size, Vector workUnit) {
+    private Vector splitQuerySequences(int begin, int end, Vector workUnit) {
         Vector newQuerySequences = new Vector();
 
         Vector querySequences = (Vector) workUnit.get(3);
         Vector databaseSequences = (Vector) workUnit.get(4);
 
-        for (int i = 0; i < size; i++)
+        for (int i = begin; i < end; i++)
             newQuerySequences.add(querySequences.get(i));
 
         Vector newWorkUnit = new Vector();
@@ -209,27 +202,6 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface,
 
         newWorkUnit.add(querySequences);
         newWorkUnit.add(newDatabaseSequences);
-
-        return newWorkUnit;
-    }
-
-    private Vector splitQuerySequencesSecondPart(int size, Vector workUnit) {
-        Vector newQuerySequences = new Vector();
-
-        Vector querySequences = (Vector) workUnit.get(3);
-        Vector databaseSequences = (Vector) workUnit.get(4);
-
-        for (int i = size; i < querySequences.size(); i++)
-            newQuerySequences.add(querySequences.get(i));
-
-        Vector newWorkUnit = new Vector();
-
-        newWorkUnit.add(workUnit.get(0));
-        newWorkUnit.add(workUnit.get(1));
-        newWorkUnit.add(workUnit.get(2));
-
-        newWorkUnit.add(newQuerySequences);
-        newWorkUnit.add(databaseSequences);
 
         return newWorkUnit;
     }
