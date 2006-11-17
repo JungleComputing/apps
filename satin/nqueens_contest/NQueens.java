@@ -18,9 +18,9 @@ final class NQueens extends SatinObject implements NQueensInterface,
 
     public long spawn_QueenNotInCorner(int[] board, int sizee, int spawnLevel,
             int y, int left, int down, int right, int mask, int lastmask,
-            int sidemask, int bound1, int endbit) {
+            int sidemask, int bound1) {
         return QueenNotInCorner(board, sizee, spawnLevel, y, left, down, right,
-            mask, lastmask, sidemask, bound1, endbit);
+            mask, lastmask, sidemask, bound1);
     }
 
     public long spawn_QueenInCorner(int y, int spawnLevel, int left, int down,
@@ -113,20 +113,21 @@ final class NQueens extends SatinObject implements NQueensInterface,
     private static final long seq_QueenNotInCorner(final int[] board,
             final int sizee, final int y, final int left, final int down,
             final int right, final int mask, final int lastmask,
-            final int sidemask, final int bound1, final int endbit) {
+            final int sidemask, final int bound1) {
         long lnsol = 0;
 
         int bitmap = mask & ~(left | down | right);
+        int ydiff = sizee - y;
 
         // Check if we have reached the end of the board. If so, 
         // we check the number of solution this board represents.
-        if (y == sizee) {
+        if (ydiff == 0) {
             if (bitmap != 0) {
                 // There is still a position left
                 if ((bitmap & lastmask) == 0) {
                     // ... and it is not dealt with earlier
                     board[y] = bitmap;
-                    lnsol = Check(board, sizee, bound1, endbit);
+                    lnsol = Check(board, sizee, bound1);
                     board[y] = 0;
                     return lnsol;
                 }
@@ -139,7 +140,7 @@ final class NQueens extends SatinObject implements NQueensInterface,
             // this case is already dealt with earlier (when bound1 was lower).
             bitmap |= sidemask;
             bitmap ^= sidemask;
-        } else if (y == sizee-bound1) {
+        } else if (ydiff == bound1) {
             // This is the last opportunity to place the queen on the lower
             // or upper row. If we do this later, it will not count, because
             // this case has been dealt with earlier, when bound1 was lower.
@@ -161,7 +162,11 @@ final class NQueens extends SatinObject implements NQueensInterface,
             return 0;
         }
 
-        if (((lastmask | down | (left << (sizee-y)) | (right >> (sizee-y))) & mask) == mask) {
+        // Check if there still is room for the last queen. After all, there
+        // was already limited room for it, due to lastmask. If this check
+        // fails, we cannot complete the board, even if we can still find
+        // a position for the current column.
+        if (((lastmask | down | (left << ydiff) | (right >> ydiff)) & mask) == mask) {
             // System.out.println("" + y);
             return 0;
         }
@@ -173,7 +178,7 @@ final class NQueens extends SatinObject implements NQueensInterface,
             bitmap ^= bit;
             lnsol += seq_QueenNotInCorner(board, sizee, y+1, (left | bit) << 1,
                 down | bit, (right | bit) >> 1, mask, lastmask, sidemask,
-                bound1, endbit);
+                bound1);
         } while (bitmap != 0);
 
         return lnsol;
@@ -182,7 +187,7 @@ final class NQueens extends SatinObject implements NQueensInterface,
     private long QueenNotInCorner(final int[] board, final int sizee,
             final int spawnLevel, final int y, final int left, final int down,
             final int right, final int mask, final int lastmask,
-            final int sidemask, final int bound1, final int endbit) {
+            final int sidemask, final int bound1) {
 
         int bitmap = mask & ~(left | down | right);
 
@@ -199,7 +204,7 @@ final class NQueens extends SatinObject implements NQueensInterface,
         // and switch to a sequential algorithm...
         if (spawnLevel <= 0) {
             return seq_QueenNotInCorner(board, sizee, y, left, down, right,
-                    mask, lastmask, sidemask, bound1, endbit);
+                    mask, lastmask, sidemask, bound1);
         }
 
         // If where not deep enough, we keep spawning.
@@ -213,7 +218,7 @@ final class NQueens extends SatinObject implements NQueensInterface,
             bitmap ^= bit;
             lnsols[it] = spawn_QueenNotInCorner(boardClone, sizee, spawnLevel-1,
                 y + 1, (left | bit) << 1, down | bit, (right | bit) >> 1, mask,
-                lastmask, sidemask, bound1, endbit);
+                lastmask, sidemask, bound1);
             it++;
         }
 
@@ -231,52 +236,119 @@ final class NQueens extends SatinObject implements NQueensInterface,
     }
 
     private static final long Check(final int[] board, final int sizee,
-            final int bound1, final int endbit) {
+            final int bound1) {
 
-        // 90-degree rotation
+        // There is a queen on position (0,bound1).
+        // Check for rotations.
         if (board[sizee-bound1] == 1) {
+            // Here, there is a queen on position (sizee-bound1,0).
+            // This means that the position found now could be a 90-degree
+            // rotation (anti-clockwise) of one that we found earlier.
             int own = 1;
 
-            for (int ptn = 2, bit = 1; own <= sizee; own++, ptn <<= 1, bit = 1) {
+            for (int ptn = 2; own <= sizee; own++, ptn <<= 1) {
+                // Queen positions from 1 .. size-1. "own" is the bit number.
+                // "ptn" the bit mask.
+                int bit = 1;
+                // Here, we are looking for a queen in row "own" as well
+                // as a queen in column "row".
                 for (int you = sizee; board[you] != ptn && board[own] >= bit; you--, bit <<= 1) {
                 }
 
-                if (board[own] > bit) return 0;
-                if (board[own] < bit) break;
+                if (board[own] > bit) {
+                    // In this case, we found the queen in row "own" first
+                    // (from right to left), which means that the row-index
+                    // of the queen in column "own" is higher than the
+                    // column-index of the queen in row "own".
+                    // This means that this is a double of a 90-degree
+                    // rotation of an earlier found solution, which means
+                    // that it is counted already.
+                    return 0;
+                }
+                if (board[own] < bit) {
+                    // In this case, we found the queen in column "own" first
+                    // (from right to left). This is a new one, and not a
+                    // 90-degree rotation of itself.
+                    break;
+                }
+                // Here, row "own" and column "own" don't tell us anything,
+                // the queens on them are in positions (own, X) and
+                // (sizee-X, own), which are 90-degree rotation positions.
+                // Continue with the next row/column.
             }
             if (own > sizee) {
+                // In this case, the board is the same as its 90-degree
+                // rotation. We can still flip the board over the horizontal
+                // axis, so it counts for 2.
                 return 2;
             }
         }
 
         final int topbit = 1 << sizee;
 
-        // 180-degree rotation
-        if (board[sizee] == endbit) {
-
+        if (board[sizee] == (1 << (sizee-bound1))) {
+            // Here, there is a queen on position (sizee,sizee-bound1).
+            // This means that the position found now could be a 180-degree
+            // rotation of one that we found earlier.
+            
             int own = 1;
-
-            for (int you = sizee - 1, bit = 1; own <= sizee; own++, you--, bit = 1) {
+            int you;
+            for (you = sizee - 1; own < you; own++, you--) {
+                // stop condition was: own <= sizee
+                int bit = 1;
+                // Now, we are looking at queens in columns 1 and sizee-2,
+                // 2 and sizee-3, et cetera, to find out if they too are at
+                // 180-degree rotation positions of each other.
                 for (int ptn = topbit; ptn != board[you] && board[own] >= bit; ptn >>= 1, bit <<= 1) {
                 }
 
-                if (board[own] > bit) return 0;
-                if (board[own] < bit) break;
+                if (board[own] > bit) {
+                    // We found the one in row sizee-own first, which means
+                    // that this position has been counted before (when it
+                    // was rotated 180 degrees).
+                    return 0;
+                }
+                if (board[own] < bit) {
+                    // We found the one in column own first. This is a new
+                    // one, and not a 180-degree rotation of itself (and also
+                    // not a 90-degree rotation).
+                    break;
+                }
+                // Here, the queens found are in 180-degree rotation
+                // positions. Continue with the next two rows.
             }
-            if (own > sizee) {
+            // if (own > sizee) {
+            if (own >= you) {
+                // 180-degree rotation of itself, but not 90-degree rotation.
+                // So, it counts for 2*2 (flipping over the horizontal axis
+                // too).
                 return 4;
             }
         }
 
-        // 270-degree rotation 
         if (board[bound1] == topbit) {
-            for (int ptn = topbit >> 1, own = 1, bit = 1; own <= sizee; own++, ptn >>= 1, bit = 1) {
+            // Here, there is a queen in position (bound1, sizee), which means
+            // that this solution could be a 270-degree rotation (or a
+            // 90-degree clockwise rotation). We only need to check here
+            // for positions that we have counted before. After all, we cannot
+            // really find a 270-degree rotation anymore, as this would
+            // be a 90-degree rotation as well.
+            for (int ptn = topbit >> 1, own = 1; own <= sizee; own++, ptn >>= 1) {
+                int bit = 1;
 
                 for (int you = 0; board[you] != ptn && board[own] >= bit; you++, bit <<= 1) {
                 }
 
-                if (board[own] > bit) return 0;
-                if (board[own] < bit) break;
+                if (board[own] > bit) {
+                    // We found a queen on row "sizee-row" first, which means
+                    // that the queen on column "row" is higher up, which means
+                    // that we have counted this position before.
+                    return 0;
+                }
+                if (board[own] < bit) {
+                    // Definitely a new position.
+                    break;
+                }
             }
         }
 
@@ -320,19 +392,17 @@ final class NQueens extends SatinObject implements NQueensInterface,
 
                 int LASTMASK = (1 << SIZEE) | 1;
                 final int SIDEMASK = LASTMASK;
-                int ENDBIT = (1 << SIZEE) / 2;
 
                 final int[] board = new int[size];
                 board[0] = bit;
 
                 for (int b1 = 1; b1 < BOUND1; b1++) {
                     LASTMASK |= LASTMASK >> 1 | LASTMASK << 1;
-                    ENDBIT /= 2;
                 }
 
                 results[i] = spawn_QueenNotInCorner(board, SIZEE, spawnLevel, 1,
                         bit << 1, bit, bit >> 1, MASK, LASTMASK, SIDEMASK,
-                        BOUND1, ENDBIT);
+                        BOUND1);
             }
         }
 
