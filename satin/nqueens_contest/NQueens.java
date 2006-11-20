@@ -403,8 +403,12 @@ final class NQueens extends SatinObject implements NQueensInterface,
 
         sync();
 
-        for (int j = 0; j < size; j++) {
-            results[0] += tempresults[j];
+        if (size == 1) {
+            results[0] = 1;
+        } else {
+            for (int j = 0; j < size; j++) {
+                results[0] += tempresults[j];
+            }
         }
 
 
@@ -462,6 +466,8 @@ final class NQueens extends SatinObject implements NQueensInterface,
         int size = readInt(d);
         int spawnLevel = readInt(d);
         int maxbound = size/2 - 1;
+
+        if (maxbound < 0) maxbound = 0;
 
         System.out.println((new Date()).toString() + ": started NQueens size "
                 + size + ", spawnlevel " + spawnLevel);
