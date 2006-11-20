@@ -16,18 +16,6 @@ final class NQueens extends SatinObject implements NQueensInterface,
         4968057848L, 39029188884L, 314666222712L, 2691008701644L,
         24233937684440L, 227514171973736L };
 
-    public long spawn_QueenNotInCorner(int[] board, int sizee, int spawnLevel,
-            int y, int left, int down, int right, int mask, int lastmask,
-            int sidemask, int bound1) {
-        return QueenNotInCorner(board, sizee, spawnLevel, y, left, down, right,
-            mask, lastmask, sidemask, bound1);
-    }
-
-    public long spawn_QueenInCorner(int y, int spawnLevel, int left, int down,
-            int right, int bound1, int mask) {
-        return QueenInCorner(y, spawnLevel, left, down, right, bound1, mask);
-    }
-
     private static final long seq_QueenInCorner(final int y, final int left,
             final int down, final int right, final int bound1, final int mask) {
         // Note: the 'y' counts down here and 'bound1' is adjusted for that.
@@ -57,7 +45,7 @@ final class NQueens extends SatinObject implements NQueensInterface,
         return lnsol;
     }
 
-    private long QueenInCorner(final int y, final int spawnLevel,
+    public long spawn_QueenInCorner(final int y, final int spawnLevel,
             final int left, final int down, final int right, final int bound1,
             final int mask) {
 
@@ -182,7 +170,7 @@ final class NQueens extends SatinObject implements NQueensInterface,
         return lnsol;
     }
 
-    private long QueenNotInCorner(final int[] board, final int sizee,
+    public long spawn_QueenNotInCorner(final int[] board, final int sizee,
             final int spawnLevel, final int y, final int left, final int down,
             final int right, final int mask, final int lastmask,
             final int sidemask, final int bound1) {
