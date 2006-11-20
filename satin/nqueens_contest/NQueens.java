@@ -18,17 +18,10 @@ final class NQueens extends SatinObject implements NQueensInterface,
 
     private static final long seq_QueenInCorner(final int y, final int left,
             final int down, final int right, final int bound1, final int mask) {
-        // Note: the 'y' counts down here and 'bound1' is adjusted for that.
-        if (y <= bound1) {
+        if (bound1 < 0) {
             return seq_QueenInCorner1(y, left, down, right, mask);
         }
         int bitmap = mask & ~(left | down | right | 2);
-        /*
-        if (y > bound1) {
-            bitmap |= 2;
-            bitmap ^= 2;
-        }
-        */
 
         long lnsol = 0;
 
@@ -36,7 +29,7 @@ final class NQueens extends SatinObject implements NQueensInterface,
             int bit = -bitmap & bitmap;
             bitmap ^= bit;
             lnsol += seq_QueenInCorner(y - 1, (left | bit) << 1, down | bit,
-                (right | bit) >> 1, bound1, mask);
+                (right | bit) >> 1, bound1 - 1, mask);
         }
 
         return lnsol;
@@ -79,16 +72,16 @@ final class NQueens extends SatinObject implements NQueensInterface,
             return 0;
         }
 
-        if (y > bound1) {
-            bitmap |= 2;
-            bitmap ^= 2;
-        }
-
         // Check if we've gone deep enough into the recursion to 
         // have generated a decent number of jobs. If so, stop spawning
         // and switch to a sequential algorithm...
         if (spawnLevel <= 0) {
             return seq_QueenInCorner(y, left, down, right, bound1, mask);
+        }
+
+        if (bound1 >= 0) {
+            bitmap |= 2;
+            bitmap ^= 2;
         }
 
         // If where not deep enough, we keep spawning.
@@ -99,7 +92,7 @@ final class NQueens extends SatinObject implements NQueensInterface,
             final int bit = -bitmap & bitmap;
             bitmap ^= bit;
             lnsols[it] = spawn_QueenInCorner(y - 1, spawnLevel - 1,
-                (left | bit) << 1, down | bit, (right | bit) >> 1, bound1,
+                (left | bit) << 1, down | bit, (right | bit) >> 1, bound1-1,
                 mask);
             it++;
         }
@@ -382,7 +375,7 @@ final class NQueens extends SatinObject implements NQueensInterface,
             int bit = 1 << BOUND1;
             tempresults[BOUND1] = spawn_QueenInCorner(SIZEE-2,
                     spawnLevel-1, (2 | bit) << 1, 1 | bit, bit >> 1,
-                    SIZEE-BOUND1, MASK);
+                    BOUND1-2, MASK);
             // The "left" parameter actually is ((1 << 1) | bit) << 1.
             // Likewise, the "right" parameter is ((1 >> 1) | bit) >> 1.
         }
