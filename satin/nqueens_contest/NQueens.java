@@ -24,25 +24,23 @@ final class NQueens extends SatinObject implements NQueensInterface,
     }
 
     public long spawn_QueenInCorner(int y, int spawnLevel, int left, int down,
-            int right, int bound1, int mask, int sizee) {
-        return QueenInCorner(y, spawnLevel, left, down, right, bound1, mask,
-            sizee);
+            int right, int bound1, int mask) {
+        return QueenInCorner(y, spawnLevel, left, down, right, bound1, mask);
     }
 
     private static final long seq_QueenInCorner(final int y, final int left,
-            final int down, final int right, final int bound1, final int mask,
-            final int sizee) {
-
+            final int down, final int right, final int bound1, final int mask) {
+        // Note: the 'y' counts down here and 'bound1' is adjusted for that.
         int bitmap = mask & ~(left | down | right);
 
-        if (y == sizee) {
+        if (y == 0) {
             if (bitmap != 0) {
                 return 8;
             }
             return 0;
         }
 
-        if (y < bound1) {
+        if (y > bound1) {
             bitmap |= 2;
             bitmap ^= 2;
         }
@@ -52,8 +50,8 @@ final class NQueens extends SatinObject implements NQueensInterface,
         while (bitmap != 0) {
             int bit = -bitmap & bitmap;
             bitmap ^= bit;
-            lnsol += seq_QueenInCorner(y + 1, (left | bit) << 1, down | bit,
-                (right | bit) >> 1, bound1, mask, sizee);
+            lnsol += seq_QueenInCorner(y - 1, (left | bit) << 1, down | bit,
+                (right | bit) >> 1, bound1, mask);
         }
 
         return lnsol;
@@ -61,18 +59,18 @@ final class NQueens extends SatinObject implements NQueensInterface,
 
     private long QueenInCorner(final int y, final int spawnLevel,
             final int left, final int down, final int right, final int bound1,
-            final int mask, final int sizee) {
+            final int mask) {
 
         int bitmap = mask & ~(left | down | right);
 
-        if (y == sizee) {
+        if (y == 0) {
             if (bitmap != 0) {
                 return 8;
             }
             return 0;
         }
 
-        if (y < bound1) {
+        if (y > bound1) {
             bitmap |= 2;
             bitmap ^= 2;
         }
@@ -81,19 +79,19 @@ final class NQueens extends SatinObject implements NQueensInterface,
         // have generated a decent number of jobs. If so, stop spawning
         // and switch to a sequential algorithm...
         if (spawnLevel <= 0) {
-            return seq_QueenInCorner(y, left, down, right, bound1, mask, sizee);
+            return seq_QueenInCorner(y, left, down, right, bound1, mask);
         }
 
         // If where not deep enough, we keep spawning.
-        long[] lnsols = new long[sizee];
+        long[] lnsols = new long[y+1];
         int it = 0;
 
         while (bitmap != 0) {
             final int bit = -bitmap & bitmap;
             bitmap ^= bit;
-            lnsols[it] = spawn_QueenInCorner(y + 1, spawnLevel - 1,
-                (left | bit) << 1, down | bit, (right | bit) >> 1, bound1, mask,
-                sizee);
+            lnsols[it] = spawn_QueenInCorner(y - 1, spawnLevel - 1,
+                (left | bit) << 1, down | bit, (right | bit) >> 1, bound1,
+                mask);
             it++;
         }
 
@@ -359,7 +357,6 @@ final class NQueens extends SatinObject implements NQueensInterface,
             final int size, final int spawnLevel) {
 
         final int SIZEE = size - 1;
-        final int TOPBIT = 1 << SIZEE;
         final int MASK = (1 << size) - 1;
 
         long start = System.currentTimeMillis();
@@ -379,8 +376,9 @@ final class NQueens extends SatinObject implements NQueensInterface,
                 for (int BOUND1 = 2; BOUND1 < SIZEE; BOUND1++) {
 
                     int bit = 1 << BOUND1;
-                    tempresults[BOUND1] = spawn_QueenInCorner(2, spawnLevel-1,
-                        (2 | bit) << 1, 1 | bit, bit >> 1, BOUND1, MASK, SIZEE);
+                    tempresults[BOUND1] = spawn_QueenInCorner(SIZEE-2,
+                            spawnLevel-1, (2 | bit) << 1, 1 | bit, bit >> 1,
+                            SIZEE-BOUND1, MASK);
                     // The "left" parameter actually is ((1 << 1) | bit) << 1.
                     // Likewise, the "right" parameter is ((1 >> 1) | bit) >> 1.
                 }
@@ -531,11 +529,17 @@ final class NQueens extends SatinObject implements NQueensInterface,
         }
     }
 
-    private void ReadFile(String file) {
+    private void readInput(String[] args) {
+        InputStream in = System.in;
         try {
-            InputStream s = this.getClass().getClassLoader()
-                    .getResourceAsStream(file);
-            StreamTokenizer d = new StreamTokenizer(new InputStreamReader(s));
+            if (args.length > 0) {
+                in = this.getClass().getClassLoader()
+                        .getResourceAsStream(args[0]);
+                if (in == null) {
+                    throw new IOException("Could not open " + args[0]);
+                }
+            }
+            StreamTokenizer d = new StreamTokenizer(new InputStreamReader(in));
 
             d.commentChar('#');
             d.eolIsSignificant(true);
@@ -548,19 +552,18 @@ final class NQueens extends SatinObject implements NQueensInterface,
             }
 
         } catch (Exception e) {
-            System.err.println("ReadFile error: " + e);
-            System.exit(1);
+            System.err.println("readInput error: " + e);
+            e.printStackTrace();
         }
     }
 
     public static void main(String[] args) {
 
-        if (args.length < 1) {
-            System.err.println("usage: nqueens <filename>");
-            System.exit(1);
+        if (args.length > 1) {
+            System.err.println("usage: nqueens [ <filename> ]");
+        } else {
+            NQueens nq = new NQueens();
+            nq.readInput(args);
         }
-
-        NQueens nq = new NQueens();
-        nq.ReadFile(args[0]);
     }
 }
