@@ -29,7 +29,7 @@ public class DsearchDC {
             File PD = new File(System.getProperty("user.dir"));
             File r = new File(PD, "result.txt");
             FileOutputStream fos = new FileOutputStream(r);
-            psRes = new PrintStream(fos);
+            psRes = new PrintStream(new BufferedOutputStream(fos));
         } catch (Exception e) {
             System.out.println("Exception in createResultFile(): "
                 + e.toString());
@@ -69,8 +69,10 @@ public class DsearchDC {
     private void printTheResultInFile() {
         createResultFile();
 
-        for (int i = 0; i < theResult.size(); i++)
+        for (int i = 0; i < theResult.size(); i++) {
             psRes.println((theResult.get(i)).toString() + "\n\n");
+        }
+        psRes.close();
     }
 
     private void processArgumentsAndSetValues() {
