@@ -112,13 +112,10 @@ final class NQueens extends SatinObject implements NQueensInterface,
     }
 
     private static final long seq_QueenNotInCorner(final int[] board,
-            final int sizee, final int y, final int left, final int right,
+            final int ydiff, final int y, final int left, final int right,
             final int mask, final int lastmask, final int sidemask,
             final int bound1) {
-        long lnsol = 0;
-
         int bitmap = mask & ~(left | right);
-        int ydiff = sizee - y;
 
         // Check if we have reached the end of the board. If so, 
         // we check the number of solution this board represents.
@@ -128,9 +125,7 @@ final class NQueens extends SatinObject implements NQueensInterface,
                 if ((bitmap & lastmask) == 0) {
                     // ... and it is not dealt with earlier
                     board[y] = bitmap;
-                    lnsol = Check(board, sizee, bound1);
-                    board[y] = 0;
-                    return lnsol;
+                    return Check(board, y, bound1);
                 }
             }
             return 0;
@@ -172,13 +167,15 @@ final class NQueens extends SatinObject implements NQueensInterface,
             return 0;
         }
 
+        long lnsol = 0;
+
         // Where not done, so recursively compute the rest of the solutions...
         do {
             final int bit = -bitmap & bitmap;
             board[y] = bit;
             bitmap ^= bit;
-            lnsol += seq_QueenNotInCorner(board, sizee, y+1, (left | bit) << 1,
-                (right | bit) >> 1, mask ^ bit, lastmask, sidemask, bound1);
+            lnsol += seq_QueenNotInCorner(board, ydiff-1, y+1, (left|bit) << 1,
+                (right|bit) >> 1, mask ^ bit, lastmask, sidemask, bound1);
         } while (bitmap != 0);
 
         return lnsol;
@@ -207,7 +204,7 @@ final class NQueens extends SatinObject implements NQueensInterface,
         // have generated a decent number of jobs. If so, stop spawining
         // and switch to a sequential algorithm...
         if (spawnLevel <= 0) {
-            return seq_QueenNotInCorner(board, sizee, y, left, right,
+            return seq_QueenNotInCorner(board, sizee-y, y, left, right,
                     mask, lastmask, sidemask, bound1);
         }
 
@@ -430,7 +427,8 @@ final class NQueens extends SatinObject implements NQueensInterface,
             nsol += results[i];
         }
 
-        System.out.println((new Date().toString()) + ": nqueens (" + size + ") = " + nsol);
+        System.out.println((new Date().toString()) + ": nqueens (" + size
+                + ") = " + nsol);
 
         if (size < solutions.length) {
             if (nsol == solutions[size]) {
@@ -465,8 +463,8 @@ final class NQueens extends SatinObject implements NQueensInterface,
         int spawnLevel = readInt(d);
         int maxbound = size/2 - 1;
 
-        System.out.println((new Date()).toString() + ": started NQueens size " + size
-                + ", spawnlevel " + spawnLevel);
+        System.out.println((new Date()).toString() + ": started NQueens size "
+                + size + ", spawnlevel " + spawnLevel);
 
         final long results[] = new long[maxbound+1];
         double time = calculate(results, size, spawnLevel);
