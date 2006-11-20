@@ -19,6 +19,32 @@ final class NQueens extends SatinObject implements NQueensInterface,
     private static final long seq_QueenInCorner(final int y, final int left,
             final int down, final int right, final int bound1, final int mask) {
         // Note: the 'y' counts down here and 'bound1' is adjusted for that.
+        if (y <= bound1) {
+            return seq_QueenInCorner1(y, left, down, right, mask);
+        }
+        int bitmap = mask & ~(left | down | right | 2);
+        /*
+        if (y > bound1) {
+            bitmap |= 2;
+            bitmap ^= 2;
+        }
+        */
+
+        long lnsol = 0;
+
+        while (bitmap != 0) {
+            int bit = -bitmap & bitmap;
+            bitmap ^= bit;
+            lnsol += seq_QueenInCorner(y - 1, (left | bit) << 1, down | bit,
+                (right | bit) >> 1, bound1, mask);
+        }
+
+        return lnsol;
+    }
+
+    private static final long seq_QueenInCorner1(final int y, final int left,
+            final int down, final int right, final int mask) {
+        // Note: the 'y' counts down here.
         int bitmap = mask & ~(left | down | right);
 
         if (y == 0) {
@@ -28,18 +54,13 @@ final class NQueens extends SatinObject implements NQueensInterface,
             return 0;
         }
 
-        if (y > bound1) {
-            bitmap |= 2;
-            bitmap ^= 2;
-        }
-
         long lnsol = 0;
 
         while (bitmap != 0) {
             int bit = -bitmap & bitmap;
             bitmap ^= bit;
-            lnsol += seq_QueenInCorner(y - 1, (left | bit) << 1, down | bit,
-                (right | bit) >> 1, bound1, mask);
+            lnsol += seq_QueenInCorner1(y - 1, (left | bit) << 1, down | bit,
+                (right | bit) >> 1, mask);
         }
 
         return lnsol;
@@ -341,9 +362,10 @@ final class NQueens extends SatinObject implements NQueensInterface,
         return 8;
     }
 
-    private final long calculate(final long[] results, final int[] bounds,
-            final int size, final int spawnLevel) {
+    private final long calculate(final long[] results, final int size,
+            final int spawnLevel) {
 
+        int maxbound = size/2 - 1;
         final int SIZEE = size - 1;
         final int MASK = (1 << size) - 1;
 
@@ -351,55 +373,44 @@ final class NQueens extends SatinObject implements NQueensInterface,
 
         long[] tempresults = new long[size];
 
-        for (int i = 0; i < bounds.length; i++) {
+        // Queen in lower-left corner case.
+        // Apparently, placing the 2nd queen on the upper border
+        // does not give any solutions? Otherwise, why not include
+        // SIZEE in this loop?
+        for (int BOUND1 = 2; BOUND1 < SIZEE; BOUND1++) {
 
-            final int SELECTED_BOUND = bounds[i];
-            results[i] = 0;
+            int bit = 1 << BOUND1;
+            tempresults[BOUND1] = spawn_QueenInCorner(SIZEE-2,
+                    spawnLevel-1, (2 | bit) << 1, 1 | bit, bit >> 1,
+                    SIZEE-BOUND1, MASK);
+            // The "left" parameter actually is ((1 << 1) | bit) << 1.
+            // Likewise, the "right" parameter is ((1 >> 1) | bit) >> 1.
+        }
 
-            if (SELECTED_BOUND == 0) {
-                // Queen in lower-left corner case.
-                // Apparently, placing the 2nd queen on the upper border
-                // does not give any solutions? Otherwise, why not include
-                // SIZEE in this loop?
-                for (int BOUND1 = 2; BOUND1 < SIZEE; BOUND1++) {
+        for (int i = 1; i <= maxbound; i++) {
+            final int BOUND1 = i;
 
-                    int bit = 1 << BOUND1;
-                    tempresults[BOUND1] = spawn_QueenInCorner(SIZEE-2,
-                            spawnLevel-1, (2 | bit) << 1, 1 | bit, bit >> 1,
-                            SIZEE-BOUND1, MASK);
-                    // The "left" parameter actually is ((1 << 1) | bit) << 1.
-                    // Likewise, the "right" parameter is ((1 >> 1) | bit) >> 1.
-                }
+            final int bit = 1 << BOUND1;
 
-            } else {
-                final int BOUND1 = SELECTED_BOUND;
+            int LASTMASK = (1 << SIZEE) | 1;
+            final int SIDEMASK = LASTMASK;
 
-                final int bit = 1 << BOUND1;
+            final int[] board = new int[size];
+            board[0] = bit;
 
-                int LASTMASK = (1 << SIZEE) | 1;
-                final int SIDEMASK = LASTMASK;
-
-                final int[] board = new int[size];
-                board[0] = bit;
-
-                for (int b1 = 1; b1 < BOUND1; b1++) {
-                    LASTMASK |= LASTMASK >> 1 | LASTMASK << 1;
-                }
-
-                results[i] = spawn_QueenNotInCorner(board, SIZEE, spawnLevel, 1,
-                        bit << 1, bit, bit >> 1, MASK, LASTMASK, SIDEMASK,
-                        BOUND1);
+            for (int b1 = 1; b1 < BOUND1; b1++) {
+                LASTMASK |= LASTMASK >> 1 | LASTMASK << 1;
             }
+
+            results[i] = spawn_QueenNotInCorner(board, SIZEE, spawnLevel, 1,
+                    bit << 1, bit, bit >> 1, MASK, LASTMASK, SIDEMASK,
+                    BOUND1);
         }
 
         sync();
 
-        for (int i = 0; i < bounds.length; i++) {
-            if (bounds[i] == 0) {
-                for (int j = 0; j < size; j++) {
-                    results[i] += tempresults[j];
-                }
-            }
+        for (int j = 0; j < size; j++) {
+            results[0] += tempresults[j];
         }
 
 
@@ -410,39 +421,25 @@ final class NQueens extends SatinObject implements NQueensInterface,
         return (end - start);
     }
 
-    private void printResults(long[] results, int[] bounds, int size,
+    private void printResults(long[] results, int size,
             double time) {
         // Note that for odd sizes, we don't have to try and place the
         // first queen on the middle row: these solutions are already
         // accounted for in the other searches.
         long nsol = 0;
         int maxbound = size/2 - 1;
-        boolean[] done = new boolean[maxbound+1];
-        boolean size_done = true;
 
-        for (int i = 0; i < results.length; i++) {
-            System.out.println("result(" + size + ", " + bounds[i]
-                    + ") = " + results[i]);
+        for (int i = 0; i <= maxbound; i++) {
             nsol += results[i];
-            done[bounds[i]] = true;
         }
 
-        for (int i = 0; i < done.length; i++) {
-            if (! done[i]) {
-                size_done = false;
-                break;
-            }
-        }
+        System.out.print(" total result nqueens (" + size + ") = " + nsol);
 
-        if (size_done) {
-            System.out.print(" total result nqueens (" + size + ") = " + nsol);
-
-            if (size < solutions.length) {
-                if (nsol == solutions[size]) {
-                    System.out.println(" application result is OK");
-                } else {
-                    System.out.println(" application result is WRONG!");
-                }
+        if (size < solutions.length) {
+            if (nsol == solutions[size]) {
+                System.out.println(" application result is OK");
+            } else {
+                System.out.println(" application result is WRONG!");
             }
         }
 
@@ -467,54 +464,16 @@ final class NQueens extends SatinObject implements NQueensInterface,
             return;
         }
         /* description of initial configuration */
-        int repeat = readInt(d);
         int size = readInt(d);
         int spawnLevel = readInt(d);
         int maxbound = size/2 - 1;
-        // Note that for odd sizes, we don't have to try and place the
-        // first queen on the middle row: these solutions are already
-        // accounted for in the other searches.
 
-        int bounds_index = 0;
-        int[] tempbounds = new int[size];
+        System.out.println("NQueens size " + size
+                + ", spawnlevel " + spawnLevel);
 
-        while (d.ttype == StreamTokenizer.TT_NUMBER) {
-            tempbounds[bounds_index] = readInt(d);
-            if (tempbounds[bounds_index] > maxbound) {
-                System.out.println("Illegal bound: " + tempbounds[bounds_index]
-                        + ", ignored");
-            } else {
-                bounds_index++;
-            }
-        }
-
-        int[] bounds = null;
-        if (bounds_index == 0) {
-            bounds = new int[maxbound + 1];
-            for (int i = 0; i <= maxbound; i++) {
-                bounds[i] = i;
-            }
-        } else {
-            bounds = new int[bounds_index];
-            for (int i = 0; i < bounds_index; i++) {
-                bounds[i] = tempbounds[i];
-            }
-        }
-
-        System.out.print("NQueens size " + size
-                + ", spawnlevel " + spawnLevel
-                + ", repeat " + repeat
-                + ", bounds:");
-        for (int i = 0; i < bounds.length; i++) {
-            System.out.print(" " + bounds[i]);
-        }
-        System.out.println();
-
-        for (int i = 0; i < repeat; i++) {
-            final long results[] = new long[bounds.length];
-            double time = calculate(results, bounds, size, spawnLevel);
-            printResults(results, bounds, size, time);
-        }
+        final long results[] = new long[maxbound+1];
+        double time = calculate(results, size, spawnLevel);
+        printResults(results, size, time);
     }
 
     private void readInput(String[] args) {
