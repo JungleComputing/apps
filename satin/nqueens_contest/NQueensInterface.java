@@ -9,4 +9,6 @@ interface NQueensInterface extends Spawnable {
             int sidemask, int bound1);
     public long spawn_QueenInCorner(int y, int spawnLevel, int left, int right,
             int bound1, int mask);
+    public long spawn_QueenCountPartial(int spawnLevel, int y, int left,
+            int right, int mask);
 }

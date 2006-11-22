@@ -12,6 +12,8 @@ import java.util.Date;
 final class NQueens extends SatinObject implements NQueensInterface,
         Serializable {
 
+    static final int MAXSZ = 30;        // :-) Yeah, right.
+
     static final long[] solutions = { 0, 1, 0, 0, 2, 10, 4, 40, 92, 352, 724,
         2680, 14200, 73712, 365596, 2279184L, 14772512L, 95815104L, 666090624L,
         4968057848L, 39029188884L, 314666222712L, 2691008701644L,
@@ -22,6 +24,9 @@ final class NQueens extends SatinObject implements NQueensInterface,
         if (bound1 < 0) {
             return seq_QueenInCorner1(y, left, right, mask);
         }
+        // Don't allow a queen in the second row as long as the column
+        // index is smaller than the row index of the queen in the second
+        // column. (Symmetry).
         int bitmap = mask & ~(left | right | 2);
 
         long lnsol = 0;
@@ -356,6 +361,138 @@ final class NQueens extends SatinObject implements NQueensInterface,
         return 8;
     }
 
+    private static final long seq_QueenCountPartial(
+            final int y, final int left,
+            final int right, final int mask) {
+
+        int bitmap = mask & ~(left | right);
+
+        if (bitmap != 0) {
+            if (y != 0) {
+                long lnsol = 0;
+                // We're not done, so recursively compute the rest of the
+                // solutions...
+                do {
+                    final int bit = -bitmap & bitmap;
+                    bitmap ^= bit;
+                    lnsol += seq_QueenCountPartial(y - 1, (left | bit) << 1,
+                        (right | bit) >> 1, mask ^ bit);
+                } while (bitmap != 0);
+
+                return lnsol;
+            }
+            return 1;
+        }
+        return 0;
+    }
+
+    public long spawn_QueenCountPartial(
+            final int spawnLevel, final int y, final int left,
+            final int right, final int mask) {
+
+        // Check if we've gone deep enough into the recursion to 
+        // have generated a decent number of jobs. If so, stop spawning
+        // and switch to a sequential algorithm...
+        if (spawnLevel <= 0) {
+            return seq_QueenCountPartial(y, left, right, mask);
+        }
+
+        int bitmap = mask & ~(left | right);
+
+        int it = 0;
+        long[] lnsols = new long[y+1];
+
+        while (bitmap != 0) {
+            int bit = -bitmap & bitmap;
+            bitmap ^= bit;
+            lnsols[it] = spawn_QueenCountPartial(spawnLevel - 1,
+                y - 1, (left | bit) << 1, (right | bit) >> 1, mask ^ bit);
+            it++;
+        }
+
+        // Wait for all the result to be returned.
+        sync();
+
+        // Determine the sum of the solutions
+        long lnsol = 0;
+
+        for (int i = 0; i < it; i++) {
+            lnsol += lnsols[i];
+        }
+
+        return lnsol;
+    }
+
+    private final long calculatePartial(final long[] results,
+            final int pos, final int size, int spawnLevel) {
+
+        final int SIZEE = size - 1;
+        final int MASK = (1 << size) - 1;
+
+        if (spawnLevel >= SIZEE-1 && spawnLevel > 0) {
+            System.out.println("Spawnlevel set too high. Setting it to "
+                    + (SIZEE-2));
+            spawnLevel = SIZEE-2;
+            if (spawnLevel < 0) {
+                spawnLevel = 0;
+            }
+        }
+
+        long start = System.currentTimeMillis();
+
+        final int bit = 1 << pos;
+
+        if (size == 1) {
+            results[pos] = 1;
+        } else {
+            if (pos == 0) {
+                // Queen in lower-left corner case.
+                // Apparently, placing the 2nd queen on the upper border
+                // does not give any solutions? Otherwise, why not include
+                // SIZEE in this loop?
+                long[] tempresults = new long[SIZEE];
+                for (int BOUND1 = 2; BOUND1 < SIZEE; BOUND1++) {
+                    int bit2 = 1 << BOUND1;
+                    tempresults[BOUND1] = spawn_QueenInCorner(SIZEE-2,
+                            spawnLevel-1, (2 | bit2) << 1, bit2 >> 1,
+                            BOUND1-2, MASK ^ (1 | bit2));
+                }
+                sync();
+                results[0] = 0;
+                for (int i = 0; i < SIZEE; i++) {
+                    results[0] += tempresults[i];
+                }
+                results[0] /= 4;
+            } else if ((size % 2 != 0) && pos == (size / 2)) {
+                // Queen in middle case.
+                long[] tempresults = new long[SIZEE];
+                int bit1 = 1 << pos;
+                for (int BOUND1 = 0; BOUND1 < pos-1; BOUND1++) {
+                    int bit2 = 1 << BOUND1;
+                    tempresults[BOUND1] = spawn_QueenCountPartial(spawnLevel-1,
+                            SIZEE-2, ((bit1 << 1) | bit2) << 1,
+                            ((bit1 >> 1) | bit2) >> 1,
+                            MASK ^ (bit1 | bit2));
+                }
+                sync();
+                results[pos] = 0;
+                for (int i = 0; i < SIZEE; i++) {
+                    results[pos] += tempresults[i];
+                }
+                results[pos] *= 2;
+            } else {
+                results[pos] = spawn_QueenCountPartial(
+                    spawnLevel, SIZEE-1, bit << 1, bit >> 1, MASK ^ bit);
+                sync();
+            }
+        }
+
+
+        long end = System.currentTimeMillis();
+
+        return (end - start);
+    }
+
     private final long calculate(final long[] results, final int size,
             final int spawnLevel) {
 
@@ -431,19 +568,14 @@ final class NQueens extends SatinObject implements NQueensInterface,
             nsol += results[i];
         }
 
-        System.out.println((new Date().toString()) + ": nqueens (" + size
-                + ") = " + nsol);
-
-        if (size < solutions.length) {
-            if (nsol == solutions[size]) {
-                System.out.println("Application result is OK");
-            } else {
-                System.out.println("Application result is WRONG!");
-            }
-        }
-
         time = time / 1000.0;
-        System.out.println(", time = " + time + " s.");
+
+        System.out.println((new Date().toString()) + ": nqueens (" + size
+                + ") = " + nsol + ", time = " + time + " s.");
+
+        if (size < solutions.length && nsol != solutions[size]) {
+            System.out.println("Application result is WRONG!");
+        }
     }
 
     private static int readInt(StreamTokenizer d) throws IOException {
@@ -455,7 +587,74 @@ final class NQueens extends SatinObject implements NQueensInterface,
         return v;
     }
 
-    private void doRun(StreamTokenizer d) throws IOException {
+    private void printResultsPartial(long[] results, int pos, int size,
+            double time, double totalTime) {
+
+        int maxbound = size/2 + size%2 - 1;
+        boolean size_done = true;
+
+        time = time / 1000.0;
+
+        System.out.println((new Date()).toString()
+                + ": nqueens(" + size + ", " + (pos + 1)
+                + ") = " + results[pos] + ", time = " + time + " s.");
+
+        long nsol = 0;
+
+        for (int i = 0; i < results.length; i++) {
+            if (results[i] < 0) {
+                size_done = false;
+                break;
+            }
+            nsol += results[i];
+            if (i != maxbound || (size % 2 == 0)) {
+                nsol += results[i];
+            }
+        }
+
+
+        if (size_done) {
+            System.out.println("Total result nqueens (" + size + ") = " + nsol
+                    + ", total time = " + (totalTime / 1000.0) + " s.");
+
+            if (size < solutions.length && nsol != solutions[size]) {
+                System.out.println(" application result is WRONG!");
+            }
+        }
+    }
+
+    private void doRunPartial(StreamTokenizer d, long[][] results, int size,
+            int spawnLevel, double[] times) throws IOException {
+
+        int maxbound = size/2 + size%2 - 1;
+
+        int pos = 0;
+
+        pos = readInt(d) - 1;
+        if (pos > maxbound) {
+            System.out.println("Illegal bound: " + pos + ", ignored");
+            return;
+        }
+
+        System.out.println((new Date()).toString() + ": NQueens size " + size
+                + ", spawnlevel " + spawnLevel + ", firstpos: " + pos);
+
+        if (results[size] == null) {
+            results[size] = new long[maxbound+1];
+            for (int i = 0; i <= maxbound; i++) {
+                results[size][i] = -1;
+            }
+        }
+
+        double time = calculatePartial(results[size], pos, size, spawnLevel);
+
+        times[size] += time;
+
+        printResultsPartial(results[size], pos, size, time, times[size]);
+    }
+
+    private void doRun(StreamTokenizer d, long[][] partials, double[] times)
+            throws IOException {
         while (d.ttype == StreamTokenizer.TT_EOL) {
             d.nextToken();
         }
@@ -465,6 +664,11 @@ final class NQueens extends SatinObject implements NQueensInterface,
         /* description of initial configuration */
         int size = readInt(d);
         int spawnLevel = readInt(d);
+
+        if (d.ttype == StreamTokenizer.TT_NUMBER) {
+            doRunPartial(d, partials, size, spawnLevel, times);
+            return;
+        }
         int maxbound = size/2 - 1;
 
         if (maxbound < 0) maxbound = 0;
@@ -479,6 +683,9 @@ final class NQueens extends SatinObject implements NQueensInterface,
 
     private void readInput(String[] args) {
         InputStream in = System.in;
+        long[][] partialResults = new long[MAXSZ+1][];
+        double[] partialTimes = new double[MAXSZ+1];
+
         try {
             if (args.length > 0) {
                 in = this.getClass().getClassLoader()
@@ -496,7 +703,7 @@ final class NQueens extends SatinObject implements NQueensInterface,
             d.nextToken();
 
             while (d.ttype != StreamTokenizer.TT_EOF) {
-                doRun(d);
+                doRun(d, partialResults, partialTimes);
             }
 
         } catch (Exception e) {
