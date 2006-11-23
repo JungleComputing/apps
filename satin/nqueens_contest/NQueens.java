@@ -637,7 +637,8 @@ final class NQueens extends SatinObject implements NQueensInterface,
         }
 
         System.out.println((new Date()).toString() + ": NQueens size " + size
-                + ", spawnlevel " + spawnLevel + ", firstpos: " + pos);
+                + ", firstpos: " + (pos + 1)
+                + ", spawnlevel " + spawnLevel);
 
         if (results[size] == null) {
             results[size] = new long[maxbound+1];
