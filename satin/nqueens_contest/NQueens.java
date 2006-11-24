@@ -424,10 +424,12 @@ final class NQueens extends SatinObject implements NQueensInterface,
     }
 
     private final long calculatePartial(final long[] results,
-            final int pos, final int size, int spawnLevel) {
+            int pos, final int size, int spawnLevel) {
 
         final int SIZEE = size - 1;
         final int MASK = (1 << size) - 1;
+
+        pos--; // 1..half --> 0..half-1: array index and shift count.
 
         if (spawnLevel >= SIZEE-1 && spawnLevel > 0) {
             System.out.println("Spawnlevel set too high. Setting it to "
@@ -570,7 +572,7 @@ final class NQueens extends SatinObject implements NQueensInterface,
 
         time = time / 1000.0;
 
-        System.out.println((new Date().toString()) + ": nqueens (" + size
+        System.out.println((new Date().toString()) + ": NQueens(" + size
                 + ") = " + nsol + ", time = " + time + " s.");
 
         if (size < solutions.length && nsol != solutions[size]) {
@@ -596,8 +598,8 @@ final class NQueens extends SatinObject implements NQueensInterface,
         time = time / 1000.0;
 
         System.out.println((new Date()).toString()
-                + ": nqueens(" + size + ", " + (pos + 1)
-                + ") = " + results[pos] + ", time = " + time + " s.");
+                + ": NQueens(" + size + ", " + pos + ") = "
+                + results[pos-1] + ", time = " + time + " s.");
 
         long nsol = 0;
 
@@ -614,8 +616,9 @@ final class NQueens extends SatinObject implements NQueensInterface,
 
 
         if (size_done) {
-            System.out.println("Total result nqueens (" + size + ") = " + nsol
-                    + ", total time = " + (totalTime / 1000.0) + " s.");
+            System.out.println((new Date()).toString()
+                    + ": sum NQueens(" + size + ") = " + nsol
+                    + ", sum time = " + (totalTime / 1000.0) + " s.");
 
             if (size < solutions.length && nsol != solutions[size]) {
                 System.out.println(" application result is WRONG!");
@@ -626,23 +629,20 @@ final class NQueens extends SatinObject implements NQueensInterface,
     private void doRunPartial(StreamTokenizer d, long[][] results, int size,
             int spawnLevel, double[] times) throws IOException {
 
-        int maxbound = size/2 + size%2 - 1;
+        int maxbound = size/2 + size%2;
 
-        int pos = 0;
-
-        pos = readInt(d) - 1;
+        int pos = readInt(d);
         if (pos > maxbound) {
             System.out.println("Illegal bound: " + pos + ", ignored");
             return;
         }
 
-        System.out.println((new Date()).toString() + ": NQueens size " + size
-                + ", firstpos: " + (pos + 1)
-                + ", spawnlevel " + spawnLevel);
+        System.out.println((new Date()).toString() + ": Started NQueens("
+                + size + ", " + pos + "), spawnlevel " + spawnLevel);
 
         if (results[size] == null) {
-            results[size] = new long[maxbound+1];
-            for (int i = 0; i <= maxbound; i++) {
+            results[size] = new long[maxbound];
+            for (int i = 0; i < maxbound; i++) {
                 results[size][i] = -1;
             }
         }
@@ -674,8 +674,8 @@ final class NQueens extends SatinObject implements NQueensInterface,
 
         if (maxbound < 0) maxbound = 0;
 
-        System.out.println((new Date()).toString() + ": started NQueens size "
-                + size + ", spawnlevel " + spawnLevel);
+        System.out.println((new Date()).toString() + ": Started NQueens("
+                + size + "), spawnlevel " + spawnLevel);
 
         final long results[] = new long[maxbound+1];
         double time = calculate(results, size, spawnLevel);
