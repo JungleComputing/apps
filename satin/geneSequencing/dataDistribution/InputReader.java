@@ -7,7 +7,7 @@ import java.util.*;
 public class InputReader implements AlignmentAlgorithms {
     public static File PROBLEMDIRECTORY;
 
-    private final String PARAMETER_FILE = "inputs.txt"; //name of the file expected to contain the input parameters
+    private final String PARAMETER_FILE = "team3/inputs.txt"; //name of the file expected to contain the input parameters
 
     private ScoringScheme scoringScheme; //the scoring scheme for the computation
 
