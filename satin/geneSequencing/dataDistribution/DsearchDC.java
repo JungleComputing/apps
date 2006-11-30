@@ -1,5 +1,7 @@
 //package dsearchDC;
 
+import ibis.satin.impl.Satin;
+
 import java.util.*;
 import java.io.*;
 
@@ -55,11 +57,13 @@ public class DsearchDC {
 
         theResult = dC.getTheResult();
 
+        Satin.pause();
         double start1 = System.currentTimeMillis();
         printTheResultInFile();
         double end1 = System.currentTimeMillis() - start1;
         System.out.println("\nThe result has been printed in " + end1 / 1000.0
             + " sec");
+        Satin.resume();
 
         double time = (System.currentTimeMillis() - startTime) / 1000.0;
         System.out.println("\nThe program has been finished in " + time
