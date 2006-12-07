@@ -71,9 +71,12 @@ public class ParTest {
 
         String me = pool.clusterName();
         String peer = pool.clusterName(1 - pool.rank());
-        if (me.equals(peer)) {
+        if (me.equals(peer) && pool.rank() == 0) {
             me = "aap";
         }
+
+        ibis.registry().elect(me);
+        
         String src = pool.rank() == 0 ? me : peer;
         String dst = pool.rank() == 0 ? peer : me;
 
@@ -229,6 +232,8 @@ public class ParTest {
             System.out.print("Creating connection " + me + "<->" + peer + " ("
                     + noStreams + " streams)...");
             System.out.flush();
+            
+            IbisIdentifier peerId = ibis.registry().getElectionResult(peer);
 
             PortType portType = ibis.createPortType("test" + noStreams, properties());
 
@@ -253,9 +258,7 @@ public class ParTest {
 
             sport = portType.createSendPort();
             sport.setProperties(props);
-            ReceivePortIdentifier rportId = ibis.registry().lookupReceivePort(
-                    peerName);
-            sport.connect(rportId);
+            sport.connect(peerId, peerName);
 
             System.out.println("done");
             System.out.flush();

@@ -25,6 +25,8 @@ final class MasterWorker {
 
     PortType manyToOneType;
 
+    IbisIdentifier masterID;
+
     MasterWorker() {
         StaticProperties s;
 
@@ -39,7 +41,9 @@ final class MasterWorker {
 
             registry = ibis.registry();
 
-            boolean master = registry.elect("master").equals(ibis.identifier());
+            masterID = registry.elect("master");
+
+            boolean master = masterID.equals(ibis.identifier());
 
             manyToOneType = ibis.createPortType("many2one type", s);
 
@@ -59,40 +63,6 @@ final class MasterWorker {
             System.err.println("main caught exception: " + e);
             e.printStackTrace();
         }
-    }
-
-    public void connect(SendPort s, ReceivePortIdentifier ident) {
-        boolean success = false;
-        do {
-            try {
-                s.connect(ident);
-                success = true;
-            } catch (Exception e) {
-                try {
-                    Thread.sleep(500);
-                } catch (Exception e2) {
-                }
-            }
-        } while (!success);
-    }
-
-    public ReceivePortIdentifier lookup(String name) throws IOException {
-        ReceivePortIdentifier temp = null;
-
-        do {
-            temp = registry.lookupReceivePort(name);
-
-            if (temp == null) {
-                try {
-                    Thread.sleep(500);
-                } catch (Exception e) {
-                    // ignore
-                }
-            }
-
-        } while (temp == null);
-
-        return temp;
     }
 
     void master() throws Exception {
@@ -127,11 +97,8 @@ final class MasterWorker {
                 sendPort = (SendPort) workers.get(origin);
 
                 if (sendPort == null) {
-
-                    peer = lookup("receiveport @ " + origin.ibis());
-
                     sendPort = oneToOneType.createSendPort();
-                    connect(sendPort, peer);
+                    sendPort.connect(origin.ibis(), "receiveport");
 
                     workers.put(origin, sendPort);
 
@@ -167,14 +134,11 @@ final class MasterWorker {
         long start;
         long end;
 
-        ReceivePort rport = oneToOneType.createReceivePort("receiveport @ "
-                + ibis.identifier());
+        ReceivePort rport = oneToOneType.createReceivePort("receiveport");
         rport.enableConnections();
         SendPort sport = manyToOneType.createSendPort();
 
-        ReceivePortIdentifier master = lookup("master receive port");
-
-        connect(sport, master);
+        sport.connect(masterID, "master receive port");
 
         while (true) {
             writeMessage = sport.newMessage();

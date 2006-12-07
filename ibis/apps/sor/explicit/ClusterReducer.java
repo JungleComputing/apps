@@ -25,6 +25,7 @@ import ibis.ipl.WriteMessage;
 import ibis.ipl.Registry;
 import ibis.ipl.StaticProperties;
 import ibis.ipl.IbisException;
+import ibis.ipl.IbisIdentifier;
 
 import ibis.util.PoolInfo;
 
@@ -43,6 +44,8 @@ public class ClusterReducer extends TreeReducer {
 
         int rank = info.rank();
         int size = info.size();
+
+        Registry registry = ibis.registry();
 
         int[] cluster = info.clusterIPRank();
         clusterSize = info.clusterIPSize();
@@ -131,15 +134,13 @@ public class ClusterReducer extends TreeReducer {
             }
         }
 
-        Registry registry = ibis.registry();
-
         /* Create and connect ports for the intra-cluster reduce phase */
         if (children > 0) {
             reduceRreduce = new ReceivePort[2];
             for (int c = 0; c < 2; c++) {
                 if (child[c] != LEAF_NODE) {
                     reduceRreduce[c] = portTypeReduce.createReceivePort("SOR"
-                            + rank + "_" + c + "_reduceR");
+                            + c + "_reduceR");
                     reduceRreduce[c].enableConnections();
                 }
             }
@@ -147,30 +148,24 @@ public class ClusterReducer extends TreeReducer {
 
         if (parent != LEAF_NODE) {
             int childrank = localRank[rank] - 2 * localRank[parent] - 1;
-            reduceSreduce = portTypeReduce.createSendPort("SOR" + rank
-                    + "reduceS");
-            ReceivePortIdentifier id;
-            id = registry.lookupReceivePort("SOR" + parent + "_" + childrank
-                    + "_reduceR");
-            reduceSreduce.connect(id);
+            reduceSreduce = portTypeReduce.createSendPort("SOR" +
+                    childrank + "_reduceS");
+            IbisIdentifier id = registry.getElectionResult("" + parent);
+            reduceSreduce.connect(id, "SOR" + childrank + "_reduceR");
         }
 
         /* Create and connect ports for the intra-cluster bcast phase */
         if (parent != LEAF_NODE) {
-            reduceRbcast = portTypeBroadcast.createReceivePort("SOR" + rank
-                    + "reduceR");
+            reduceRbcast = portTypeBroadcast.createReceivePort("SORreduceR");
             reduceRbcast.enableConnections();
         }
 
         if (children > 0) {
-            reduceSbcast = portTypeBroadcast.createSendPort("SOR" + rank
-                    + "reduceS");
+            reduceSbcast = portTypeBroadcast.createSendPort("SORreduceS");
             for (int c = 0; c < 2; c++) {
                 if (child[c] != LEAF_NODE) {
-                    ReceivePortIdentifier id;
-                    id = registry.lookupReceivePort("SOR" + child[c]
-                            + "reduceR");
-                    reduceSbcast.connect(id);
+                    IbisIdentifier id = registry.getElectionResult("" + child[c]);
+                    reduceSbcast.connect(id, "SORreduceR");
                 }
             }
         }
@@ -191,19 +186,16 @@ public class ClusterReducer extends TreeReducer {
             for (int i = 0; i < clusterSize; i++) {
                 if (i != myCluster) {
                     reduceRinter[i] = portTypeInter.createReceivePort("SOR"
-                            + rank + "_" + i + "_interR");
+                            + i + "_interR");
                     reduceRinter[i].enableConnections();
                 }
             }
 
-            reduceSinter = portTypeInter
-                    .createSendPort("SOR" + rank + "interS");
+            reduceSinter = portTypeInter.createSendPort("SORinterS");
             for (int i = 0; i < clusterSize; i++) {
                 if (i != myCluster) {
-                    ReceivePortIdentifier id;
-                    id = registry.lookupReceivePort("SOR" + clusterRoot[i]
-                            + "_" + myCluster + "_interR");
-                    reduceSinter.connect(id);
+                    IbisIdentifier id = registry.getElectionResult("" + clusterRoot[i]);
+                    reduceSinter.connect(id, "SOR" + myCluster + "_interR");
                 }
             }
             System.err.println(rank + ": interlocal connection OK");

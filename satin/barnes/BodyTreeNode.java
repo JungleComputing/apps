@@ -1,5 +1,7 @@
 /* $Id$ */
 
+import ibis.util.Timer;
+
 import java.util.ArrayList;
 
 /**
@@ -23,6 +25,19 @@ import java.util.ArrayList;
 /*strictfp*/final class BodyTreeNode implements java.io.Serializable {
 
     private static ArrayList treeNodeIds = new ArrayList();
+
+    static Timer intTimer = Timer.createTimer();
+    static Timer barnesBodyTimer = Timer.createTimer();
+    static long bodyInteractions = 0;
+    static {
+        Runtime.getRuntime().addShutdownHook(
+            new Thread("xxx") {
+                public void run() {
+                    System.out.println("intTimer: total = " + intTimer.totalTime() + ", body interactions = " +  bodyInteractions);
+                    System.out.println("barnesBodyTimer: total = " + barnesBodyTimer.totalTime() + ", count = " +  barnesBodyTimer.nrTimes());
+                }
+            });
+    }
 
     BodyTreeNode children[];
 
@@ -433,7 +448,6 @@ import java.util.ArrayList;
         final double pos_x = body.pos_x;
         final double pos_y = body.pos_y;
         final double pos_z = body.pos_z;
-
         double diff_x = com_x - pos_x;
         double diff_y = com_y - pos_y;
         double diff_z = com_z - pos_z;
@@ -470,6 +484,8 @@ import java.util.ArrayList;
                 System.exit(1);
             }
 
+            intTimer.start();
+
             double dx = 0;
             double dy = 0;
             double dz = 0;
@@ -493,6 +509,8 @@ import java.util.ArrayList;
             totalAcc[1] += dy;
             totalAcc[2] += dz;
 
+            bodyInteractions += bodies.length;
+            intTimer.stop();
             return;
         }
 
@@ -625,15 +643,13 @@ import java.util.ArrayList;
             return;
         }
 
-        double[] acc = null;
+        double[] acc = new double[3];
 
         for (int i = 0; i < bodies.length; i++) {
-            if (acc == null) {
-                acc = new double[3];
-            } else {
-                acc[0] = 0; acc[1] = 0; acc[2] = 0;
-            }
+            acc[0] = 0; acc[1] = 0; acc[2] = 0;
+            barnesBodyTimer.start();
             interactTree.barnesBody(bodies[i], acc, params);
+            barnesBodyTimer.stop();
             results.addAccels(bodies[i].number, acc[0], acc[1], acc[2]);
         }
     }

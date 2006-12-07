@@ -20,12 +20,16 @@ class Sender extends Thread {
 
     boolean sendTree;
 
-    Sender(Ibis ibis, PortType t, int count, int repeat, boolean sendTree) {
+    IbisIdentifier master;
+
+    Sender(Ibis ibis, PortType t, int count, int repeat, boolean sendTree,
+            IbisIdentifier master) {
         this.ibis = ibis;
         this.t = t;
         this.count = count;
         this.repeat = repeat;
         this.sendTree = sendTree;
+        this.master = master;
     }
 
     public void run() {
@@ -36,11 +40,7 @@ class Sender extends Thread {
             }
 
             SendPort sport = t.createSendPort("send port");
-            ReceivePort rport;
-
-            ReceivePortIdentifier ident = ibis.registry().lookupReceivePort(
-                    "receive port");
-            sport.connect(ident);
+            sport.connect(master, "receive port");
 
             System.err.println(this
                     + ": Connection established -- I'm a Sender");
@@ -180,6 +180,8 @@ class ConcurrentSenders {
 
     static Registry registry;
 
+    static IbisIdentifier master;
+
     static void usage() {
         System.out.println("Usage: ConcurrentReceives [-ibis]");
         System.exit(0);
@@ -237,7 +239,7 @@ class ConcurrentSenders {
             registry = ibis.registry();
 
             logger.debug("LAT: pre elect");
-            IbisIdentifier master = registry.elect("latency");
+            master = registry.elect("latency");
             logger.debug("LAT: post elect");
 
             if (master.equals(ibis.identifier())) {
@@ -255,7 +257,7 @@ class ConcurrentSenders {
             } else {
                 // start N senders
                 for (int i = 0; i < senders; i++) {
-                    new Sender(ibis, t, count, repeat, sendTree).start();
+                    new Sender(ibis, t, count, repeat, sendTree, master).start();
                 }
             }
 

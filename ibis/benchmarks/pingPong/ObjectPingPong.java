@@ -90,41 +90,6 @@ static class ExplicitReceiver {
 
     static Registry registry;
 
-    public static void connect(SendPort s, ReceivePortIdentifier ident) {
-        boolean success = false;
-        do {
-            try {
-                s.connect(ident);
-                success = true;
-            } catch (Exception e) {
-                try {
-                    Thread.sleep(500);
-                } catch (Exception e2) {
-                    // ignore
-                }
-            }
-        } while (!success);
-    }
-
-    public static ReceivePortIdentifier lookup(String name) throws Exception {
-        ReceivePortIdentifier temp = null;
-
-        do {
-            temp = registry.lookupReceivePort(name);
-
-            if (temp == null) {
-                try {
-                    Thread.sleep(500);
-                } catch (Exception e) {
-                    // ignore
-                }
-            }
-
-        } while (temp == null);
-
-        return temp;
-    }
-
     public static void main(String[] args) {
         int count = 10000;
         int repeat = 10;
@@ -148,35 +113,31 @@ static class ExplicitReceiver {
 //            Latency lat = null;
 
             IbisIdentifier master = registry.elect("latency");
-
+            IbisIdentifier remote;
 
             if (master.equals(ibis.identifier())) {
                 rank = 0;
-                remoteRank = 1;
+                remote = registry.getElectionResult("client");
             } else {
+                registry.elect("client");
                 rank = 1;
-                remoteRank = 0;
+                remote = master;
             }
 
+	    Sender sender = null;
+	    ExplicitReceiver receiver = null;
             if (rank == 0) {
-                    rport = t.createReceivePort("test port 0");
-                    rport.enableConnections();
-                    ReceivePortIdentifier ident = lookup("test port 1");
-                    connect(sport, ident);
-                    Sender sender = new Sender(rport, sport);
-
-                    sender.send(count, repeat);
+                rport = t.createReceivePort("test port");
+                rport.enableConnections();
+                sport.connect(remote, "test port");
+                sender = new Sender(rport, sport);
+                sender.send(count, repeat);
             } else {
-                ReceivePortIdentifier ident = lookup("test port 0");
-                connect(sport, ident);
-
-                    rport = t.createReceivePort("test port 1");
-                    rport.enableConnections();
-
-                    ExplicitReceiver receiver = new ExplicitReceiver(rport,
-                            sport);
-
-                    receiver.receive(count, repeat);
+                sport.connect(remote, "test port");
+                rport = t.createReceivePort("test port");
+                rport.enableConnections();
+                receiver = new ExplicitReceiver(rport, sport);
+                receiver.receive(count, repeat);
             }
 
             /* free the send ports first */

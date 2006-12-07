@@ -223,8 +223,8 @@ class OpenCell1D implements OpenConfig {
         if( tracePortCreation ){
             System.out.println( "P" + me + ": created send port " + res  );
         }
-        ReceivePortIdentifier id = registry.lookupReceivePort( receiveportname );
-        res.connect( id );
+        IbisIdentifier id = registry.getElectionResult( receiveportname );
+        res.connect( id, receiveportname );
         if( tracePortCreation ){
             System.out.println( "P" + me + ": connected " + sendportname + " to " + receiveportname );
         }
@@ -242,6 +242,7 @@ class OpenCell1D implements OpenConfig {
         String receiveportname = prefix + "Receive" + myName.name();
 
         ReceivePort res;
+        registry.elect( receiveportname );
         if( up == null ){
             res = updatePort.createReceivePort( receiveportname );
         }

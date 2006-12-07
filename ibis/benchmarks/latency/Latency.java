@@ -321,41 +321,6 @@ class Latency {
 
     static Registry registry;
 
-    public static void connect(SendPort s, ReceivePortIdentifier ident) {
-        boolean success = false;
-        do {
-            try {
-                s.connect(ident);
-                success = true;
-            } catch (Exception e) {
-                try {
-                    Thread.sleep(500);
-                } catch (Exception e2) {
-                    // ignore
-                }
-            }
-        } while (!success);
-    }
-
-    public static ReceivePortIdentifier lookup(String name) throws Exception {
-
-        ReceivePortIdentifier temp = null;
-
-        do {
-            temp = registry.lookupReceivePort(name);
-
-            if (temp == null) {
-                try {
-                    Thread.sleep(500);
-                } catch (Exception e) {
-                    // ignore
-                }
-            }
-
-        } while (temp == null);
-
-        return temp;
-    }
 
     static void usage() {
         System.out.println("Usage: Latency [-u] [-uu] [-ibis] [count]");
@@ -368,7 +333,7 @@ class Latency {
         boolean ibisSer = false;
         int count = -1;
         int repeat = 10;
-        int rank = 0, remoteRank = 1;
+        int rank;
         Random r = new Random();
         boolean compRec = false;
         boolean compSnd = false;
@@ -437,16 +402,18 @@ class Latency {
 
             logger.debug("LAT: pre elect");
             IbisIdentifier master = registry.elect("latency");
+            IbisIdentifier remote;
             logger.debug("LAT: post elect");
 
             if (master.equals(ibis.identifier())) {
                 logger.debug("LAT: I am master");
+                remote = registry.getElectionResult("client");
                 rank = 0;
-                remoteRank = 1;
             } else {
                 logger.debug("LAT: I am slave");
+                registry.elect("client");
                 rank = 1;
-                remoteRank = 0;
+                remote = master;
             }
 
             if (rank == 0) {
@@ -457,10 +424,9 @@ class Latency {
                 }
 
                 if (!upcallsend) {
-                    rport = t.createReceivePort("test port 0");
+                    rport = t.createReceivePort("test port");
                     rport.enableConnections();
-                    ReceivePortIdentifier ident = lookup("test port 1");
-                    connect(sport, ident);
+                    sport.connect(remote, "test port");
                     Sender sender = new Sender(rport, sport);
 
                     logger.debug("LAT: starting send test");
@@ -468,20 +434,15 @@ class Latency {
                 } else {
                     UpcallSender sender = new UpcallSender(sport, count,
                             earlyFinish, delayedFinish, repeat, c);
-                    rport = t.createReceivePort("test port 0", sender);
+                    rport = t.createReceivePort("test port", sender);
                     rport.enableConnections();
-
-                    ReceivePortIdentifier ident = lookup("test port 1");
-                    connect(sport, ident);
-
+                    sport.connect(remote, "test port");
                     rport.enableUpcalls();
-
                     sender.start();
                     sender.finish();
                 }
             } else {
-                ReceivePortIdentifier ident = lookup("test port 0");
-                connect(sport, ident);
+                sport.connect(remote, "test port");
 
                 if (compRec) {
                     c = new Computer();
@@ -492,12 +453,12 @@ class Latency {
                 if (upcalls) {
                     UpcallReceiver receiver = new UpcallReceiver(sport, count,
                             earlyFinish, delayedFinish, repeat, c);
-                    rport = t.createReceivePort("test port 1", receiver);
+                    rport = t.createReceivePort("test port", receiver);
                     rport.enableConnections();
                     rport.enableUpcalls();
                     receiver.finish();
                 } else {
-                    rport = t.createReceivePort("test port 1");
+                    rport = t.createReceivePort("test port");
                     rport.enableConnections();
 
                     ExplicitReceiver receiver = new ExplicitReceiver(rport,

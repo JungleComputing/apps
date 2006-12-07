@@ -480,44 +480,6 @@ public final class Ping {
         }
     }
 
-    static ReceivePortIdentifier lookup(String name) throws Exception {
-        ReceivePortIdentifier temp = null;
-
-        do {
-            temp = registry.lookupReceivePort(name);
-
-            if (temp == null) {
-                try {
-                    Thread.sleep(500);
-                } catch (Exception e) {
-                    // ignore
-                }
-            }
-
-        } while (temp == null);
-
-        return temp;
-    }
-
-    static void connect(SendPort s, ReceivePortIdentifier ident) {
-        boolean success = false;
-        do {
-            try {
-                s.connect(ident);
-                success = true;
-            } catch (Exception e) {
-                System.err.println(e.getMessage());
-                e.printStackTrace();
-
-                try {
-                    Thread.sleep(500);
-                } catch (Exception e2) {
-                    // ignore
-                }
-            }
-        } while (!success);
-    }
-
     static void master() throws Exception {
         if (param_one_way) {
             ping();
@@ -540,12 +502,13 @@ public final class Ping {
         try {
             // Local initialization
 
-            String id = "ibis:" + (new Random()).nextInt();
-            //String name = "ibis.impl.tcp.TcpIbis";
+            String name = "tcp";
             //String name = "ibis.impl.messagePassing.PandaIbis";
-            String name = "ibis.impl.net.NetIbis";
+            //String name = "ibis.impl.net.NetIbis";
 
-            ibis = Ibis.createIbis(id, name, null);
+            StaticProperties props = new StaticProperties();
+            props.add("name", name);
+            ibis = Ibis.createIbis(props, null);
 
             // Configuration information
             registry = ibis.registry();
@@ -592,20 +555,21 @@ public final class Ping {
             PortType t = ibis.createPortType("ping", s);
             sport = t.createSendPort();
             rport = null;
+            ibis.registry().elect("" + rank);
 
             // Connection setup and test
             if (rank == 0) {
-                rport = t.createReceivePort("ping 0");
+                rport = t.createReceivePort("ping");
                 rport.enableConnections();
-                ReceivePortIdentifier ident = lookup("ping 1");
-                connect(sport, ident);
+                IbisIdentifier id = ibis.registry().getElectionResult("1");
+                sport.connect(id, "ping");
 
                 System.err.println("Master: starting test");
                 master();
             } else {
-                ReceivePortIdentifier ident = lookup("ping 0");
-                connect(sport, ident);
-                rport = t.createReceivePort("ping 1");
+                IbisIdentifier id = ibis.registry().getElectionResult("0");
+                sport.connect(id, "ping");
+                rport = t.createReceivePort("ping");
                 rport.enableConnections();
 
                 System.err.println("Slave: starting test");

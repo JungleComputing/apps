@@ -159,33 +159,13 @@ class Latency {
 
     static Registry registry;
 
-    public static ReceivePortIdentifier lookup(String name) throws IOException {
-
-        ReceivePortIdentifier temp = null;
-
-        do {
-            temp = registry.lookupReceivePort(name);
-
-            if (temp == null) {
-                try {
-                    Thread.sleep(1000);
-                } catch (Exception e) {
-                    // ignore
-                }
-            }
-
-        } while (temp == null);
-
-        return temp;
-    }
-
     public static void main(String[] args) {
         /* Parse commandline. */
 
         boolean upcall = false;
 
         int count = Integer.parseInt(args[0]);
-        int rank = 0, remoteRank = 1;
+        int rank;
 
         if (args.length > 1) {
             upcall = args[1].equals("-u");
@@ -211,37 +191,36 @@ class Latency {
             Latency lat = null;
 
             IbisIdentifier master = registry.elect("latency");
+            IbisIdentifier remote;
             if (master.equals(ibis.identifier())) {
                 rank = 0;
-                remoteRank = 1;
+                remote = registry.getElectionResult("client");
             } else {
                 rank = 1;
-                remoteRank = 0;
+                registry.elect("client");
+                remote = master;
             }
 
             if (rank == 0) {
 
-                rport = t.createReceivePort("test port 0");
+                rport = t.createReceivePort("test port");
                 rport.enableConnections();
-
-                sport.connect(lookup("test port 1"));
-
+                sport.connect(remote, "test port");
                 Sender sender = new Sender(rport, sport);
                 sender.send(count);
 
             } else {
-
-                sport.connect(lookup("test port 0"));
+                sport.connect(remote, "test port");
 
                 if (upcall) {
                     UpcallReceiver receiver = new UpcallReceiver(sport,
                             2 * count);
-                    rport = t.createReceivePort("test port 1", receiver);
+                    rport = t.createReceivePort("test port", receiver);
                     rport.enableConnections();
                     rport.enableUpcalls();
                     receiver.finish();
                 } else {
-                    rport = t.createReceivePort("test port 1");
+                    rport = t.createReceivePort("test port");
                     rport.enableConnections();
                     ExplicitReceiver receiver = new ExplicitReceiver(rport,
                             sport);
@@ -261,10 +240,6 @@ class Latency {
             System.out.println("StackTrace:");
             e.printStackTrace();
         } catch (IbisException e) {
-            System.out.println("Got exception " + e);
-            System.out.println("StackTrace:");
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
             System.out.println("Got exception " + e);
             System.out.println("StackTrace:");
             e.printStackTrace();

@@ -13,26 +13,6 @@ class Latency {
 
     static Registry registry;
 
-    public static ReceivePortIdentifier lookup(String name) throws IOException {
-
-        ReceivePortIdentifier temp = null;
-
-        do {
-            temp = registry.lookupReceivePort(name);
-
-            if (temp == null) {
-                try {
-                    Thread.sleep(1000);
-                } catch (Exception e) {
-                    // ignore
-                }
-            }
-
-        } while (temp == null);
-
-        return temp;
-    }
-
     public static void main(String[] args) {
         /* Parse commandline. */
 
@@ -61,14 +41,15 @@ class Latency {
 
             PortType t = ibis.createPortType("test type", sp);
 
-            ReceivePort rport = t.createReceivePort("receive port " + rank);
-            SendPort sport = t.createSendPort("send port " + rank);
+            ReceivePort rport = t.createReceivePort("receive port");
+            SendPort sport = t.createSendPort("send port");
 
             rport.enableConnections();
 
             Latency lat = null;
 
             if (rank == 0) {
+                registry.elect("0");
                 sport.connect(rport.identifier());
 
                 System.err.println(rank + "*******  connect to myself");
@@ -96,12 +77,9 @@ class Latency {
                 sport.close();
 
             } else {
-                ReceivePortIdentifier id = lookup("receive port 0");
-
+                IbisIdentifier id = registry.getElectionResult("0");
                 System.err.println(rank + "*******  connect to 0");
-
-                sport.connect(id);
-
+                sport.connect(id, "receive port");
                 System.err.println(rank + "*******  connect done");
 
                 WriteMessage w = sport.newMessage();

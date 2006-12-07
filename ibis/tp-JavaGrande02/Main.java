@@ -96,42 +96,6 @@ final class Main {
     static Ibis ibis;
     static Registry registry;
 
-    public static void connect(SendPort s, ReceivePortIdentifier ident) {
-	boolean success = false;
-	do {
-	    try {
-		s.connect(ident);
-		success = true;
-	    } catch (Exception e) {
-		try {
-		    Thread.sleep(500);
-		} catch (Exception e2) {
-		    // ignore
-		}
-	    }
-	} while (!success);
-    }
-
-    public static ReceivePortIdentifier lookup(String name) throws IOException { 
-
-	ReceivePortIdentifier temp = null;
-
-	do {
-	    temp = registry.lookupReceivePort(name);
-
-	    if (temp == null) {
-		try {
-		    Thread.sleep(500);
-		} catch (Exception e) {
-		    // ignore
-		}
-	    }
-
-	} while (temp == null);
-
-	return temp;
-    } 
-
     private static long one_way(ReceivePort rport, SendPort sport, int count, Object data, boolean stream) throws Exception { 
 
 	//		System.out.println("one way " + count);
@@ -313,10 +277,11 @@ final class Main {
 	    }
 
 	    if (rank == 0) {
-		rport = t.createReceivePort("test port 0");
+                registry.elect("0");
+		rport = t.createReceivePort("test port");
 		rport.enableConnections();
-		ReceivePortIdentifier ident = lookup("test port 1");
-		connect(sport, ident);
+                IbisIdentifier other = registry.getElectionResult("1");
+		sport.connect(other, "test port");
 
 		Object data;
 		long time;
@@ -417,18 +382,18 @@ final class Main {
 		if (verbose) System.out.println("Done");				
 
 	    } else { 
-
-		ReceivePortIdentifier ident = lookup("test port 0");
-		connect(sport, ident);
+                registry.elect("1");
+                IbisIdentifier other = registry.getElectionResult("0");
+		sport.connect(other, "test port");
 
 		if (upcalls) {
 		    Receiver receiver = new Receiver(null, sport, tests*retries*count, one_way, false);
-		    rport = t.createReceivePort("test port 1", receiver);
+		    rport = t.createReceivePort("test port", receiver);
 		    rport.enableConnections();
 		    rport.enableUpcalls();
 		    receiver.finish();
 		} else { 
-		    rport = t.createReceivePort("test port 1");
+		    rport = t.createReceivePort("test port");
 		    rport.enableConnections();
 		    Receiver receiver = new Receiver(rport, sport, count, one_way, stream);
 

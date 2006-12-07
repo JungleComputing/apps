@@ -4,5 +4,6 @@ import ibis.satin.Spawnable;
 
 interface NQueensInterface extends Spawnable {
 
-    public long spawn_QueenCount(int spawnLevel, int y, int left, int down, int right, int mask);
+    public long spawn_QueenCountPartial(int spawnLevel, int y, int left,
+            int right, int mask);
 }

@@ -96,8 +96,6 @@ class Throughput extends Thread {
     public void run() {
         Random rand = new Random();
         try {
-            ReceivePortIdentifier ident;
-
             StaticProperties s = new StaticProperties();
             s.add("Serialization", "object");
             s.add("WorldModel", "open");
@@ -107,34 +105,25 @@ class Throughput extends Thread {
             Registry r = ibis.registry();
 
             IbisIdentifier master = r.elect("throughput");
+            IbisIdentifier remote;
 
             if (master.equals(ibis.identifier())) {
                 rank = 0;
-                remoteRank = 1;
+                remote = r.getElectionResult("1");
                 System.err.println(">>>>>>>> Righto, I'm the master");
             } else {
+                r.elect("1");
                 rank = 1;
-                remoteRank = 0;
+                remote = master;
                 System.err.println(">>>>>>>> Righto, I'm the slave");
             }
 
 
             PortType t = ibis.createPortType("test type", s);
-            rport = t.createReceivePort("test port " + rank);
+            rport = t.createReceivePort("test port");
             rport.enableConnections();
             sport = t.createSendPort();
-
-            do {
-                ident = r.lookupReceivePort("test port " + remoteRank);
-                if (ident == null) {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (Exception e) {
-                    }
-                }
-            } while (ident == null);
-
-            sport.connect(ident);
+            sport.connect(remote, "test port");
 
             if (rank == 0) {
                 // warmup
@@ -164,11 +153,6 @@ class Throughput extends Thread {
             System.exit(0);
 
         } catch (IbisException e) {
-            System.out.println("Got exception " + e);
-            System.out.println("StackTrace:");
-            e.printStackTrace();
-
-        } catch (ClassNotFoundException e) {
             System.out.println("Got exception " + e);
             System.out.println("StackTrace:");
             e.printStackTrace();

@@ -482,9 +482,9 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
 
         System.err.println("Do measurement: " + count + " calls");
 
-        if (myIbis instanceof ibis.impl.messagePassing.Ibis) {
-            ibis.impl.messagePassing.Ibis.resetStats();
-        }
+        //if (myIbis instanceof ibis.impl.messagePassing.Ibis) {
+        //    ibis.impl.messagePassing.Ibis.resetStats();
+        //}
         System.gc();
         // t_client.start();
         long time = System.currentTimeMillis();
@@ -571,9 +571,9 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
             }
 
             // myIbis.disableResizeUpcalls();
-            if (myIbis instanceof ibis.impl.messagePassing.Ibis) {
-                ibis.impl.messagePassing.Ibis.resetStats();
-            }
+            //if (myIbis instanceof ibis.impl.messagePassing.Ibis) {
+            //    ibis.impl.messagePassing.Ibis.resetStats();
+            //}
             System.gc();
             // myIbis.enableResizeUpcalls();
 
@@ -595,9 +595,9 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
         } else {
             // warmup
             serve(clients, warmup);
-            if (myIbis instanceof ibis.impl.messagePassing.Ibis) {
-                ibis.impl.messagePassing.Ibis.resetStats();
-            }
+            //if (myIbis instanceof ibis.impl.messagePassing.Ibis) {
+            //    ibis.impl.messagePassing.Ibis.resetStats();
+            //}
 
             // test
             serve(clients, count);
@@ -634,11 +634,12 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
 
         myIbis.enableResizeUpcalls();
 
+        registry.elect("client"+rank);
         if (connectUpcalls) {
-            rport = replyPortType.createReceivePort("client port " + rank,
+            rport = replyPortType.createReceivePort("client port",
                     (ReceivePortConnectUpcall) this);
         } else {
-            rport = replyPortType.createReceivePort("client port " + rank);
+            rport = replyPortType.createReceivePort("client port");
         }
         // System.err.println(rank + ": t = " + ((ibis.impl.net.NetIbis)myIbis).now() + "  created \"client port " + rank + "\"");
 
@@ -651,10 +652,8 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
         rport.enableConnections();
 
         for (int i = 0; i < servers; i++) {
-            // System.err.println(rank + ": t = " + ((ibis.impl.net.NetIbis)myIbis).now() + " lookup \"server port " + i + "\"");
-            ReceivePortIdentifier rp = registry
-                    .lookupReceivePort("server port " + i);
-            sport.connect(rp);
+            IbisIdentifier id = registry.getElectionResult("server" + i);
+            sport.connect(id, "server port");
             // System.err.println(rank + ": t = " + ((ibis.impl.net.NetIbis)myIbis).now() + " connected to \"server port " + i + "\"");
         }
 
@@ -713,22 +712,22 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
 
         myIbis.enableResizeUpcalls();
 
+        registry.elect("server" + (rank - clients));
         if (upcall) {
             if (connectUpcalls) {
-                rport = requestPortType.createReceivePort("server port "
-                        + (rank - clients), this,
+                rport = requestPortType.createReceivePort("server port",
+                        this,
                         (ReceivePortConnectUpcall) this);
             } else {
-                rport = requestPortType.createReceivePort("server port "
-                        + (rank - clients), (Upcall) this);
+                rport = requestPortType.createReceivePort("server port",
+                        (Upcall) this);
             }
         } else {
             if (connectUpcalls) {
-                rport = requestPortType.createReceivePort("server port "
-                        + (rank - clients), (ReceivePortConnectUpcall) this);
+                rport = requestPortType.createReceivePort("server port",
+                        (ReceivePortConnectUpcall) this);
             } else {
-                rport = requestPortType.createReceivePort("server port "
-                        + (rank - clients));
+                rport = requestPortType.createReceivePort("server port");
             }
         }
         // System.err.println(rank + ": created \"server port " + (rank - clients) + "\"");
@@ -742,16 +741,9 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
         rport.enableConnections();
 
         for (int i = 0; i < clients; i++) {
-            ReceivePortIdentifier rp = registry
-                    .lookupReceivePort("client port " + i);
+            IbisIdentifier id = registry.getElectionResult("client" + i);
+            sport.connect(id, "client port");
             // System.err.println(rank + ": t = " + ((ibis.impl.net.NetIbis)myIbis).now() + " connect to \"client port " + i + "\"");
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                // Give up
-            }
-            sport.connect(rp);
-            // System.err.println(rank + ": t = " + ((ibis.impl.net.NetIbis)myIbis).now() + " Server: connected to \"client port " + i + "\"");
         }
 
         // Do a poor-man's barrier to allow the connections to proceed.

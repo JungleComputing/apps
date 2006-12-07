@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.StreamTokenizer;
+import java.util.Date;
 
 final class NQueensPartial extends SatinObject implements
         NQueensInterface, Serializable {
@@ -18,11 +19,11 @@ final class NQueensPartial extends SatinObject implements
         4968057848L, 39029188884L, 314666222712L, 2691008701644L,
         24233937684440L, 227514171973736L };
 
-    private static final long seq_QueenCount(
-            final int y, final int left, final int down,
+    private static final long seq_QueenCountPartial(
+            final int y, final int left,
             final int right, final int mask) {
 
-        int bitmap = mask & ~(left | down | right);
+        int bitmap = mask & ~(left | right);
 
         if (bitmap != 0) {
             if (y != 0) {
@@ -32,8 +33,8 @@ final class NQueensPartial extends SatinObject implements
                 do {
                     final int bit = -bitmap & bitmap;
                     bitmap ^= bit;
-                    lnsol += seq_QueenCount(y - 1, (left | bit) << 1,
-                        down | bit, (right | bit) >> 1, mask);
+                    lnsol += seq_QueenCountPartial(y - 1, (left | bit) << 1,
+                        (right | bit) >> 1, mask ^ bit);
                 } while (bitmap != 0);
 
                 return lnsol;
@@ -43,18 +44,18 @@ final class NQueensPartial extends SatinObject implements
         return 0;
     }
 
-    public long spawn_QueenCount(
-            final int spawnLevel, final int y, final int left, final int down,
+    public long spawn_QueenCountPartial(
+            final int spawnLevel, final int y, final int left,
             final int right, final int mask) {
 
         // Check if we've gone deep enough into the recursion to 
         // have generated a decent number of jobs. If so, stop spawning
         // and switch to a sequential algorithm...
         if (spawnLevel <= 0) {
-            return seq_QueenCount(y, left, down, right, mask);
+            return seq_QueenCountPartial(y, left, right, mask);
         }
 
-        int bitmap = mask & ~(left | down | right);
+        int bitmap = mask & ~(left | right);
 
         int it = 0;
         long[] lnsols = new long[y+1];
@@ -62,8 +63,8 @@ final class NQueensPartial extends SatinObject implements
         while (bitmap != 0) {
             int bit = -bitmap & bitmap;
             bitmap ^= bit;
-            lnsols[it] = spawn_QueenCount(spawnLevel - 1,
-                y - 1, (left | bit) << 1, down | bit, (right | bit) >> 1, mask);
+            lnsols[it] = spawn_QueenCountPartial(spawnLevel - 1,
+                y - 1, (left | bit) << 1, (right | bit) >> 1, mask ^ bit);
             it++;
         }
 
@@ -105,8 +106,8 @@ final class NQueensPartial extends SatinObject implements
             if (size == 1) {
                 results[SELECTED_BOUND] = 1;
             } else {
-                results[SELECTED_BOUND] = spawn_QueenCount(
-                    spawnLevel, SIZEE-1, bit << 1, bit, bit >> 1, MASK);
+                results[SELECTED_BOUND] = spawn_QueenCountPartial(
+                    spawnLevel, SIZEE-1, bit << 1, bit >> 1, MASK ^ bit);
             }
         }
 
@@ -122,6 +123,8 @@ final class NQueensPartial extends SatinObject implements
 
         int maxbound = size/2 + size%2 - 1;
         boolean size_done = true;
+
+        System.out.println((new Date()).toString() + ": results of this run:");
 
         for (int i = 0; i < bounds.length; i++) {
             System.out.println("result(" + size + ", " + bounds[i]
@@ -142,7 +145,7 @@ final class NQueensPartial extends SatinObject implements
         }
 
         if (size_done) {
-            System.out.print(" total result nqueens (" + size + ") = " + nsol);
+            System.out.print("total result nqueens (" + size + ") = " + nsol);
 
             if (size < solutions.length) {
                 if (nsol == solutions[size]) {
@@ -174,7 +177,6 @@ final class NQueensPartial extends SatinObject implements
             return;
         }
         /* description of initial configuration */
-        int repeat = readInt(d);
         int size = readInt(d);
         int spawnLevel = readInt(d);
         int maxbound = size/2 + size%2 - 1;
@@ -205,9 +207,9 @@ final class NQueensPartial extends SatinObject implements
             }
         }
 
-        System.out.print("NQueens size " + size
+        System.out.print((new Date()).toString());
+        System.out.print(": NQueens size " + size
                 + ", spawnlevel " + spawnLevel
-                + ", repeat " + repeat
                 + ", bounds:");
         for (int i = 0; i < bounds.length; i++) {
             System.out.print(" " + bounds[i]);
@@ -221,10 +223,8 @@ final class NQueensPartial extends SatinObject implements
             }
         }
 
-        for (int i = 0; i < repeat; i++) {
-            double time = calculate(results[size], bounds, size, spawnLevel);
-            printResults(results[size], bounds, size, time);
-        }
+        double time = calculate(results[size], bounds, size, spawnLevel);
+        printResults(results[size], bounds, size, time);
     }
 
     private void ReadFile(String file) {

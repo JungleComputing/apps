@@ -60,8 +60,8 @@ class Cell1D implements Config {
         if( tracePortCreation ){
             System.err.println( "P" + me + ": created send port " + sendportname  );
         }
-        ReceivePortIdentifier id = registry.lookupReceivePort( receiveportname );
-        res.connect( id );
+        IbisIdentifier id = registry.getElectionResult( receiveportname );
+        res.connect( id, receiveportname );
         if( tracePortCreation ){
             System.err.println( "P" + me + ": connected " + sendportname + " to " + receiveportname );
         }
@@ -87,6 +87,7 @@ class Cell1D implements Config {
         }
         String receiveportname = portclass + me;
 
+        registry.elect( receiveportname );
         ReceivePort res = t.createReceivePort( receiveportname );
         if( tracePortCreation ){
             System.err.println( "P" + me + ": created receive port " + receiveportname  );

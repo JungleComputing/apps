@@ -30,6 +30,7 @@ import ibis.ipl.WriteMessage;
 import ibis.ipl.Registry;
 import ibis.ipl.StaticProperties;
 import ibis.ipl.IbisException;
+import ibis.ipl.IbisIdentifier;
 import ibis.ipl.NoMatchingIbisException;
 import ibis.ipl.Upcall;
 
@@ -164,7 +165,7 @@ public class SOR {
 
         getBounds();
 
-        createNeighbourPorts(name);
+        createNeighbourPorts();
         if (clusterReduce) {
             reducer = new ClusterReducer(ibis, info);
         } else if (USE_O_N_BROADCAST) {
@@ -275,9 +276,10 @@ public class SOR {
                 });
 
         registry = ibis.registry();
+        registry.elect("" + rank);
     }
 
-    private void createNeighbourPorts(String name) throws IOException,
+    private void createNeighbourPorts() throws IOException,
             IbisException {
 
         StaticProperties reqprops = new StaticProperties();
@@ -292,42 +294,32 @@ public class SOR {
             if (upcall) {
                 leftSyncer = new Syncer(g[lb - 1]);
             }
-            leftR = portTypeNeighbour.createReceivePort(name + "leftR",
-                    leftSyncer);
-            leftS = portTypeNeighbour.createSendPort(name + "leftS");
+            leftR = portTypeNeighbour.createReceivePort("leftR", leftSyncer);
+            leftS = portTypeNeighbour.createSendPort("leftS");
             leftR.enableConnections();
 
-            // System.out.println(rank + " created " + name + "leftR and " + name + "leftS");
+            // System.out.println(rank + " created leftR and leftS");
         }
 
         if (rank != size - 1) {
             if (upcall) {
                 rightSyncer = new Syncer(g[ub]);
             }
-            rightR = portTypeNeighbour.createReceivePort(name + "rightR",
-                    rightSyncer);
-            rightS = portTypeNeighbour.createSendPort(name + "rightS");
+            rightR = portTypeNeighbour.createReceivePort("rightR", rightSyncer);
+            rightS = portTypeNeighbour.createSendPort("rightS");
             rightR.enableConnections();
 
-            // System.out.println(rank + " created " + name + "rightR and " + name + "rightS");
+            // System.out.println(rank + " created rightR and rightS");
         }
 
         if (rank != 0) {
-            // System.out.println(rank + " looking up " + "SOR" + (rank-1) + "rightR");
-
-            ReceivePortIdentifier id = registry.lookupReceivePort("SOR"
-                    + (rank - 1) + "rightR");
-            // System.out.println(rank + " leftS = " + leftS + " id = " + id);
-            leftS.connect(id);
+            IbisIdentifier id = registry.getElectionResult("" + (rank-1));
+            leftS.connect(id, "rightR");
         }
 
         if (rank != size - 1) {
-            // System.out.println(rank + " looking up " + "SOR" + (rank+1) + "rightR");
-
-            ReceivePortIdentifier id = registry.lookupReceivePort("SOR"
-                    + (rank + 1) + "leftR");
-            // System.out.println(rank + " rightS = " + rightS + " id = " + id);
-            rightS.connect(id);
+            IbisIdentifier id = registry.getElectionResult("" + (rank+1));
+            rightS.connect(id, "leftR");
         }
     }
 

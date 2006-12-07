@@ -23,6 +23,7 @@ import ibis.ipl.WriteMessage;
 import ibis.ipl.Registry;
 import ibis.ipl.StaticProperties;
 import ibis.ipl.IbisException;
+import ibis.ipl.IbisIdentifier;
 
 import ibis.util.PoolInfo;
 import ibis.util.Timer;
@@ -54,6 +55,7 @@ public class Reducer {
         rank = info.rank();
         size = info.size();
 
+        Registry registry = ibis.registry();
         StaticProperties reqprops = new StaticProperties();
         reqprops.add("serialization", "data");
         // reqprops.add("communication", "OneToOne, Reliable, ExplicitReceipt");
@@ -70,31 +72,23 @@ public class Reducer {
         PortType portTypeBroadcast = ibis.createPortType("SOR Broadcast",
                 reqprops);
 
-        Registry registry = ibis.registry();
-
         if (rank == 0) {
             // one-to-many to bcast result
-            reduceR = portTypeReduce
-                    .createReceivePort("SOR" + rank + "reduceR");
+            reduceR = portTypeReduce.createReceivePort("SORreduceR");
             reduceR.enableConnections();
-            reduceS = portTypeBroadcast
-                    .createSendPort("SOR" + rank + "reduceS");
+            reduceS = portTypeBroadcast.createSendPort("SORreduceS");
             for (int i = 1; i < size; i++) {
-                ReceivePortIdentifier id = registry.lookupReceivePort("SOR" + i
-                        + "reduceR");
-                reduceS.connect(id);
+                IbisIdentifier id = registry.getElectionResult("" + i);
+                reduceS.connect(id, "SORreduceR");
             }
-
         } else {
-            reduceR = portTypeBroadcast.createReceivePort("SOR" + rank
-                    + "reduceR");
+            reduceR = portTypeBroadcast.createReceivePort("SORreduceR");
             reduceR.enableConnections();
-            reduceS = portTypeReduce.createSendPort("SOR" + rank + "reduceS");
+            reduceS = portTypeReduce.createSendPort("SORreduceS");
 
             // many-to-one to gather values
-            ReceivePortIdentifier id = registry
-                    .lookupReceivePort("SOR0reduceR");
-            reduceS.connect(id);
+            IbisIdentifier id = registry.getElectionResult("" + 0);
+            reduceS.connect(id, "SORreduceR");
         }
     }
 
