@@ -7,7 +7,6 @@ import java.io.DataOutputStream;
 import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
 import ibis.util.PoolInfo;
-import ibis.ipl.IbisException;
 
 public class Radix {
 
@@ -39,7 +38,7 @@ public class Radix {
 
     String output_file = null;
 
-    Radix() throws IbisException {
+    Radix() {
         d = PoolInfo.createPoolInfo();
         nhosts = d.size();
         host = d.rank();
