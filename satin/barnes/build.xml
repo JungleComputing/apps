@@ -13,9 +13,9 @@
 
     <property name="ibis-run-args" value="-Dsatin.closed"/>
     <property name="test-par-run"
-	      value="BarnesHut -so 10000 5"/>
+	      value="BarnesHut -so 1000 5 -min 1"/>
     <property name="test-seq-run"
-	      value="BarnesHut -so 10000 5"/>
+	      value="BarnesHut -so 1000 5 -min 1"/>
 
     <import file="${ibis}/build-files/apps/build-satin-app.xml"/>
 

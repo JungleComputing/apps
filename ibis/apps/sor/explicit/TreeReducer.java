@@ -23,7 +23,6 @@ import ibis.ipl.ReadMessage;
 import ibis.ipl.WriteMessage;
 import ibis.ipl.Registry;
 import ibis.ipl.StaticProperties;
-import ibis.ipl.IbisException;
 import ibis.ipl.IbisIdentifier;
 import ibis.ipl.NoMatchingIbisException;
 import ibis.ipl.Upcall;
@@ -56,8 +55,7 @@ public class TreeReducer extends Reducer {
         // then I will know *why*.
     }
 
-    public TreeReducer(Ibis ibis, PoolInfo info) throws IOException,
-            IbisException {
+    public TreeReducer(Ibis ibis, PoolInfo info) throws IOException {
 
         int rank = info.rank();
         int size = info.size();

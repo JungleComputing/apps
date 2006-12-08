@@ -29,7 +29,6 @@ import ibis.ipl.ReadMessage;
 import ibis.ipl.WriteMessage;
 import ibis.ipl.Registry;
 import ibis.ipl.StaticProperties;
-import ibis.ipl.IbisException;
 import ibis.ipl.IbisIdentifier;
 import ibis.ipl.NoMatchingIbisException;
 import ibis.ipl.Upcall;
@@ -128,7 +127,7 @@ public class SOR {
 
     SOR(int N, int maxIters, boolean reduceAlways, boolean async,
             boolean upcall, int itersPerReduce, boolean clusterReduce)
-            throws IOException, IbisException {
+            throws IOException {
 
         info = PoolInfo.createPoolInfo();
 
@@ -251,7 +250,7 @@ public class SOR {
         }
     }
 
-    private void createIbis() throws IOException, IbisException {
+    private void createIbis() throws IOException {
         StaticProperties reqprops = new StaticProperties();
 
         reqprops.add("serialization", "data");
@@ -262,9 +261,10 @@ public class SOR {
 
         try {
             ibis = Ibis.createIbis(reqprops, null);
-        } catch (NoMatchingIbisException e) {
+        } catch (Exception e) {
             System.err
-                    .println("Could not find an Ibis that can run this GMI implementation");
+                    .println("Could not find an Ibis that can run this SOR implementation");
+            e.printStackTrace();
             System.exit(1);
         }
 
@@ -279,8 +279,7 @@ public class SOR {
         registry.elect("" + rank);
     }
 
-    private void createNeighbourPorts() throws IOException,
-            IbisException {
+    private void createNeighbourPorts() throws IOException {
 
         StaticProperties reqprops = new StaticProperties();
 

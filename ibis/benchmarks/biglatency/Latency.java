@@ -172,7 +172,6 @@ class Latency {
         }
 
         try {
-
             StaticProperties p = new StaticProperties();
             p.add("Serialization", "object");
             if (upcall) {
@@ -235,11 +234,7 @@ class Latency {
 
             System.exit(0);
 
-        } catch (IOException e) {
-            System.out.println("Got exception " + e);
-            System.out.println("StackTrace:");
-            e.printStackTrace();
-        } catch (IbisException e) {
+        } catch (Exception e) {
             System.out.println("Got exception " + e);
             System.out.println("StackTrace:");
             e.printStackTrace();

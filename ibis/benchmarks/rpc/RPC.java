@@ -19,7 +19,6 @@ import ibis.ipl.StaticProperties;
 import ibis.ipl.ReceivePortConnectUpcall;
 import ibis.ipl.SendPortConnectUpcall;
 import ibis.ipl.ResizeHandler;
-import ibis.ipl.IbisException;
 
 import ibis.util.TypedProperties;
 import ibis.util.Timer;
@@ -968,7 +967,7 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
         }
     }
 
-    private void parseIbisName() throws IOException, IbisException {
+    private void parseIbisName() throws IOException {
         /* Parse commandline. */
 
         PoolInfo info = PoolInfo.createPoolInfo();
@@ -1010,7 +1009,7 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
                 || clients > 1 || servers > 1;
     }
 
-    private void createIbis() throws IOException, IbisException {
+    private void createIbis() throws Exception {
 
         if (USE_RESIZEHANDLER || rank == -1) {
             rszHandler = new RszHandler();
@@ -1069,7 +1068,7 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
         }
     }
 
-    private void registerIbis() throws IOException, IbisException {
+    private void registerIbis() throws IOException {
         registry = myIbis.registry();
     }
 
@@ -1184,13 +1183,8 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
                 registerIbis();
             }
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.err.println("Top-level exception " + e);
-
-        } catch (IbisException e) {
-            System.out.println("Got exception " + e);
-            System.out.println("StackTrace:");
-            e.printStackTrace();
         }
     }
 
@@ -1207,7 +1201,7 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
     }
 
     public void lostConnection(ReceivePort rp, SendPortIdentifier sp,
-            Exception e) {
+            Throwable e) {
         System.err.println("Lost connection with send port " + sp + " threw "
                 + e);
     }
@@ -1216,7 +1210,7 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
      * Interface SendPortConnectUpcall
      */
     public void lostConnection(SendPort sp, ReceivePortIdentifier rp,
-            Exception e) {
+            Throwable e) {
         System.err.println("Lost connection with receive port " + rp
                 + " threw " + e);
     }

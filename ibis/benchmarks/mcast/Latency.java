@@ -98,15 +98,7 @@ class Latency {
             rport.close();
             ibis.end();
 
-        } catch (IOException e) {
-            System.out.println("Got exception " + e);
-            System.out.println("StackTrace:");
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            System.out.println("Got exception " + e);
-            System.out.println("StackTrace:");
-            e.printStackTrace();
-        } catch (IbisException e) {
+        } catch (Exception e) {
             System.out.println("Got exception " + e);
             System.out.println("StackTrace:");
             e.printStackTrace();

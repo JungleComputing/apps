@@ -24,7 +24,6 @@ import ibis.ipl.ReadMessage;
 import ibis.ipl.WriteMessage;
 import ibis.ipl.Registry;
 import ibis.ipl.StaticProperties;
-import ibis.ipl.IbisException;
 import ibis.ipl.IbisIdentifier;
 
 import ibis.util.PoolInfo;
@@ -39,8 +38,7 @@ public class ClusterReducer extends TreeReducer {
 
     private int clusterSize;
 
-    public ClusterReducer(Ibis ibis, PoolInfo info) throws IOException,
-            IbisException {
+    public ClusterReducer(Ibis ibis, PoolInfo info) throws IOException {
 
         int rank = info.rank();
         int size = info.size();

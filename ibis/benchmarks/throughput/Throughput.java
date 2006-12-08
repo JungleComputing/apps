@@ -100,7 +100,7 @@ class Throughput extends Thread {
             s.add("Serialization", "object");
             s.add("WorldModel", "open");
             s.add("Communication", "OneToOne, Reliable, ExplicitReceipt");
-                                                                                            Ibis ibis = Ibis.createIbis(s, null);
+            Ibis ibis = Ibis.createIbis(s, null);
 
             Registry r = ibis.registry();
 
@@ -152,12 +152,7 @@ class Throughput extends Thread {
 
             System.exit(0);
 
-        } catch (IbisException e) {
-            System.out.println("Got exception " + e);
-            System.out.println("StackTrace:");
-            e.printStackTrace();
-
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.out.println("Got exception " + e);
             System.out.println("StackTrace:");
             e.printStackTrace();

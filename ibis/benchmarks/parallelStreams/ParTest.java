@@ -26,7 +26,7 @@ public class ParTest {
     private PoolInfo pool;
 
     ParTest(int probeSize, int sliceSize, int bufSize, int rounds)
-            throws IOException, IbisException {
+            throws Exception {
         this.probeSize = probeSize;
         this.sliceSize = sliceSize;
         this.bufSize = bufSize;
@@ -228,7 +228,7 @@ public class ParTest {
         ReceivePort rport;
 
         Connection(String me, String peer, int noStreams, boolean tweak)
-                throws IOException, IbisException {
+                throws IOException {
             System.out.print("Creating connection " + me + "<->" + peer + " ("
                     + noStreams + " streams)...");
             System.out.flush();
