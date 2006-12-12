@@ -217,7 +217,7 @@ class Cell1D implements Config {
 
             if( me == 0 ){
                 System.out.println( Helpers.getPlatformVersion() );
-                System.out.println( "Using " + ibis.implementationName() );
+                System.out.println( "Using " + ibis.getClass().getName() );
                 System.out.println( "Started" );
             }
 
