@@ -5,6 +5,7 @@ import java.util.Hashtable;
 import java.io.IOException;
 
 import ibis.ipl.Ibis;
+import ibis.ipl.IbisFactory;
 import ibis.ipl.IbisIdentifier;
 import ibis.ipl.Registry;
 import ibis.ipl.PortType;
@@ -1039,7 +1040,7 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
         StaticProperties s = new StaticProperties();
         s.add("communication", basicProps + requestProps + replyProps);
         s.add("serialization", "object");
-        myIbis = Ibis.createIbis(s, rszHandler);
+        myIbis = IbisFactory.createIbis(s, rszHandler);
 
         // myIbis.init();
 
@@ -1057,10 +1058,10 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
 
         s = new StaticProperties();
         s.add("communication", basicProps + requestProps);
-        requestPortType = myIbis.createPortType("request port type", s);
+        requestPortType = myIbis.createPortType(s);
         s = new StaticProperties();
         s.add("communication", basicProps + replyProps);
-        replyPortType = myIbis.createPortType("reply port type", s);
+        replyPortType = myIbis.createPortType(s);
 
         if (rank == -1 && rszHandler != null) {
             rszHandler.sync(clients + servers);

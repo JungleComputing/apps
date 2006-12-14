@@ -20,6 +20,7 @@
 import java.io.IOException;
 
 import ibis.ipl.Ibis;
+import ibis.ipl.IbisFactory;
 import ibis.ipl.PortType;
 import ibis.ipl.SendPort;
 import ibis.ipl.ReceivePort;
@@ -260,7 +261,7 @@ public class SOR {
         // reqprops.add("communication", "OneToOne, Reliable, ExplicitReceipt");
 
         try {
-            ibis = Ibis.createIbis(reqprops, null);
+            ibis = IbisFactory.createIbis(reqprops, null);
         } catch (Exception e) {
             System.err
                     .println("Could not find an Ibis that can run this SOR implementation");
@@ -286,8 +287,7 @@ public class SOR {
         reqprops.add("serialization", "data");
         reqprops.add("communication", "OneToOne, Reliable, ExplicitReceipt");
 
-        PortType portTypeNeighbour = ibis.createPortType("SOR Neigbour",
-                reqprops);
+        PortType portTypeNeighbour = ibis.createPortType(reqprops);
 
         if (rank != 0) {
             if (upcall) {

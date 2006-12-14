@@ -216,8 +216,8 @@ class OpenCell1D implements OpenConfig {
     private static SendPort createNeighbourSendPort( PortType updatePort, IbisIdentifier dest, String prefix )
         throws java.io.IOException
     {
-        String sendportname = prefix + "Send" + myName.name();
-        String receiveportname = prefix + "Receive" + dest.name();
+        String sendportname = prefix + "Send" + myName;
+        String receiveportname = prefix + "Receive" + dest;
 
         SendPort res = updatePort.createSendPort( sendportname );
         if( tracePortCreation ){
@@ -239,7 +239,7 @@ class OpenCell1D implements OpenConfig {
     private static ReceivePort createNeighbourReceivePort( PortType updatePort, String prefix, Upcall up )
         throws java.io.IOException
     {
-        String receiveportname = prefix + "Receive" + myName.name();
+        String receiveportname = prefix + "Receive" + myName;
 
         ReceivePort res;
         registry.elect( receiveportname );
@@ -866,15 +866,15 @@ class OpenCell1D implements OpenConfig {
             sprop.add( "serialization", "data" );
             sprop.add( "communication", "OneToOne, Reliable, AutoUpcalls" );
             sprop.add( "worldmodel", "open" );
-            ibis = Ibis.createIbis( iprop, rszHandler );
+            ibis = IbisFactory.createIbis( iprop, rszHandler );
             myName = ibis.identifier();
 
             registry = ibis.registry();
 
             // TODO: be more precise about the properties for the two
             // port types.
-            PortType updatePort = ibis.createPortType( "neighbour update", uprop );
-            PortType stealPort = ibis.createPortType( "loadbalance", sprop );
+            PortType updatePort = ibis.createPortType( uprop );
+            PortType stealPort = ibis.createPortType( sprop );
 
             long startTime = System.currentTimeMillis();
             ibis.enableResizeUpcalls();

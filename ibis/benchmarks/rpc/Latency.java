@@ -184,12 +184,12 @@ class Latency {
         int rank = 0;
 
         try {
-            ibis = Ibis.createIbis(null, null);
+            ibis = IbisFactory.createIbis(null, null);
             registry = ibis.registry();
 
             StaticProperties s = new StaticProperties();
             s.add("Serialization", "ibis");
-            PortType t = ibis.createPortType("test type", s);
+            PortType t = ibis.createPortType(s);
 
             SendPort sport = t.createSendPort();
             ReceivePort rport;

@@ -234,7 +234,7 @@ class ConcurrentSenders {
                             "OneToOne, ManyToOne, OneToMany, Reliable, ExplicitReceipt, AutoUpcalls");
             sp.add("worldmodel", "closed");
 
-            ibis = Ibis.createIbis(sp, null);
+            ibis = IbisFactory.createIbis(sp, null);
 
             registry = ibis.registry();
 
@@ -250,7 +250,7 @@ class ConcurrentSenders {
                 rank = 1;
             }
 
-            PortType t = ibis.createPortType("test type", sp);
+            PortType t = ibis.createPortType(sp);
 
             if (rank == 0) {
                 new Receiver(ibis, t, count, repeat, senders, doFinish);

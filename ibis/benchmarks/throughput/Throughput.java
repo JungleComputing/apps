@@ -100,7 +100,7 @@ class Throughput extends Thread {
             s.add("Serialization", "object");
             s.add("WorldModel", "open");
             s.add("Communication", "OneToOne, Reliable, ExplicitReceipt");
-            Ibis ibis = Ibis.createIbis(s, null);
+            Ibis ibis = IbisFactory.createIbis(s, null);
 
             Registry r = ibis.registry();
 
@@ -119,7 +119,7 @@ class Throughput extends Thread {
             }
 
 
-            PortType t = ibis.createPortType("test type", s);
+            PortType t = ibis.createPortType(s);
             rport = t.createReceivePort("test port");
             rport.enableConnections();
             sport = t.createSendPort();

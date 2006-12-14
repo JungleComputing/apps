@@ -34,7 +34,7 @@ public class ParTest {
 
         connectionCounter = 0;
         System.out.println("Creating Ibis...");
-        ibis = Ibis.createIbis(properties(), null);
+        ibis = IbisFactory.createIbis(properties(), null);
         System.out.println("Creating PoolInfo...");
         pool = PoolInfo.createPoolInfo();
     }
@@ -235,7 +235,7 @@ public class ParTest {
             
             IbisIdentifier peerId = ibis.registry().getElectionResult(peer);
 
-            PortType portType = ibis.createPortType("test" + noStreams, properties());
+            PortType portType = ibis.createPortType(properties());
 
             String myName = "" + pool.rank() + "_" + connectionCounter;
             String peerName = "" + (pool.rank() == 0 ? 1 : 0) + "_" 

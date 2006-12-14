@@ -178,7 +178,7 @@ class Cell1D implements Config {
             s.add( "serialization", "data" );
             s.add( "communication", "OneToOne, Reliable, ExplicitReceipt" );
             s.add( "worldmodel", "closed" );
-            ibis = Ibis.createIbis( s, null );
+            ibis = IbisFactory.createIbis( s, null );
 
             registry = ibis.registry();
 
@@ -186,7 +186,7 @@ class Cell1D implements Config {
             final int me = info.rank();         // My processor number.
             final int nProcs = info.size();     // Total number of procs.
 
-            PortType t = ibis.createPortType( "neighbour update", s );
+            PortType t = ibis.createPortType( s );
 
             SendPort leftSendPort = null;
             SendPort rightSendPort = null;

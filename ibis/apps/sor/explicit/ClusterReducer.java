@@ -104,15 +104,14 @@ public class ClusterReducer extends TreeReducer {
         // reqprops.add("communication", "OneToOne, Reliable, ExplicitReceipt");
         reqprops.add("communication", "OneToOne, Reliable, ExplicitReceipt");
 
-        PortType portTypeReduce = ibis.createPortType("SOR Reduce", reqprops);
+        PortType portTypeReduce = ibis.createPortType(reqprops);
 
         reqprops = new StaticProperties();
         reqprops.add("serialization", "data");
         reqprops.add("communication",
                 "OneToMany, OneToOne, Reliable, ExplicitReceipt");
 
-        PortType portTypeBroadcast = ibis.createPortType("SOR Broadcast",
-                reqprops);
+        PortType portTypeBroadcast = ibis.createPortType(reqprops);
 
         if (localRank[rank] == 0) {
             parent = LEAF_NODE;
@@ -177,8 +176,7 @@ public class ClusterReducer extends TreeReducer {
             reqprops.add("communication",
                     "OneToMany, OneToOne, Reliable, ExplicitReceipt");
 
-            PortType portTypeInter = ibis.createPortType("SOR InterCluster",
-                    reqprops);
+            PortType portTypeInter = ibis.createPortType(reqprops);
 
             reduceRinter = new ReceivePort[clusterSize];
             for (int i = 0; i < clusterSize; i++) {

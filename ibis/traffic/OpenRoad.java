@@ -898,15 +898,15 @@ class OpenCell1D implements OpenConfig {
             s.add( "serialization", "data" );
             s.add( "communication", "OneToOne, Reliable, AutoUpcalls, ExplicitReceipt" );
             s.add( "worldmodel", "open" );
-            ibis = Ibis.createIbis( s, rszHandler );
+            ibis = IbisFactory.createIbis( s, rszHandler );
             myName = ibis.identifier();
 
             registry = ibis.registry();
 
             // TODO: be more precise about the properties for the two
             // port types.
-            PortType updatePort = ibis.createPortType( "neighbour update", s );
-            PortType stealPort = ibis.createPortType( "loadbalance", s );
+            PortType updatePort = ibis.createPortType( s );
+            PortType stealPort = ibis.createPortType( s );
 
             ibis.enableResizeUpcalls();
 

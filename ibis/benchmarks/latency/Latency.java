@@ -390,11 +390,11 @@ class Latency {
             s.add("Communication",
                     "OneToOne, Reliable, AutoUpcalls, ExplicitReceipt");
             s.add("worldmodel", "open");
-            ibis = Ibis.createIbis(s, null);
+            ibis = IbisFactory.createIbis(s, null);
 
             registry = ibis.registry();
 
-            PortType t = ibis.createPortType("test type", s);
+            PortType t = ibis.createPortType(s);
 
             SendPort sport = t.createSendPort("send port");
             ReceivePort rport;

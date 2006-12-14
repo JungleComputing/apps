@@ -508,7 +508,7 @@ public final class Ping {
 
             StaticProperties props = new StaticProperties();
             props.add("name", name);
-            ibis = Ibis.createIbis(props, null);
+            ibis = IbisFactory.createIbis(props, null);
 
             // Configuration information
             registry = ibis.registry();
@@ -552,7 +552,7 @@ public final class Ping {
                 }
             }
 
-            PortType t = ibis.createPortType("ping", s);
+            PortType t = ibis.createPortType(s);
             sport = t.createSendPort();
             rport = null;
             ibis.registry().elect("" + rank);

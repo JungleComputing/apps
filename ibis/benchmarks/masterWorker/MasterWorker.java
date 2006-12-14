@@ -37,7 +37,7 @@ final class MasterWorker {
                     "OneToOne ManyToOne Reliable ExplicitReceipt");
             s.add("serialization", "ibis");
             s.add("worldmodel", "open");
-            ibis = Ibis.createIbis(s, null);
+            ibis = IbisFactory.createIbis(s, null);
 
             registry = ibis.registry();
 
@@ -45,14 +45,14 @@ final class MasterWorker {
 
             boolean master = masterID.equals(ibis.identifier());
 
-            manyToOneType = ibis.createPortType("many2one type", s);
+            manyToOneType = ibis.createPortType(s);
 
             s = new StaticProperties();
             s.add("communication", "OneToOne Reliable ExplicitReceipt");
             s.add("serialization", "ibis");
             s.add("worldmodel", "open");
 
-            oneToOneType = ibis.createPortType("one2one type", s);
+            oneToOneType = ibis.createPortType(s);
 
             if (master) {
                 master();

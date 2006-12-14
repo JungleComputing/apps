@@ -256,7 +256,7 @@ final class Main {
 		s.add("serialization", "sun");
 	    }
 	    s.add("worldmodel", "closed");
-	    ibis = Ibis.createIbis(s, null);
+	    ibis = IbisFactory.createIbis(s, null);
 
 	    if (verbose) { 
 		System.out.println("Ibis created; getting registry ...");
@@ -268,7 +268,7 @@ final class Main {
 		System.out.println("Got registry");
 	    }
 
-	    PortType t = ibis.createPortType("test type", null);			
+	    PortType t = ibis.createPortType(null);			
 	    SendPort sport = t.createSendPort();					      
 	    ReceivePort rport;
 
