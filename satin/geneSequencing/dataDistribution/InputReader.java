@@ -5,9 +5,6 @@ import java.io.*;
 import java.util.*;
 
 public class InputReader implements AlignmentAlgorithms {
-    public static File PROBLEMDIRECTORY;
-
-    private final String PARAMETER_FILE = "team3/inputs.txt"; //name of the file expected to contain the input parameters
 
     private ScoringScheme scoringScheme; //the scoring scheme for the computation
 
@@ -23,11 +20,10 @@ public class InputReader implements AlignmentAlgorithms {
 
     private int numScores; //how many top scores per query sequence to record
 
-    public InputReader() throws Throwable {
+    public InputReader(String parameterFile) throws Throwable {
         //read and check all parameters in the inputs file
         BufferedReader inputs =
-                new BufferedReader(new FileReader(new File(PROBLEMDIRECTORY,
-                    PARAMETER_FILE)));
+                new BufferedReader(new FileReader(new File(parameterFile)));
         Properties parameters = new Properties();
         String line = inputs.readLine();
         while (line != null) {
@@ -56,7 +52,7 @@ public class InputReader implements AlignmentAlgorithms {
                 "Could not get name of database.file parameter from parameter file");
         }
 
-        database = new File(PROBLEMDIRECTORY, property);
+        database = new File(property);
         if (!database.isFile()) {
             throw new Exception(
                 "Cannot find database file - was it included as problem data? Was the name of the database file entered into the parameter file");
@@ -68,7 +64,7 @@ public class InputReader implements AlignmentAlgorithms {
                 "Could not get name of query.file parameter from parameter file");
         }
 
-        query = new File(PROBLEMDIRECTORY, property);
+        query = new File(property);
         if (!query.isFile()) {
             throw new Exception(
                 "Cannot find query file - was it included as problem data? Was the name of the query file entered into the parameter file?");
@@ -167,7 +163,7 @@ public class InputReader implements AlignmentAlgorithms {
                 throw new Exception(
                     "Could not get score.matrix parameter from parameter file");
             }
-            File scoringMatrix = new File(PROBLEMDIRECTORY, property);
+            File scoringMatrix = new File(property);
             if (!scoringMatrix.isFile()) {
                 throw new Exception(
                     "Check that the score matrix file was included as problem data");

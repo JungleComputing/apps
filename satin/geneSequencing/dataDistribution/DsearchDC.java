@@ -14,11 +14,16 @@ public class DsearchDC {
 
     private ArrayList<ResSeq> theResult;
 
-    public DsearchDC() {
+    public DsearchDC(String[] args) {
         theResult = new ArrayList<ResSeq>();
 
+        if(args.length != 1) {
+            System.err.println("Usage: java DsearchDC <input file>");
+            System.exit(1);
+        }
+        
         try {
-            iR = new InputReader();
+            iR = new InputReader(args[0]);
         } catch (Throwable e) {
             System.out.println("Exception in  Dsearch(): " + e.toString());
         }
@@ -89,7 +94,7 @@ public class DsearchDC {
         dC.setDatabaseFile(iR.getDatabaseFile());
     }
 
-    public void start(String[] args) {
+    public void start() {
         System.out.println("\n---> START <---");
         double startTime = System.currentTimeMillis();
         processArgumentsAndSetValues();
@@ -98,6 +103,6 @@ public class DsearchDC {
     }
 
     public static void main(String[] args) {
-        new DsearchDC().start(args);
+        new DsearchDC(args).start();
     }
 }
