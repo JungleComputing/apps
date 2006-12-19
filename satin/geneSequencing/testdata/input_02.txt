@@ -30,7 +30,7 @@ top.scores = 20
 #------------------------------The value of threshold----------------------------------------------
 #the value of threshold
 
-value.threshold = 5
+value.threshold = 6
 
 #------------------------------type of scoring scheme----------------------------------------------
 #scoring type: a scoring scheme (match, mismatch, gap penalty) or full score matrix
