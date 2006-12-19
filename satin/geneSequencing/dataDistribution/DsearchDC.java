@@ -25,7 +25,8 @@ public class DsearchDC {
         try {
             iR = new InputReader(args[0]);
         } catch (Throwable e) {
-            System.out.println("Exception in  Dsearch(): " + e.toString());
+            System.out.println("An error occurred: " + e.toString());
+            System.exit(1);
         }
 
         dC = new DivCon();
