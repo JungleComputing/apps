@@ -15,12 +15,12 @@ scores.or.alignments = 2
 #----------------------------------Database file---------------------------------------------------
 #name of database file
 
-database.file = ../testdata/set03/set03db.fasta
+database.file = ../testdata/set03db.fasta
 
 #----------------------------------Querys file-----------------------------------------------------
 #name of query sequence file
 
-query.file = ../testdata/set03/set03q.fasta
+query.file = ../testdata/set03q.fasta
 
 #----------------------------------Number of scores returned---------------------------------------
 
