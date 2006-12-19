@@ -15,7 +15,7 @@ scores.or.alignments = 2
 #----------------------------------Database file---------------------------------------------------
 #name of database file
 
-database.file = ../testData/set02db.fasta
+database.file = ../testdata/set02db.fasta
 
 #----------------------------------Querys file-----------------------------------------------------
 #name of query sequence file
