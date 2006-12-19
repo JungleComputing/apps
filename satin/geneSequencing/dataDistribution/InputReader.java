@@ -55,7 +55,7 @@ public class InputReader implements AlignmentAlgorithms {
         database = new File(property);
         if (!database.isFile()) {
             throw new Exception(
-                "Cannot find database file - was it included as problem data? Was the name of the database file entered into the parameter file");
+                "Cannot find database file: " + property);
         }
 
         property = parameters.getProperty("query.file");
