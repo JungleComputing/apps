@@ -10,7 +10,7 @@ public class Dsearch_AlgorithmV1 {
 
     public ArrayList<ResSeq> processUnit(WorkUnit workUnit) throws Throwable {
         ArrayList<ResSeq> results = new ArrayList<ResSeq>();
-        
+
         for (int i = 0; i < workUnit.querySequences.size(); i++) {
             Sequence querySequence = (Sequence) workUnit.querySequences.get(i);
             String querySequenceBody = querySequence.createSequenceBody();
@@ -22,7 +22,8 @@ public class Dsearch_AlgorithmV1 {
             resSeq.setQuerySequence(querySequence); //add the name of the current query sequence
 
             for (int j = 0; j < workUnit.databaseSequences.size(); j++) {
-                Sequence databaseSequence = (Sequence) workUnit.databaseSequences.get(j);
+                Sequence databaseSequence =
+                        (Sequence) workUnit.databaseSequences.get(j);
                 String databaseSequenceBody =
                         databaseSequence.createSequenceBody();
 
@@ -40,18 +41,18 @@ public class Dsearch_AlgorithmV1 {
                     if (workUnit.scoresOrAlignments == ALIGN_GET_ALIGNMENTS) {
                         alignment =
                                 Sequence_Aligner.computeAlignment(
-                                    workUnit.alignmentAlgorithm, qSequence, dbSequence,
-                                    workUnit.scoringScheme);
+                                        workUnit.alignmentAlgorithm, qSequence,
+                                        dbSequence, workUnit.scoringScheme);
                         score = getScore(alignment);
                     } else {
                         score =
                                 Sequence_Aligner.computeAlignmentScore(
-                                    workUnit.alignmentAlgorithm, qSequence, dbSequence,
-                                    workUnit.scoringScheme);
+                                        workUnit.alignmentAlgorithm, qSequence,
+                                        dbSequence, workUnit.scoringScheme);
                     }
                 } catch (Exception e) {
                     System.out.println("My Exception in processUnit: "
-                        + e.toString());
+                            + e.toString());
                 }
 
                 if (score > 0) {

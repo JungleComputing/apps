@@ -27,7 +27,7 @@ public class FileSequences implements java.io.Serializable {
 
                     Vector tail = new Vector();
                     while ((line = bf.readLine()) != null
-                        && line.charAt(0) != '>') {
+                            && line.charAt(0) != '>') {
                         tail.add(line);
                     }
                     seq.setSequenceBody(tail);

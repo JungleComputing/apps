@@ -49,43 +49,42 @@ public class InputReader implements AlignmentAlgorithms {
         String property = parameters.getProperty("database.file");
         if (property == null) {
             throw new Exception(
-                "Could not get name of database.file parameter from parameter file");
+                    "Could not get name of database.file parameter from parameter file");
         }
 
         database = new File(property);
         if (!database.isFile()) {
-            throw new Exception(
-                "Cannot find database file: " + property);
+            throw new Exception("Cannot find database file: " + property);
         }
 
         property = parameters.getProperty("query.file");
         if (property == null) {
             throw new Exception(
-                "Could not get name of query.file parameter from parameter file");
+                    "Could not get name of query.file parameter from parameter file");
         }
 
         query = new File(property);
         if (!query.isFile()) {
             throw new Exception(
-                "Cannot find query file - was it included as problem data? Was the name of the query file entered into the parameter file?");
+                    "Cannot find query file - was it included as problem data? Was the name of the query file entered into the parameter file?");
         }
 
         property = parameters.getProperty("scores.or.alignments");
         if (property == null)
             throw new Exception(
-                "Could not get scoresOrAlignments parameter from parameter file");
+                    "Could not get scoresOrAlignments parameter from parameter file");
 
         try {
             scoresOrAlignments = Integer.parseInt(property);
         } catch (Exception e) {
             throw new Exception(
-                "Check scoresOrAlignments parameter in parameter file");
+                    "Check scoresOrAlignments parameter in parameter file");
         }
 
         property = parameters.getProperty("top.scores");
         if (property == null) {
             throw new Exception(
-                "Could not get top.scores parameter from parameter file");
+                    "Could not get top.scores parameter from parameter file");
         }
 
         try {
@@ -97,14 +96,14 @@ public class InputReader implements AlignmentAlgorithms {
         property = parameters.getProperty("value.threshold");
         if (property == null) {
             throw new Exception(
-                "Could not get value.threshold parameter from parameter file");
+                    "Could not get value.threshold parameter from parameter file");
         }
 
         try {
             valueOfThreshold = Integer.parseInt(property);
         } catch (Exception e) {
             throw new Exception(
-                "Check value.threshold parameter in parameter file");
+                    "Check value.threshold parameter in parameter file");
         }
 
         property = parameters.getProperty("alignment.algorithm");
@@ -114,18 +113,18 @@ public class InputReader implements AlignmentAlgorithms {
 
         alignmentAlgorithm = new String(property.toLowerCase());
         if (!alignmentAlgorithm.equals(NEEDLEMAN_WUNSCH)
-            && !alignmentAlgorithm.equals(SMITH_WATERMAN)
-            && !alignmentAlgorithm.equals(CROCHEMORE_GLOBAL)
-            && !alignmentAlgorithm.equals(CROCHEMORE_LOCAL)) {
+                && !alignmentAlgorithm.equals(SMITH_WATERMAN)
+                && !alignmentAlgorithm.equals(CROCHEMORE_GLOBAL)
+                && !alignmentAlgorithm.equals(CROCHEMORE_LOCAL)) {
             throw new Exception("Alignment algorithm must be: "
-                + NEEDLEMAN_WUNSCH + " or " + SMITH_WATERMAN + " or "
-                + CROCHEMORE_GLOBAL + " or " + CROCHEMORE_LOCAL);
+                    + NEEDLEMAN_WUNSCH + " or " + SMITH_WATERMAN + " or "
+                    + CROCHEMORE_GLOBAL + " or " + CROCHEMORE_LOCAL);
         }
 
         property = parameters.getProperty("scoring.scheme");
         if (property == null) {
             throw new Exception(
-                "Could not get score.scheme parameter from parameter file");
+                    "Could not get score.scheme parameter from parameter file");
         }
 
         if (property.equals("ss")) {
@@ -161,12 +160,12 @@ public class InputReader implements AlignmentAlgorithms {
 
             if (property == null) {
                 throw new Exception(
-                    "Could not get score.matrix parameter from parameter file");
+                        "Could not get score.matrix parameter from parameter file");
             }
             File scoringMatrix = new File(property);
             if (!scoringMatrix.isFile()) {
                 throw new Exception(
-                    "Check that the score matrix file was included as problem data");
+                        "Check that the score matrix file was included as problem data");
             }
 
             //check the score matrix is valid

@@ -15,21 +15,21 @@ public class DsearchDC {
     private ArrayList<ResSeq> theResult;
 
     private boolean dump = false;
-    
+
     public DsearchDC(String[] args) {
         theResult = new ArrayList<ResSeq>();
 
-        if(args.length < 1) {
+        if (args.length < 1) {
             System.err.println("Usage: java DsearchDC <input file> [-dump]");
             System.exit(1);
         }
-        
-        if(args.length == 2) {
-            if(args[1].equals("-dump")) {
+
+        if (args.length == 2) {
+            if (args[1].equals("-dump")) {
                 dump = true;
             }
         }
-        
+
         try {
             iR = new InputReader(args[0]);
         } catch (Throwable e) {
@@ -48,40 +48,40 @@ public class DsearchDC {
             psRes = new PrintStream(new BufferedOutputStream(fos));
         } catch (Exception e) {
             System.out.println("Exception in createResultFile(): "
-                + e.toString());
+                    + e.toString());
         }
     }
 
     private void generateResultDivCon(double startTime) {
         System.out.println();
         System.out.println("query sequences    = "
-            + dC.getQuerySequences().size());
+                + dC.getQuerySequences().size());
         System.out.println("database sequences = "
-            + dC.getDatabaseSequences().size());
+                + dC.getDatabaseSequences().size());
         System.out.println("threshold          = " + dC.getThreshold());
         System.out.println();
 
         Satin.resume();
-        
+
         dC.generateTheResult();
         System.out.println("The result has been generated in "
-            + (System.currentTimeMillis() - startTime) / 1000.0 + " sec");
+                + (System.currentTimeMillis() - startTime) / 1000.0 + " sec");
 
         theResult = dC.getTheResult();
 
-        if(dump) {
-        Satin.pause();
+        if (dump) {
+            Satin.pause();
             double start1 = System.currentTimeMillis();
             printTheResultInFile();
             double end1 = System.currentTimeMillis() - start1;
-            System.out.println("\nThe result has been printed in " + end1 / 1000.0
-                + " sec");
+            System.out.println("\nThe result has been printed in " + end1
+                    / 1000.0 + " sec");
             Satin.resume();
         }
-        
+
         double time = (System.currentTimeMillis() - startTime) / 1000.0;
         System.out.println("\nThe program has been finished in " + time
-            + " sec");
+                + " sec");
     }
 
     private void printTheResultInFile() {

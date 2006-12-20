@@ -38,11 +38,11 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface,
             int newSplitSize = workUnit.querySequences.size() / 2;
 
             ArrayList<ResSeq> subRes1 =
-                    spawn_splitQuerySequences(
-                        splitQuerySequences(0, newSplitSize, workUnit));
+                    spawn_splitQuerySequences(splitQuerySequences(0,
+                            newSplitSize, workUnit));
             ArrayList<ResSeq> subRes2 =
-                    spawn_splitQuerySequences(splitQuerySequences(
-                        newSplitSize, workUnit.querySequences.size(), workUnit));
+                    spawn_splitQuerySequences(splitQuerySequences(newSplitSize,
+                            workUnit.querySequences.size(), workUnit));
 
             sync();
 
@@ -56,7 +56,7 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface,
         ArrayList<ResSeq> result;
         int newSplitSize;
 
-//        Vector databaseSequences = (Vector) workUnit.get(4);
+        //        Vector databaseSequences = (Vector) workUnit.get(4);
 
         if (workUnit.databaseSequences.size() <= threshold) {
             result = createTrivialResult(workUnit);
@@ -65,10 +65,11 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface,
 
             ArrayList<ResSeq> subResult1 =
                     spawn_splitDatabaseSequences(splitDatabaseSequences(0,
-                        newSplitSize, workUnit));
+                            newSplitSize, workUnit));
             ArrayList<ResSeq> subResult2 =
                     spawn_splitDatabaseSequences(splitDatabaseSequences(
-                        newSplitSize, workUnit.databaseSequences.size(), workUnit));
+                            newSplitSize, workUnit.databaseSequences.size(),
+                            workUnit));
 
             sync();
 
@@ -85,11 +86,11 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface,
         try {
             ArrayList<ResSeq> resultUnit = dA.processUnit(workUnit);
             subResult = processResultUnit(resultUnit);
-      } catch (Throwable thr) {
+        } catch (Throwable thr) {
             System.out
-                .println("Exception in createTrivialResult in DivCon class: "
-                    + thr.toString());
-      }
+                    .println("Exception in createTrivialResult in DivCon class: "
+                            + thr.toString());
+        }
 
         return subResult;
     }
@@ -111,7 +112,10 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface,
     }
 
     public void generateTheResult() {
-        WorkUnit workUnit = new WorkUnit(alignmentAlgorithm, scoresOrAlignments, scoringScheme, querySequences.getSequences(), databaseSequences.getSequences());
+        WorkUnit workUnit =
+                new WorkUnit(alignmentAlgorithm, scoresOrAlignments,
+                        scoringScheme, querySequences.getSequences(),
+                        databaseSequences.getSequences());
 
         querySequences = null;
         databaseSequences = null;
@@ -121,7 +125,8 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface,
         sync();
     }
 
-    private ArrayList<ResSeq> combineSubResults(ArrayList<ResSeq> subResult1, ArrayList<ResSeq> subResult2) {
+    private ArrayList<ResSeq> combineSubResults(ArrayList<ResSeq> subResult1,
+            ArrayList<ResSeq> subResult2) {
         ArrayList<ResSeq> main = subResult1;
         ArrayList<ResSeq> additional = subResult2;
 
@@ -133,7 +138,8 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface,
         return res;
     }
 
-    private ArrayList<ResSeq> processSubResults(ResSeq resSeq, ArrayList<ResSeq> main) {
+    private ArrayList<ResSeq> processSubResults(ResSeq resSeq,
+            ArrayList<ResSeq> main) {
         boolean flag = false;
         for (int i = 0; i < main.size(); i++) {
             ResSeq resSeqMain = main.get(i);
@@ -147,7 +153,8 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface,
                 resSeqMain.updateDatabaseSequences(newDatabaseSeqs);
             }
         }
-        if (!flag) main.add(resSeq);
+        if (!flag)
+            main.add(resSeq);
 
         return main;
     }
@@ -162,16 +169,21 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface,
         for (int i = begin; i < end; i++)
             newQuerySequences.add(workUnit.querySequences.get(i));
 
-        return new WorkUnit(workUnit.alignmentAlgorithm, workUnit.scoresOrAlignments, workUnit.scoringScheme, newQuerySequences, workUnit.databaseSequences);
+        return new WorkUnit(workUnit.alignmentAlgorithm,
+                workUnit.scoresOrAlignments, workUnit.scoringScheme,
+                newQuerySequences, workUnit.databaseSequences);
     }
 
-    private WorkUnit splitDatabaseSequences(int begin, int end, WorkUnit workUnit) {
+    private WorkUnit splitDatabaseSequences(int begin, int end,
+            WorkUnit workUnit) {
         Vector newDatabaseSequences = new Vector();
 
         for (int i = begin; i < end; i++)
             newDatabaseSequences.add(workUnit.databaseSequences.get(i));
-        
-        return new WorkUnit(workUnit.alignmentAlgorithm, workUnit.scoresOrAlignments, workUnit.scoringScheme, workUnit.querySequences, newDatabaseSequences);
+
+        return new WorkUnit(workUnit.alignmentAlgorithm,
+                workUnit.scoresOrAlignments, workUnit.scoringScheme,
+                workUnit.querySequences, newDatabaseSequences);
     }
 
     public void setAlignmentAlgorithm(String alignmentAlgorithm) {

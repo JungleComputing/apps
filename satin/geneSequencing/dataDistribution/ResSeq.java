@@ -42,7 +42,7 @@ public class ResSeq implements Serializable {
         for (int i = 0; i < databaseSequences.size(); i++) {
             for (int j = 0; j < i; j++) {
                 if (compareSeqs((Sequence) databaseSequences.get(i),
-                    (Sequence) databaseSequences.get(j)) > 0) {
+                        (Sequence) databaseSequences.get(j)) > 0) {
                     Sequence elementI = (Sequence) databaseSequences.get(i);
                     Sequence elementJ = (Sequence) databaseSequences.get(j);
 
@@ -62,7 +62,8 @@ public class ResSeq implements Serializable {
         int first_i_score = i.getSequenceScore();
         int first_j_score = j.getSequenceScore();
 
-        if (first_i_score > first_j_score) return 1;
+        if (first_i_score > first_j_score)
+            return 1;
 
         return first_i_score != first_j_score ? -1 : 0;
     }
@@ -80,11 +81,11 @@ public class ResSeq implements Serializable {
             if (sequenceAlignment.equals("not calculated"))
                 str =
                         str + "   " + "[" + (i + 1) + "] : " + sequenceScore
-                            + " : " + sequenceName + "\n";
+                                + " : " + sequenceName + "\n";
             else {
                 str =
                         str + "   " + "[" + (i + 1) + "] : " + sequenceName
-                            + "\n";
+                                + "\n";
                 str = str + "\n" + sequenceAlignment + "\n\n";
             }
         }

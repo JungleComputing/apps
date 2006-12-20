@@ -17,7 +17,7 @@ public class Sequence_Aligner implements AlignmentAlgorithms, Serializable {
             algorithm = new CrochemoreLandauZivUkelsonGlobalAlignment();
         } else {
             throw new Exception("Non-existant alignment algorithm selected: "
-                + alignmentAlgorithm);
+                    + alignmentAlgorithm);
         }
 
         // set scoring scheme
@@ -48,7 +48,7 @@ public class Sequence_Aligner implements AlignmentAlgorithms, Serializable {
             algorithm = new CrochemoreLandauZivUkelsonGlobalAlignment();
         } else {
             throw new Exception("Non-existant alignment algorithm selected: "
-                + alignmentAlgorithm);
+                    + alignmentAlgorithm);
         }
 
         // set scoring scheme
