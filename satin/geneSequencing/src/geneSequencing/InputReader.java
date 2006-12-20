@@ -1,4 +1,4 @@
-//package dsearchDC;
+package geneSequencing;
 
 import neobio.alignment.*;
 import java.io.*;

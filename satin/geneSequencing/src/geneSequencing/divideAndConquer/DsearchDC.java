@@ -1,5 +1,7 @@
 package geneSequencing.divideAndConquer;
 
+import geneSequencing.InputReader;
+import geneSequencing.ResSeq;
 import ibis.satin.impl.Satin;
 
 import java.util.*;

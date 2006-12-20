@@ -1,4 +1,4 @@
-//package dsearchDC_so;
+package geneSequencing;
 
 import java.util.Vector;
 import java.io.Serializable;

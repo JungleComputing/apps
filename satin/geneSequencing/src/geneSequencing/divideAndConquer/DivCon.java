@@ -1,4 +1,8 @@
-//package dsearchDC;
+package geneSequencing.divideAndConquer;
+
+import geneSequencing.Dsearch_AlgorithmV1;
+import geneSequencing.FileSequences;
+import geneSequencing.ResSeq;
 
 import java.io.Serializable;
 import java.util.ArrayList;

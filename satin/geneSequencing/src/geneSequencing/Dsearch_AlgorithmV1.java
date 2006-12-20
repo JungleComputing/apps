@@ -1,4 +1,6 @@
-//package dsearchDC;
+package geneSequencing;
+
+import geneSequencing.divideAndConquer.WorkUnit;
 
 import java.io.CharArrayReader;
 import java.util.ArrayList;

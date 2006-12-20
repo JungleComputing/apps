@@ -1,4 +1,4 @@
-//package dsearchDC;
+package geneSequencing;
 
 public interface AlignmentAlgorithms {
     public final String SMITH_WATERMAN = "sw";

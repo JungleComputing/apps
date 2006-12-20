@@ -1,3 +1,5 @@
+package geneSequencing.divideAndConquer;
+
 import java.util.Vector;
 
 import neobio.alignment.ScoringScheme;
@@ -7,11 +9,11 @@ import neobio.alignment.ScoringScheme;
  */
 
 public class WorkUnit implements java.io.Serializable {
-    String alignmentAlgorithm;
-    int scoresOrAlignments;
-    ScoringScheme scoringScheme;
-    Vector querySequences;
-    Vector databaseSequences;
+    public String alignmentAlgorithm;
+    public int scoresOrAlignments;
+    public ScoringScheme scoringScheme;
+    public Vector querySequences;
+    public Vector databaseSequences;
 
     public WorkUnit(String alignmentAlgorithm, int scoresOrAlignments, ScoringScheme scoringScheme, Vector querySequences, Vector databaseSequences) {
         super();
