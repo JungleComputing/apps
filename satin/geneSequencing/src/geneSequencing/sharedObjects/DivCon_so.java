@@ -1,8 +1,9 @@
-package geneSequencing.divideAndConquer;
+package geneSequencing.sharedObjects;
 
 import geneSequencing.Dsearch_AlgorithmV1;
 import geneSequencing.FileSequences;
 import geneSequencing.ResSeq;
+import geneSequencing.divideAndConquer.WorkUnit;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ import java.util.Vector;
 
 import neobio.alignment.ScoringScheme;
 
-public class DivCon extends ibis.satin.SatinObject implements DivConInterface,
+public class DivCon_so extends ibis.satin.SatinObject implements DivCon_soInterface,
         Serializable {
     private int threshold;
 
@@ -28,25 +29,33 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface,
 
     private ScoringScheme scoringScheme;
 
-    public DivCon() {
+    private SharedData sharedData;
+
+    private Vector databaseSeqsPointers;
+
+    private Vector querySeqsPointers;
+
+    public DivCon_so() {
         theResult = new ArrayList<ResSeq>();
+        sharedData = new SharedData();
+        sharedData.exportObject();
     }
 
-    public ArrayList<ResSeq> spawn_splitQuerySequences(WorkUnit workUnit) {
+    public ArrayList<ResSeq> spawn_splitQuerySequences(WorkUnit workUnit, SharedData sharedData) {
         ArrayList<ResSeq> result;
 
         if (workUnit.querySequences.size() <= threshold) {
-            result = spawn_splitDatabaseSequences(workUnit);
+            result = spawn_splitDatabaseSequences(workUnit, sharedData);
             sync();
         } else {
             int newSplitSize = workUnit.querySequences.size() / 2;
 
             ArrayList<ResSeq> subRes1 =
                     spawn_splitQuerySequences(splitQuerySequences(0,
-                            newSplitSize, workUnit));
+                            newSplitSize, workUnit), sharedData);
             ArrayList<ResSeq> subRes2 =
                     spawn_splitQuerySequences(splitQuerySequences(newSplitSize,
-                            workUnit.querySequences.size(), workUnit));
+                            workUnit.querySequences.size(), workUnit), sharedData);
 
             sync();
 
@@ -56,7 +65,7 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface,
         return result;
     }
 
-    public ArrayList<ResSeq> spawn_splitDatabaseSequences(WorkUnit workUnit) {
+    public ArrayList<ResSeq> spawn_splitDatabaseSequences(WorkUnit workUnit, SharedData sharedData) {
         ArrayList<ResSeq> result;
         int newSplitSize;
 
@@ -69,11 +78,11 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface,
 
             ArrayList<ResSeq> subResult1 =
                     spawn_splitDatabaseSequences(splitDatabaseSequences(0,
-                            newSplitSize, workUnit));
+                            newSplitSize, workUnit), sharedData);
             ArrayList<ResSeq> subResult2 =
                     spawn_splitDatabaseSequences(splitDatabaseSequences(
                             newSplitSize, workUnit.databaseSequences.size(),
-                            workUnit));
+                            workUnit), sharedData);
 
             sync();
 
@@ -86,11 +95,17 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface,
     private ArrayList<ResSeq> createTrivialResult(WorkUnit workUnit) {
         Dsearch_AlgorithmV1 dA = new Dsearch_AlgorithmV1();
         ArrayList<ResSeq> subResult = null;
+        
+        Vector queryPointers    = workUnit.querySequences;
+        Vector databasePointers = workUnit.databaseSequences;
+
+        Vector querySequences     = sharedData.getQuerySeqs(queryPointers);
+        Vector databaseSequences = sharedData.getDatabaseSeqs(databasePointers);
 
         try {
             ArrayList<ResSeq> resultUnit =
-                    dA.processUnit(workUnit.querySequences,
-                                    workUnit.databaseSequences,
+                    dA.processUnit(querySequences,
+                                    databaseSequences,
                                     workUnit.scoresOrAlignments,
                                     workUnit.scoringScheme,
                                     workUnit.alignmentAlgorithm);
@@ -129,7 +144,7 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface,
         querySequences = null;
         databaseSequences = null;
 
-        theResult = spawn_splitQuerySequences(workUnit);
+        theResult = spawn_splitQuerySequences(workUnit, sharedData);
 
         sync();
     }
@@ -236,4 +251,39 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface,
     public Vector getDatabaseSequences() {
         return databaseSequences.getSequences();
     }
+
+    private Vector createSeqsPointers(int size) {
+        Vector pointers = new Vector();
+
+        for (int i = 0; i < size; i++)
+            pointers.add(i);
+
+        return pointers;
+    }
+    public Vector getQuerySeqPointers() {
+        return querySeqsPointers;
+    }
+
+    public Vector getDatabaseSeqPointers() {
+        return databaseSeqsPointers;
+    }
+
+    public void setSharedObject(String queryFile, String databaseFile) {
+        FileSequences querySequences, databaseSequences;
+
+        querySequences = new FileSequences(queryFile);
+        querySequences.createFileSequnces();
+
+        databaseSequences = new FileSequences(databaseFile);
+        databaseSequences.createFileSequnces();
+
+        querySeqsPointers =
+                createSeqsPointers(querySequences.getSequences().size());
+        databaseSeqsPointers =
+                createSeqsPointers(databaseSequences.getSequences().size());
+
+        sharedData.updateQuerySeqs(querySequences);
+        sharedData.updateDatabaseSeqs(databaseSequences);
+    }
+
 }
