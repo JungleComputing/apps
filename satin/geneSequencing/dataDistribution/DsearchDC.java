@@ -53,13 +53,11 @@ public class DsearchDC {
     }
 
     private void generateResultDivCon(double startTime) {
-        System.out.println();
-        System.out.println("query sequences    = "
-                + dC.getQuerySequences().size());
-        System.out.println("database sequences = "
-                + dC.getDatabaseSequences().size());
-        System.out.println("threshold          = " + dC.getThreshold());
-        System.out.println();
+        System.out.println("query sequences = "
+            + dC.getQuerySequences().size() + ", "
+            + "database sequences = "
+            + dC.getDatabaseSequences().size() + ", " 
+            + "threshold          = " + dC.getThreshold());
 
         Satin.resume();
 
@@ -78,10 +76,6 @@ public class DsearchDC {
                     / 1000.0 + " sec");
             Satin.resume();
         }
-
-        double time = (System.currentTimeMillis() - startTime) / 1000.0;
-        System.out.println("\nThe program has been finished in " + time
-                + " sec");
     }
 
     private void printTheResultInFile() {
