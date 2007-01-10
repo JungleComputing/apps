@@ -211,7 +211,7 @@ import java.util.Arrays;
 
 	if (me.children == null || me.bodyCount < params.THRESHOLD) {
 	    /* it is a leaf node, do sequential computation */
-            System.out.println("LEAF: bodycount = " + me.bodyCount);
+            // System.out.println("LEAF: bodycount = " + me.bodyCount);
             BodyUpdates res = getBodyUpdates(me.bodyCount, params);
             // Experiment:
             // BodyTreeNode necessaryTree = new BodyTreeNode(bodies.bodyTreeRoot, me);
@@ -233,7 +233,7 @@ import java.util.Arrays;
 	for (int i = 0; i < 8; i++) {
 	    BodyTreeNode ch = me.children[i];
 	    if (ch != null) {
-                System.out.println("SPAWN ... bodycount = " + ch.bodyCount);
+                // System.out.println("SPAWN ... bodycount = " + ch.bodyCount);
                 /* spawn child jobs */
                 res[childcount] = /* spawn */ BarnesSO(ch.getId(),
                         iteration, bodies);
