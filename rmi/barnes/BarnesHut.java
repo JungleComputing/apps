@@ -56,6 +56,13 @@ strictfp public class BarnesHut {
                     //	      System.out.println("Using " + bhGd.gdEndTime + " as endtime");
                 }
 
+                if (args[i].equals("-theta")) {
+                    foundArg = true;
+                    bhGd.gdTheta = Double.valueOf(args[i + 1]).doubleValue();
+                    i++;
+                    //	      System.out.println("Using " + bhGd.gdTheta + " as theta");
+                }
+
                 if (args[i].equals("-dtime")) {
                     foundArg = true;
                     bhGd.gdDt = Double.valueOf(args[i + 1]).doubleValue();

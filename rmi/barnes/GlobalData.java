@@ -1,12 +1,14 @@
 /* $Id$ */
 
+import ibis.util.GetLogger;
+
 import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 
 strictfp public class GlobalData implements Cloneable, Serializable {
 
-    static Logger logger = Logger.getLogger(GlobalData.class.getName());
+    static Logger logger = GetLogger.getLogger(GlobalData.class.getName());
 
     public Body gdBodies[];
 
@@ -125,21 +127,21 @@ strictfp public class GlobalData implements Cloneable, Serializable {
         gdEndTime *= scale;
         gdTheta *= 1.0 / scale;
 */
-        debugStr("theta: " + gdTheta);
+        if (logger.isDebugEnabled()) {
+            logger.debug("theta: " + gdTheta);
+        }
 
         gdDtHalf = gdDt / 2;
         gdThetaSq = gdTheta * gdTheta;
         gdSoftSQ = gdSoft * gdSoft;
-        gdIterations = 10; // (int) (((gdEndTime - GD_START_TIME) / gdDt) + 1.1);
+        gdIterations = (int) (((gdEndTime - GD_START_TIME) / gdDt) + 1.1);
 
-//        debugStr("scale: " + scale + "theta: " + gdTheta + ", theta sq: "
-//            + gdThetaSq);
-
-        debugStr("Parameters: " + gdTotNumBodies + " bodies, " + gdDt + " dt, "
-            + gdSoft + " eps, " + (2.0 / gdTheta) + " tol, " + gdNumProcs
-            + " procs, " + gdDtHalf + " dthalf, " + gdMaxLocalBodies
-            + " Max LocalBodies ");
-
+        if (logger.isDebugEnabled()) {
+            logger.debug("Parameters: " + gdTotNumBodies + " bodies, " + gdDt
+                    + " dt, " + gdSoft + " eps, " + (2.0 / gdTheta)
+                    + " tol, " + gdNumProcs + " procs, " + gdDtHalf
+                    + " dthalf, " + gdMaxLocalBodies + " Max LocalBodies ");
+        }
     }
 
     public GlobalData GenerateClone() {
@@ -148,11 +150,6 @@ strictfp public class GlobalData implements Cloneable, Serializable {
         } catch (Exception e) {
             throw new Error("could not clone!", e);
         }
-    }
-
-    void debugStr(String s) {
-        System.err.println(gdMyProc + ": " + s);
-        logger.debug(gdMyProc + ": " + s);
     }
 
     GlobalData() {

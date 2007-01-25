@@ -25,14 +25,16 @@ public class ProcessorThread extends Thread {
     }
 
     private void PrintBody(int i) {
-        g.debugStr("Body " + i + ": [ " + g.gdBodies[i].bPos.x + ", "
-            + g.gdBodies[i].bPos.y + ", " + g.gdBodies[i].bPos.z + " ]");
-        g.debugStr("     " + i + ": [ " + g.gdBodies[i].bVel.x + ", "
-            + g.gdBodies[i].bVel.y + ", " + g.gdBodies[i].bVel.z + " ]");
-        g.debugStr("     " + i + ": [ " + g.gdBodies[i].bAcc.x + ", "
-            + g.gdBodies[i].bAcc.y + ", " + g.gdBodies[i].bAcc.z + " ]");
-        g.debugStr("     " + i + ": [ " + g.gdBodies[i].bMass + " ]");
-        //        g.debugStr("     " + i + ": " + g.gdBodies[i].bNumber);
+        if (g.logger.isDebugEnabled()) {
+            g.logger.debug("Body " + i + ": [ " + g.gdBodies[i].bPos.x + ", "
+                + g.gdBodies[i].bPos.y + ", " + g.gdBodies[i].bPos.z + " ]");
+            g.logger.debug("     " + i + ": [ " + g.gdBodies[i].bVel.x + ", "
+                + g.gdBodies[i].bVel.y + ", " + g.gdBodies[i].bVel.z + " ]");
+            g.logger.debug("     " + i + ": [ " + g.gdBodies[i].bAcc.x + ", "
+                + g.gdBodies[i].bAcc.y + ", " + g.gdBodies[i].bAcc.z + " ]");
+            g.logger.debug("     " + i + ": [ " + g.gdBodies[i].bMass + " ]");
+        //        g.logger.debug("     " + i + ": " + g.gdBodies[i].bNumber);
+        }
     }
 
     private void PrintBodies() {
@@ -47,11 +49,11 @@ public class ProcessorThread extends Thread {
 
         g.InitializeBodies();
 
-        g.debugStr("initializing Orb Tree");
+        g.logger.info("initializing Orb Tree");
 
         orbTree = new OrbTree(g);
 
-        g.debugStr("initialized Orb Tree");
+        g.logger.info("initialized Orb Tree");
 
         try {
 
@@ -63,13 +65,13 @@ public class ProcessorThread extends Thread {
 
                 GenerateBodiesPlummer();
 
-                g.debugStr("broadcasting bodies\n");
+                g.logger.info("broadcasting bodies");
 
                 g.Proc.broadcastBodies();
 
             } else {
 
-                g.debugStr("receiving bodies\n");
+                g.logger.info("receiving bodies\n");
 
                 g.Proc.receiveBodies();
             }
@@ -81,8 +83,10 @@ public class ProcessorThread extends Thread {
             System.exit(-1);
         }
 
-        g.debugStr("totNumBodies: " + g.gdTotNumBodies + ", numBodies "
-            + g.gdNumBodies);
+        if (g.logger.isDebugEnabled()) {
+            g.logger.info("totNumBodies: " + g.gdTotNumBodies + ", numBodies "
+                + g.gdNumBodies);
+        }
 
     }
 
@@ -111,15 +115,15 @@ public class ProcessorThread extends Thread {
                 if (g.Proc.myProc == 0)
                     System.out.println("Computing iteration: " + g.gdIteration);
 
-                g.debugStr("Computing iteration: " + g.gdIteration);
+                g.logger.info("Computing iteration: " + g.gdIteration);
 
                 tStart = System.currentTimeMillis();
 
-                //	g.debugStr( "iteratie " + g.gdIteration + ", voor update, bodies: " + g.gdNumBodies );
+                //	g.logger.debug( "iteratie " + g.gdIteration + ", voor update, bodies: " + g.gdNumBodies );
 
                 orbTree.Update();
 
-                //	g.debugStr( "iteratie " + g.gdIteration + ", na update, bodies: " + g.gdNumBodies );
+                //	g.logger.debug( "iteratie " + g.gdIteration + ", na update, bodies: " + g.gdNumBodies );
 
                 // Balance the load
 
@@ -129,17 +133,17 @@ public class ProcessorThread extends Thread {
                     level = orbTree.determineLoadBalanceLevel();
                 }
 
-                g.debugStr("load balancing, level = " + level);
+                g.logger.info("load balancing, level = " + level);
 
                 orbTree.LoadBalance(level);
 
-                //        g.debugStr("finished loadbalance (level: " + level + ")" );
+                //        g.logger.debug("finished loadbalance (level: " + level + ")" );
 
                 tLoadBalance = System.currentTimeMillis();
 
                 // Load balancing finished, build the local tree...
 
-                //        g.debugStr("Building tree");
+                //        g.logger.debug("Building tree");
 
                 tree = new BodyTree(g, orbTree.getGlobalMin(), orbTree
                     .getGlobalMax());
@@ -148,25 +152,23 @@ public class ProcessorThread extends Thread {
 
                 tree.ComputeCenterOfMass();
 
-                //	g.debugStr("CenterOfMass computed!");
+                //	g.logger.debug("CenterOfMass computed!");
 
                 tCOFM = System.currentTimeMillis();
                 /*
-                 g.debugStr( "bodies: " + tree.dumpTree( 0, 10 ));
-                 g.debugStr( "\n\n\n\n\n" );
+                 g.logger.debug( "bodies: " + tree.dumpTree( 0, 10 ));
                  */
                 orbTree.ExchangeEssentialTree(tree);
 
-                //      	g.debugStr("Essential trees updated");
+                //      	g.logger.debug("Essential trees updated");
 
                 tEssentialTree = System.currentTimeMillis();
 
                 tree.ComputeCenterOfMass();
 
-                //	g.debugStr("CenterOfMass updated!");
+                //	g.logger.debug("CenterOfMass updated!");
                 /*
-                 g.debugStr( "bodies: " + tree.dumpTree( 0, 10 ));
-                 g.debugStr( "\n\n\n\n\n" );
+                 g.logger.debug( "bodies: " + tree.dumpTree( 0, 10 ));
                  */
                 tUpdateCOFM = System.currentTimeMillis();
 
@@ -188,26 +190,26 @@ public class ProcessorThread extends Thread {
 
                 tGC = System.currentTimeMillis();
 
-                g.debugStr("\nIteration " + g.gdIteration + ":");
-                g.debugStr("Load balancing: " + (tLoadBalance - tStart)
+                g.logger.info("Iteration " + g.gdIteration + ":");
+                g.logger.info("Load balancing: " + (tLoadBalance - tStart)
                     + " ms (level " + level + ")");
-                g.debugStr("Tree construction: " + (tTree - tLoadBalance)
+                g.logger.info("Tree construction: " + (tTree - tLoadBalance)
                     + " ms");
-                g.debugStr("Center of mass computation: " + (tCOFM - tTree)
+                g.logger.info("Center of mass computation: " + (tCOFM - tTree)
                     + " ms");
-                g.debugStr("Essential tree transmission: "
+                g.logger.info("Essential tree transmission: "
                     + (tEssentialTree - tCOFM) + " ms ");
-                g.debugStr("Center of mass update: "
+                g.logger.info("Center of mass update: "
                     + (tUpdateCOFM - tEssentialTree) + " ms");
-                g.debugStr("Acceleration computation: "
+                g.logger.info("Acceleration computation: "
                     + (tAccels - tUpdateCOFM) + " ms (" + interactions
                     + " interactions) ");
-                g.debugStr("New position computation: " + (tNewPos - tAccels)
+                g.logger.info("New position computation: " + (tNewPos - tAccels)
                     + " ms");
-                g.debugStr("Explicit Garbage Collection: " + (tGC - tNewPos)
+                g.logger.info("Explicit Garbage Collection: " + (tGC - tNewPos)
                     + " ms");
 
-                g.debugStr("Total: " + (tGC - tStart) + " ms\n");
+                g.logger.info("Total: " + (tGC - tStart) + " ms\n");
 
                 if (g.gdIteration > 2) {
                     totalMillis += (tGC - tStart);
@@ -230,44 +232,44 @@ public class ProcessorThread extends Thread {
             n.printStackTrace();
         }
 
-        g.debugStr("stats; Bodies: " + g.gdTotNumBodies + ", Bodies per Leaf: "
+        g.logger.info("stats; Bodies: " + g.gdTotNumBodies + ", Bodies per Leaf: "
             + g.gdMaxBodiesPerNode + ", Processors: " + g.gdNumProcs + "");
 
-        g.debugStr("stats; Total time: " + totalMillis + " ms, average: "
+        g.logger.info("stats; Total time: " + totalMillis + " ms, average: "
             + (totalMillis / (g.gdIterations - 3)) + " ms per iteration");
 
-        g.debugStr("stats; time spent in load balancing:              "
+        g.logger.info("stats; time spent in load balancing:              "
             + totLoadBalance + " ms ("
             + ((totLoadBalance * 1.0) / (totalMillis * 1.0) * 100.0)
             + " percent)");
 
-        g.debugStr("stats; time spent in tree construction:           "
+        g.logger.info("stats; time spent in tree construction:           "
             + totTree + " ms ("
             + ((totTree * 1.0) / (totalMillis * 1.0) * 100.0) + " percent)");
 
-        g.debugStr("stats; time spent in center of mass computation:  "
+        g.logger.info("stats; time spent in center of mass computation:  "
             + totCOFM + " ms ("
             + ((totCOFM * 1.0) / (totalMillis * 1.0) * 100.0) + " percent)");
 
-        g.debugStr("stats; time spent in essential tree exchange:     "
+        g.logger.info("stats; time spent in essential tree exchange:     "
             + totEssentialTree + " ms ("
             + ((totEssentialTree * 1.0) / (totalMillis * 1.0) * 100.0)
             + " percent)");
 
-        g.debugStr("stats; time spent in center of mass update:  "
+        g.logger.info("stats; time spent in center of mass update:  "
             + totUpdateCOFM + " ms ("
             + ((totUpdateCOFM * 1.0) / (totalMillis * 1.0) * 100.0)
             + " percent)");
 
-        g.debugStr("stats; time spent in force computation:           "
+        g.logger.info("stats; time spent in force computation:           "
             + totAccels + " ms ("
             + ((totAccels * 1.0) / (totalMillis * 1.0) * 100.0) + " percent)");
 
-        g.debugStr("stats; time spent in position update:             "
+        g.logger.info("stats; time spent in position update:             "
             + totNewPos + " ms ("
             + ((totNewPos * 1.0) / (totalMillis * 1.0) * 100.0) + " percent)");
 
-        g.debugStr("stats; time spent in explicit garbage collection: " + totGC
+        g.logger.info("stats; time spent in explicit garbage collection: " + totGC
             + " ms (" + ((totGC * 1.0) / (totalMillis * 1.0) * 100.0)
             + " percent)");
 
@@ -288,7 +290,7 @@ public class ProcessorThread extends Thread {
         this.numProcs = numProcs;
 
         g.gdMyProc = myProc;
-        g.debugStr("Logfile for processor " + myProc + " of " + numProcs);
+        g.logger.debug("Logfile for processor " + myProc + " of " + numProcs);
 
         try {
             g.Proc = new ProcessorImpl(g, numProcs, myProc, p);
@@ -306,9 +308,9 @@ public class ProcessorThread extends Thread {
         this.numProcs = d.size();
 
         g.gdMyProc = myProc;
-        g.debugStr("Logfile for processor " + myProc + " of " + numProcs);
+        g.logger.debug("Logfile for processor " + myProc + " of " + numProcs);
 
-        //    g.debugStr("Creating Processor Implementation");
+        //    g.logger.debug("Creating Processor Implementation");
 
         if (ProcessorImpl.VERBOSE) {
             System.out.println("creating ProcImpl");
@@ -317,7 +319,7 @@ public class ProcessorThread extends Thread {
         try {
             g.Proc = new ProcessorImpl(g, d, p);
         } catch (Exception e) {
-            g.debugStr("exceptie gevangen!!!!!!!: " + e);
+            g.logger.debug("exceptie gevangen!!!!!!!: " + e);
             e.printStackTrace();
             System.exit(-1);
         }
@@ -325,26 +327,26 @@ public class ProcessorThread extends Thread {
             System.out.println("created ProcImpl");
         }
 
-        //    g.debugStr("Created Processor Implementation");
+        //    g.logger.debug("Created Processor Implementation");
     }
 
     public void run() {
 
         try {
 
-            g.debugStr("ProcessorThread: running");
+            g.logger.debug("ProcessorThread: running");
 
             g.Proc.register();
 
-            g.debugStr("ProcessorThread: calling MainSetup");
+            g.logger.debug("ProcessorThread: calling MainSetup");
 
             MainSetup();
 
-            g.debugStr("ProcessorThread: starting MainLoop");
+            g.logger.debug("ProcessorThread: starting MainLoop");
 
             MainLoop();
 
-            g.debugStr("ProcessorThread: finished mainloop");
+            g.logger.debug("ProcessorThread: finished mainloop");
 
             g.Proc.cleanup();
 

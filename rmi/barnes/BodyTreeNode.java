@@ -6,10 +6,6 @@ strictfp class BodyTreeNode {
 
     public static int InstanceCount = 0;
 
-    // Debugging stuff;
-
-    public static boolean btnDebug;
-
     /*
      private static final String depthStr[] = {
 
@@ -127,7 +123,9 @@ strictfp class BodyTreeNode {
         btnChildrenCount = 0;
         btnDepth = depth;
         btnMaxTheta = btnGd.gdThetaSq * HalfSize * HalfSize;
-        System.err.println("BodyTreeNode init: thetasq = " + btnGd.gdThetaSq + ", maxTheta = " + btnMaxTheta + ", halfSize = " + HalfSize);
+        if (btnGd.logger.isDebugEnabled()) {
+            btnGd.logger.debug("BodyTreeNode init: thetasq = " + btnGd.gdThetaSq + ", maxTheta = " + btnMaxTheta + ", halfSize = " + HalfSize);
+        }
 
         btnCenterOfMassValid = false;
         btnCenterOfMassReceived = false;
@@ -165,7 +163,7 @@ strictfp class BodyTreeNode {
             if (btnIsLeaf) for (int j = 0; j < btnBodyCount; j++)
                 str += btnGd.gdBodies[btnBodyIndex[j]].bNumber + " ";
 
-            btnGd.debugStr(str);
+            btnGd.logger.debug(str);
         }
 
         return bodies;
@@ -298,7 +296,7 @@ strictfp class BodyTreeNode {
 
         btnIsLeaf = false;
 
-        debugStr("Splitting node, bodies: " + btnBodyCount);
+        btnGd.logger.debug("Splitting node, bodies: " + btnBodyCount);
 
         btnChildren = new BodyTreeNode[8];
 
@@ -361,7 +359,7 @@ strictfp class BodyTreeNode {
 
             // this is the right node, add the center of mass
             /*
-             btnGd.debugStr("adding COFM: (" + btnCenter_x + "," + 
+             btnGd.logger.debug("adding COFM: (" + btnCenter_x + "," + 
              btnCenter_y + "," + 
              btnCenter_z + "), " + c.cofmMass );
              */
@@ -384,7 +382,7 @@ strictfp class BodyTreeNode {
                 btnCenterOfMassReceived = true;
             }
             /*
-             btnGd.debugStr("updating COFM, now: (" + btnCenterOfMass_x + "," + 
+             btnGd.logger.debug("updating COFM, now: (" + btnCenterOfMass_x + "," + 
              btnCenterOfMass_y + "," + 
              btnCenterOfMass_z + "), " + c.cofmMass );
              */
@@ -436,13 +434,13 @@ strictfp class BodyTreeNode {
 
      if (!check( btnCenter, btnHalfSize, btnGd.gdBodies[bi].bPos)) {
      InsaneBodies++;
-     debugStr( "Body: x: " + btnGd.gdBodies[bi].bPos.x + ", y: " +  
+     logger.debug( "Body: x: " + btnGd.gdBodies[bi].bPos.x + ", y: " +  
      btnGd.gdBodies[bi].bPos.y + ", z: " +  btnGd.gdBodies[bi].bPos.z );
      }
      }
 
      if (InsaneBodies>0) {
-     debugStr( "^^^ (" + InsaneBodies + "/" + btnBodyCount + ") outside cell bounds, center: " +
+     logger.debug( "^^^ (" + InsaneBodies + "/" + btnBodyCount + ") outside cell bounds, center: " +
      "x: " + btnCenter.x + ", y: " + btnCenter.y + ", z: " + btnCenter.z + ", size: " + btnHalfSize );
      SaneChildren = 1;
      }
@@ -479,21 +477,24 @@ strictfp class BodyTreeNode {
 
     public void Iterate(int Depth) {
 
-        int i;
+        if (btnGd.logger.isDebugEnabled()) {
+            String str = "";
+            int i;
 
-        for (i = 0; i < Depth; i++) {
-            System.out.print(".");
-        }
+            for (i = 0; i < Depth; i++) {
+                str += ".";
+            }
 
-        if (btnIsLeaf) {
-            debugStr("LeafNode, Bodies: " + btnBodyCount + " of "
+            if (btnIsLeaf) {
+                btnGd.logger.debug(str + "LeafNode, Bodies: " + btnBodyCount + " of "
                 + btnGd.gdMaxBodiesPerNode + ".");
-        } else {
-            debugStr("Internal Node, Children: " + btnChildrenCount + " of 8");
+            } else {
+                btnGd.logger.debug(str + "Internal Node, Children: " + btnChildrenCount + " of 8");
 
-            for (i = 0; i < 8; i++) {
-                if (btnChildren[i] != null)
-                    btnChildren[i].Iterate((Depth + 1));
+                for (i = 0; i < 8; i++) {
+                    if (btnChildren[i] != null)
+                        btnChildren[i].Iterate((Depth + 1));
+                }
             }
         }
     }
@@ -505,22 +506,10 @@ strictfp class BodyTreeNode {
      }
      */
 
-    protected void debugStr(String s) {
-
-        if (btnDebug) btnGd.debugStr(s);
-    }
-
     protected void debugFatalStr(String s) {
 
-        btnGd.debugStr(s);
+        btnGd.logger.fatal(s);
     }
-
-    /*
-     public static void setDebugMode( boolean debug ) {
-
-     btnDebug = debug;
-     }
-     */
 
     public void ComputeCenterOfMass() {
         int i;
@@ -580,8 +569,8 @@ strictfp class BodyTreeNode {
             }
         }
 
-        System.err.println("set com to: " + btnCenterOfMass_x + ", "
-            + btnCenterOfMass_y + ", " + btnCenterOfMass_z);
+        // System.err.println("set com to: " + btnCenterOfMass_x + ", "
+         //    + btnCenterOfMass_y + ", " + btnCenterOfMass_z);
     }
 
     void Barnes(Body b) {
@@ -591,7 +580,7 @@ strictfp class BodyTreeNode {
         double Diff_z = btnCenterOfMass_z - b.bPos.z;
 
         double DistSq = Diff_x * Diff_x + Diff_y * Diff_y + Diff_z * Diff_z;
-        System.err.println("distsq = " + DistSq + ", maxTheta = " + btnMaxTheta);
+        // System.err.println("distsq = " + DistSq + ", maxTheta = " + btnMaxTheta);
 
         if (DistSq >= btnMaxTheta) {
             // The distance was large enough to use the treenode instead of iterating all bodies.  
@@ -634,7 +623,7 @@ strictfp class BodyTreeNode {
             }
         }
  
-        System.err.println("acc for body " + " = " + b.bAcc.x + ", " + b.bAcc.y + ", " + b.bAcc.z);
+        // System.err.println("acc for body " + " = " + b.bAcc.x + ", " + b.bAcc.y + ", " + b.bAcc.z);
     }
 
     int ComputeLeafAccelerationsBarnes(BodyTreeNode root) {
@@ -659,7 +648,7 @@ strictfp class BodyTreeNode {
 
             root.Barnes(b);
             /*
-             btnGd.debugStr("computed accels for body " + b.bNumber + ", weight " +  b.bWeight + ", (" + b.bAcc.x + "," + b.bAcc.y + "," + b.bAcc.z + ")" );
+             btnGd.logger.debug("computed accels for body " + b.bNumber + ", weight " +  b.bWeight + ", (" + b.bAcc.x + "," + b.bAcc.y + "," + b.bAcc.z + ")" );
              */
             Weight += b.bWeight;
         }

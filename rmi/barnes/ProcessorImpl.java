@@ -170,8 +170,10 @@ strictfp public class ProcessorImpl extends UnicastRemoteObject implements
         essBodyCountRecv = new int[ProcessorCount];
         essBodyRecv = new Body[ProcessorCount][];
 
-        g.debugStr("maxTempCOFM   " + g.gdMaxTempCentersOfMass);
-        g.debugStr("maxTempBodies " + g.gdMaxTempBodies);
+        if (g.logger.isDebugEnabled()) {
+            g.logger.debug("maxTempCOFM   " + g.gdMaxTempCentersOfMass);
+            g.logger.debug("maxTempBodies " + g.gdMaxTempBodies);
+        }
 
         essCenterOfMass = new CenterOfMass[ProcessorCount][];
         for (int i = 0; i < ProcessorCount; i++)
@@ -360,7 +362,7 @@ strictfp public class ProcessorImpl extends UnicastRemoteObject implements
 
                 t = data[i + offset];
 
-                //	g.debugStr("sending " + t + " to proc " + i );
+                //	g.logger.debug("sending " + t + " to proc " + i );
 
                 if (t >= 0) Processors[i].setTotalExchangeInt(myProc, t);
             }
@@ -510,7 +512,7 @@ strictfp public class ProcessorImpl extends UnicastRemoteObject implements
         try {
             if (ProcessorCount > 1) barrier();
 
-            //      g.debugStr("the arraylength: " + array.length );
+            //      g.logger.debug("the arraylength: " + array.length );
 
             for (int i = 0; i < ProcessorCount; i++) {
                 if (ExchangeIntArrayOffset[i] != -1) {
@@ -748,7 +750,7 @@ strictfp public class ProcessorImpl extends UnicastRemoteObject implements
             HandleException(e, "ExchangeEssential");
         }
 
-        //    g.debugStr("Sent " + extraBods + " bodies and " + extraCOFM + " centers of mass overhead");
+        //    g.logger.debug("Sent " + extraBods + " bodies and " + extraCOFM + " centers of mass overhead");
     }
 
     public Body[] getEssentialBodies(int source) {

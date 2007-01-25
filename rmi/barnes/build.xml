@@ -16,6 +16,9 @@
 
     <property name="shared-dir"	 location="../shared"/>
 
+    <property name="test-seq-run" value="BarnesHut -N50000 -M10 -theta 2.0 -tstop 0.10 -dtime 0.025 -eps 0.00000025 -das -threads"/>
+    <property name="test-par-run" value="BarnesHut -N50000 -M10 -theta 2.0 -tstop 0.10 -dtime 0.025 -eps 0.00000025 -das -threads"/>
+
     <import file="${ibis}/build-files/apps/build-rmi-app.xml"/>
 
 </project>
