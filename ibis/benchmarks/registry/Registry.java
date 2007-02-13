@@ -7,20 +7,28 @@ import ibis.ipl.StaticProperties;
 
 public final class Registry implements Runnable {
     
-    double totalTime = 0.0;
-    int totalTries = 0;
-
     final class AppEmulator implements Runnable, ResizeHandler {
         private final long start;
 
         private final Ibis ibis;
 
         private final IbisIdentifier identifier;
+        
+        private final int poolSize;
 
         private boolean done = false;
+        
+        private ArrayList<Double, Double> stats;
+        
+        private int seen;
+        
+        private int step;
 
-        AppEmulator() throws Exception {
+        AppEmulator(int estimatedTotal) throws Exception {
             start = System.currentTimeMillis();
+            seen = 0;
+            
+            step = estimatedTotal / TOTAL_POINTS;
 
             StaticProperties s = new StaticProperties();
             s.add("Serialization", "ibis");
@@ -34,17 +42,9 @@ public final class Registry implements Runnable {
             ibis.enableResizeUpcalls();
         }
 
-        public void joined(IbisIdentifier ident) {
-            if (ident.equals(identifier)) {
-                System.err.println("got join for self after "
-                        + (System.currentTimeMillis() - start)
-                        + " milliseconds");
-                addTime(System.currentTimeMillis() - start);
-                synchronized (this) {
-                    done = true;
-                    notifyAll();
-                }
-            }
+        public synchronized void joined(IbisIdentifier ident) {
+            seen++;
+            
         }
 
         public void left(IbisIdentifier ident) {
