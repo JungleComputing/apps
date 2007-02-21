@@ -31,13 +31,6 @@ public final class Main {
         }
     }
     
-    private void end() {
-        for (int i = 0 ; i < apps.length;i++) {
-            apps[i].end();
-        }
-    }
-    
-
     public static void main(String[] args) {
         int threads = 1;
         int step = 1;
@@ -58,21 +51,9 @@ public final class Main {
             }
         }
             
-        Main main = new Main(threads, sync, step);
+        new Main(threads, sync, step);
 
-        // register shutdown hook
-        try {
-            Runtime.getRuntime().addShutdownHook(new Shutdown(main));
-        } catch (Exception e) {
-            // IGNORE
-        }
-        
-        try {
-            Signal.handle(new Signal("USR2"), new Terminator(main));
-        } catch (Exception e) {
-            logger.warn("could not install handler for USR2 signal");
-        }
-
+      
         
         while(true) {
             try {
@@ -83,34 +64,7 @@ public final class Main {
         }
     }
     
-    private static class Shutdown extends Thread {
-        private final Main main;
-
-        Shutdown(Main main) {
-            this.main = main;
-        }
-
-        public void run() {
-            System.err.println("shutdown hook triggered");
-
-            main.end();
-        }
-    }
-    
-    private static class Terminator implements SignalHandler {
-        private final Main main;
-
-        Terminator(Main main) {
-            this.main = main;
-        }
-
-        public void handle(Signal signal) {
-            logger.debug("SIGUSR2 catched, shutting down");
-
-            main.end();
-            System.exit(0);
-        }
-    }
+   
 
 
 }
