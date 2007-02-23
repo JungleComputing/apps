@@ -71,11 +71,11 @@ class RszHandler implements ResizeHandler {
 class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
         SendPortConnectUpcall {
 
-    private final static int BUFSIZ = TypedProperties.intProperty(
-            "socketbuffersize", 0);
+    static final TypedProperties tp = new TypedProperties(System.getProperties());
+    private final static int BUFSIZ = tp.intProperty("socketbuffersize", 0);
 
-    private final static boolean VARIANCE_TIMER = TypedProperties
-            .booleanProperty("variance-timer", false);
+    private final static boolean VARIANCE_TIMER = tp.booleanProperty(
+            "variance-timer", false);
 
     private Ibis myIbis;
 

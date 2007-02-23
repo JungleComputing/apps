@@ -30,7 +30,9 @@ import ibis.util.TypedProperties;
 
 public class Reducer {
 
-    private final static boolean TIMINGS = TypedProperties.booleanProperty(
+    TypedProperties tp = new TypedProperties(System.getProperties());
+
+    private final static boolean TIMINGS = tp.booleanProperty(
             "timing.reduce", false);
 
     private Timer t_reduce_send = Timer.createTimer();

@@ -11,7 +11,8 @@ import ibis.util.Timer;
 
 public class Client {
 
-    private final static boolean VARIANCE_TIMER = TypedProperties.booleanProperty("variance-timer", false);
+    static final TypedProperties tp = new TypedProperties(System.getProperties());
+    private final static boolean VARIANCE_TIMER = tp.booleanProperty("variance-timer", false);
 
     private int N = 10000;
     private int size = 0;

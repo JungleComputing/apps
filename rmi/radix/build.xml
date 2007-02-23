@@ -15,6 +15,7 @@
     <property name="build"       location="build"/>
 
     <property name="shared-dir"	 location="../shared"/>
+    <property name="rmic-flags"  value="-keep"/>
 
     <property name="test-par-run" value="Radix -t -r64"/>
     <property name="test-seq-run" value="Radix -t -r64"/>

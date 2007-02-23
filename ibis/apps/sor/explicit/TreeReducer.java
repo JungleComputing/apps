@@ -33,7 +33,9 @@ import ibis.util.TypedProperties;
 
 public class TreeReducer extends Reducer {
 
-    private final static boolean TIMINGS = TypedProperties.booleanProperty(
+    TypedProperties tp = new TypedProperties(System.getProperties());
+
+    private final static boolean TIMINGS = tp.booleanProperty(
             "timing.reduce", false);
 
     protected ReceivePort[] reduceRreduce;

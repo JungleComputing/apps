@@ -7,19 +7,20 @@ import ibis.util.TypedProperties;
 
 public final class Othello extends ibis.satin.SatinObject implements OthelloInterface {
 
-    static final boolean BEST_FIRST = TypedProperties.booleanProperty(
+    static final TypedProperties tp = new TypedProperties(System.getProperties());
+    static final boolean BEST_FIRST = tp.booleanProperty(
         "othello.bestfirst", true);
 
-    static final boolean DO_ABORT = TypedProperties.booleanProperty(
+    static final boolean DO_ABORT = tp.booleanProperty(
         "othello.aborts", true);
 
-    static final boolean SUPPORT_TT = TypedProperties.booleanProperty(
+    static final boolean SUPPORT_TT = tp.booleanProperty(
         "othello.tt", true);
 
-    static final int REPLICATED_DEPTH = TypedProperties.intProperty(
+    static final int REPLICATED_DEPTH = tp.getIntProperty(
         "othello.replicatedDepth", 9);
 
-    static final int SPAWN_THRESHOLD = ibis.util.TypedProperties.intProperty(
+    static final int SPAWN_THRESHOLD = tp.getIntProperty(
         "othello.spawnThreshold", 7);
 
     static final int INF = 10000;

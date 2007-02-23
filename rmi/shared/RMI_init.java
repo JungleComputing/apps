@@ -18,13 +18,14 @@ import ibis.util.TypedProperties;
 
 public class RMI_init {
 
-    private final static boolean VERBOSE = TypedProperties.booleanProperty(
+    static final TypedProperties tp = new TypedProperties(System.getProperties());
+    private final static boolean VERBOSE = tp.booleanProperty(
             "RMI_init.verbose", false);
 
-    private final static boolean USE_IP_MAP_FACTORY = TypedProperties
+    private final static boolean USE_IP_MAP_FACTORY = tp
             .booleanProperty("RMI_init.factory", true);
 
-    private final static String FACTORY = TypedProperties.stringProperty(
+    private final static String FACTORY = tp.getProperty(
             "RMI_init.factory.name", "IPMapSocketFactory");
 
     static Registry reg = null;

@@ -10,7 +10,6 @@ import java.net.InetAddress;
 import java.rmi.server.RMISocketFactory;
 
 import ibis.util.IPUtils;
-import ibis.util.TypedProperties;
 
 import org.apache.log4j.Logger;
 

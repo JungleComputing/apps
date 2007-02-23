@@ -8,7 +8,9 @@ public final class DDTree implements TestObject {
 
     static final int KARMI_SIZE = 2 * 4 + 8;
 
-    static final int LEN = TypedProperties.intProperty("len", 1023);
+    static final TypedProperties tp = new TypedProperties(System.getProperties());
+
+    static final int LEN = tp.getIntProperty("len", 1023);
 
     DDTree left;
 

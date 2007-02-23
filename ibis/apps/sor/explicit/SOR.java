@@ -40,7 +40,9 @@ import ibis.util.TypedProperties;
 
 public class SOR {
 
-    private static final boolean USE_O_N_BROADCAST = TypedProperties
+    TypedProperties tp = new TypedProperties(System.getProperties());
+
+    private static final boolean USE_O_N_BROADCAST = tp
             .booleanProperty("bcast.O_n", false);
 
     private static final double TOLERANCE = 0.00001; /* termination criterion */
@@ -107,7 +109,7 @@ public class SOR {
 
     private Syncer rightSyncer;
 
-    final static boolean TIMINGS = TypedProperties.booleanProperty("timing",
+    final static boolean TIMINGS = tp.booleanProperty("timing",
             false);
 
     private Timer t_compute = Timer.createTimer();
