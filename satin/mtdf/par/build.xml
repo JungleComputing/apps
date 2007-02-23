@@ -12,7 +12,7 @@
 
     <property name="satinc-flags" value="-keep"/>
 
-    <property name="ibis-run-args" value="-Dsatin.closed"/>
+    <property name="test-par-java-args" value="-Dsatin.closed"/>
     <import file="${ibis}/build-files/apps/build-satin-app.xml"/>
 
     <target name="run"

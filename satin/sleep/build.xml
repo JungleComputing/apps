@@ -11,9 +11,9 @@
     <property name="satinc-flags" value="-keep"/>
     <property name="satin-classes" value="Sleep"/>
 
-    <property name="ibis-run-args" value="-Dsatin.closed"/>
-	
+    <property name="test-par-java-args" value="-Dsatin.closed"/>
     <property name="test-par-run" value="Sleep"/>
+    <property name="test-seq-java-args" value="-Dsatin.closed"/>
     <property name="test-seq-run" value="Sleep"/>
 
     <import file="${ibis}/build-files/apps/build-satin-app.xml"/>
