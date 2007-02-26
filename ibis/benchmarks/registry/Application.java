@@ -3,7 +3,7 @@ import org.apache.log4j.Logger;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
 
-import ibis.ipl.Capabilities;
+import ibis.ipl.CapabilitySet;
 import ibis.ipl.Ibis;
 import ibis.ipl.IbisFactory;
 import ibis.ipl.IbisIdentifier;
