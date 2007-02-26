@@ -8,7 +8,7 @@ import java.util.Random;
 
 import java.io.IOException;
 
-class ArrayPingPong {
+class ArrayPingPong implements PredefinedCapabilities {
 static class Sender {
     SendPort sport;
     ReceivePort rport;
@@ -87,12 +87,10 @@ static class ExplicitReceiver {
         int rank;
 
         try {
-            StaticProperties s = new StaticProperties();
-	    s.add("Serialization", "ibis");
-            s.add("Communication",
-                    "OneToOne, Reliable, ExplicitReceipt");
-            s.add("worldmodel", "closed");
-            ibis = IbisFactory.createIbis(s, null);
+            CapabilitySet s = new CapabilitySet(
+                    WORLDMODEL_CLOSED, SERIALIZATION_OBJECT,
+                    COMMUNICATION_RELIABLE, RECEIVE_EXPLICIT);
+            ibis = IbisFactory.createIbis(s, null, null, null);
 
             registry = ibis.registry();
 

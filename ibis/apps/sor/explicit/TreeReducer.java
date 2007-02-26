@@ -22,7 +22,7 @@ import ibis.ipl.ReceivePortIdentifier;
 import ibis.ipl.ReadMessage;
 import ibis.ipl.WriteMessage;
 import ibis.ipl.Registry;
-import ibis.ipl.StaticProperties;
+import ibis.ipl.CapabilitySet;
 import ibis.ipl.IbisIdentifier;
 import ibis.ipl.NoMatchingIbisException;
 import ibis.ipl.Upcall;
@@ -33,7 +33,7 @@ import ibis.util.TypedProperties;
 
 public class TreeReducer extends Reducer {
 
-    TypedProperties tp = new TypedProperties(System.getProperties());
+    static TypedProperties tp = new TypedProperties(System.getProperties());
 
     private final static boolean TIMINGS = tp.booleanProperty(
             "timing.reduce", false);
@@ -62,17 +62,14 @@ public class TreeReducer extends Reducer {
         int rank = info.rank();
         int size = info.size();
 
-        StaticProperties reqprops = new StaticProperties();
-        reqprops.add("serialization", "data");
-        reqprops.add("communication", "OneToOne, Reliable, ExplicitReceipt");
+        CapabilitySet reqprops = new CapabilitySet(SERIALIZATION_DATA,
+                COMMUNICATION_RELIABLE, RECEIVE_EXPLICIT);
 
         PortType portTypeReduce = ibis.createPortType(reqprops);
 
-        reqprops = new StaticProperties();
-        reqprops.add("serialization", "data");
-        reqprops.add("communication",
-                "OneToMany, OneToOne, Reliable, ExplicitReceipt");
-
+        reqprops = new CapabilitySet(SERIALIZATION_DATA, CONNECTION_ONE_TO_MANY,
+                COMMUNICATION_RELIABLE, RECEIVE_EXPLICIT);
+        
         PortType portTypeBroadcast = ibis.createPortType(reqprops);
         if (rank == 0) {
             parent = LEAF_NODE;

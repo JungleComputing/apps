@@ -8,7 +8,7 @@ import java.util.Random;
 
 import java.io.IOException;
 
-class PingPong {
+class PingPong implements PredefinedCapabilities {
 
 static class Sender {
     SendPort sport;
@@ -42,7 +42,7 @@ static class Sender {
     }
 }
 
-static class ExplicitReceiver  {
+static class ExplicitReceiver {
 
     SendPort sport;
 
@@ -77,13 +77,10 @@ static class ExplicitReceiver  {
         int rank = 0, remoteRank = 1;
 
         try {
-            StaticProperties s = new StaticProperties();
-                s.add("Serialization", "ibis");
-
-            s.add("Communication",
-                    "OneToOne, Reliable, ExplicitReceipt");
-            s.add("worldmodel", "closed");
-            ibis = IbisFactory.createIbis(s, null);
+            CapabilitySet s = new CapabilitySet(
+                    WORLDMODEL_CLOSED, SERIALIZATION_OBJECT,
+                    COMMUNICATION_RELIABLE, RECEIVE_EXPLICIT);
+            ibis = IbisFactory.createIbis(s, null, null, null);
 
             registry = ibis.registry();
 

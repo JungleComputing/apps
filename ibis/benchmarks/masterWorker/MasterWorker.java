@@ -12,7 +12,7 @@ import ibis.util.*;
  * Simulates master worker communication model. Workers request work/return
  * results to the master, and the master replies to the workers.
  */
-final class MasterWorker {
+final class MasterWorker implements PredefinedCapabilities {
     static final int COUNT = 10000;
 
     static final boolean ASSERT = false;
@@ -28,16 +28,13 @@ final class MasterWorker {
     IbisIdentifier masterID;
 
     MasterWorker() {
-        StaticProperties s;
 
         try {
 
-            s = new StaticProperties();
-            s.add("communication",
-                    "OneToOne ManyToOne Reliable ExplicitReceipt");
-            s.add("serialization", "ibis");
-            s.add("worldmodel", "open");
-            ibis = IbisFactory.createIbis(s, null);
+            CapabilitySet s = new CapabilitySet(WORLDMODEL_OPEN,
+                    SERIALIZATION_OBJECT, COMMUNICATION_RELIABLE,
+                    RECEIVE_EXPLICIT, CONNECTION_MANY_TO_ONE);
+            ibis = IbisFactory.createIbis(s, null, null, null);
 
             registry = ibis.registry();
 
@@ -47,10 +44,8 @@ final class MasterWorker {
 
             manyToOneType = ibis.createPortType(s);
 
-            s = new StaticProperties();
-            s.add("communication", "OneToOne Reliable ExplicitReceipt");
-            s.add("serialization", "ibis");
-            s.add("worldmodel", "open");
+            s = new CapabilitySet(SERIALIZATION_OBJECT,
+                    COMMUNICATION_RELIABLE, RECEIVE_EXPLICIT);
 
             oneToOneType = ibis.createPortType(s);
 
@@ -68,7 +63,8 @@ final class MasterWorker {
     void master() throws Exception {
         //map of sendports to workers, indexed on sendportidentifiers of the
         //worker's sendports
-        HashMap workers = new HashMap();
+        HashMap<SendPortIdentifier, SendPort> workers
+                = new HashMap<SendPortIdentifier, SendPort>();
 
         ReadMessage readMessage;
         WriteMessage writeMessage;
@@ -94,7 +90,7 @@ final class MasterWorker {
                 data = readMessage.readObject();
                 readMessage.finish();
 
-                sendPort = (SendPort) workers.get(origin);
+                sendPort = workers.get(origin);
 
                 if (sendPort == null) {
                     sendPort = oneToOneType.createSendPort();

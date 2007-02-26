@@ -153,7 +153,7 @@ class UpcallReceiver implements Upcall {
     }
 }
 
-class Latency {
+class Latency implements PredefinedCapabilities {
 
     static Ibis ibis;
 
@@ -172,16 +172,10 @@ class Latency {
         }
 
         try {
-            StaticProperties p = new StaticProperties();
-            p.add("Serialization", "object");
-            if (upcall) {
-                p.add("Communication",
-                        "OneToOne, Reliable, AutoUpcalls, ExplicitReceipt");
-            } else {
-                p.add("Communication", "OneToOne, Reliable, ExplicitReceipt");
-            }
-            p.add("worldmodel", "open");
-            ibis = IbisFactory.createIbis(p, null);
+            CapabilitySet p = new CapabilitySet(SERIALIZATION_OBJECT,
+                    WORLDMODEL_OPEN, COMMUNICATION_RELIABLE,
+                    RECEIVE_AUTO_UPCALLS, RECEIVE_EXPLICIT);
+            ibis = IbisFactory.createIbis(p, null, null, null);
             registry = ibis.registry();
             PortType t = ibis.createPortType(p);
 

@@ -7,7 +7,7 @@ import ibis.util.PoolInfo;
 import java.util.Properties;
 import java.io.IOException;
 
-class Latency {
+class Latency implements PredefinedCapabilities {
 
     static Ibis ibis;
 
@@ -29,14 +29,12 @@ class Latency {
             int size = info.size();
             int remoteRank = (rank == 0 ? 1 : 0);
 
-            StaticProperties sp = new StaticProperties();
-            sp.add("serialization", "object");
-            sp
-                    .add("communication",
-                            "OneToOne, ManyToOne, OneToMany, Reliable, ExplicitReceipt, AutoUpcalls");
-            sp.add("worldmodel", "closed");
+            CapabilitySet sp = new CapabilitySet(WORLDMODEL_CLOSED,
+                    SERIALIZATION_OBJECT, COMMUNICATION_RELIABLE,
+                    RECEIVE_AUTO_UPCALLS,  RECEIVE_EXPLICIT,
+                    CONNECTION_MANY_TO_ONE, CONNECTION_ONE_TO_MANY);
 
-            ibis = IbisFactory.createIbis(sp, null);
+            ibis = IbisFactory.createIbis(sp, null, null, null);
             registry = ibis.registry();
 
             PortType t = ibis.createPortType(sp);

@@ -18,7 +18,7 @@ interface Config {
     static final int SHOWNBOARDHEIGHT = 30;
 }
 
-class Cell1D implements Config {
+class Cell1D implements Config, PredefinedCapabilities {
     static Ibis ibis;
     static Registry registry;
     static PoolInfo info;
@@ -174,11 +174,10 @@ class Cell1D implements Config {
 
         try {
             info = PoolInfo.createPoolInfo();
-            StaticProperties s = new StaticProperties();
-            s.add( "serialization", "data" );
-            s.add( "communication", "OneToOne, Reliable, ExplicitReceipt" );
-            s.add( "worldmodel", "closed" );
-            ibis = IbisFactory.createIbis( s, null );
+            CapabilitySet s = new CapabilitySet(WORLDMODEL_CLOSED,
+                    COMMUNICATION_RELIABLE, RECEIVE_EXPLICIT,
+                    SERIALIZATION_DATA);
+            ibis = IbisFactory.createIbis( s, null, null, null );
 
             registry = ibis.registry();
 

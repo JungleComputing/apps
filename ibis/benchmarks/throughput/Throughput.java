@@ -8,7 +8,7 @@ import java.util.Random;
 
 import java.io.IOException;
 
-class Throughput extends Thread {
+class Throughput extends Thread implements PredefinedCapabilities {
 
     int count = 1000;
 
@@ -96,11 +96,10 @@ class Throughput extends Thread {
     public void run() {
         Random rand = new Random();
         try {
-            StaticProperties s = new StaticProperties();
-            s.add("Serialization", "object");
-            s.add("WorldModel", "open");
-            s.add("Communication", "OneToOne, Reliable, ExplicitReceipt");
-            Ibis ibis = IbisFactory.createIbis(s, null);
+            CapabilitySet s = new CapabilitySet(
+                    SERIALIZATION_OBJECT, WORLDMODEL_OPEN,
+                    COMMUNICATION_RELIABLE, RECEIVE_EXPLICIT);
+            Ibis ibis = IbisFactory.createIbis(s, null, null, null);
 
             Registry r = ibis.registry();
 

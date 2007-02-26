@@ -167,7 +167,7 @@ class UpcallReceiver implements Upcall {
     }
 }
 
-class Latency {
+class Latency implements PredefinedCapabilities {
     static Ibis ibis;
 
     static Registry registry;
@@ -184,11 +184,13 @@ class Latency {
         int rank = 0;
 
         try {
-            ibis = IbisFactory.createIbis(null, null);
+            CapabilitySet s = new CapabilitySet(WORLDMODEL_CLOSED,
+                    COMMUNICATION_RELIABLE, SERIALIZATION_OBJECT,
+                    RECEIVE_AUTO_UPCALLS, RECEIVE_POLL);
+
+            ibis = IbisFactory.createIbis(s, null, null, null);
             registry = ibis.registry();
 
-            StaticProperties s = new StaticProperties();
-            s.add("Serialization", "ibis");
             PortType t = ibis.createPortType(s);
 
             SendPort sport = t.createSendPort();

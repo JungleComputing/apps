@@ -154,7 +154,7 @@ class LevelRecorder implements ibis.ipl.Upcall {
     }
 }
 
-class OpenCell1D implements OpenConfig {
+class OpenCell1D implements OpenConfig, PredefinedCapabilities {
     static Ibis ibis;
     static Registry registry;
     static IbisIdentifier leftNeighbour;
@@ -894,11 +894,10 @@ class OpenCell1D implements OpenConfig {
         try {
             long startTime = System.currentTimeMillis();
 
-            StaticProperties s = new StaticProperties();
-            s.add( "serialization", "data" );
-            s.add( "communication", "OneToOne, Reliable, AutoUpcalls, ExplicitReceipt" );
-            s.add( "worldmodel", "open" );
-            ibis = IbisFactory.createIbis( s, rszHandler );
+            CapabilitySet s = new CapabilitySet(SERIALIZATION_DATA,
+                    COMMUNICATION_RELIABLE, RECEIVE_AUTO_UPCALLS,
+                    RECEIVE_EXPLICIT, WORLDMODEL_OPEN);
+            ibis = IbisFactory.createIbis( s, null, null, rszHandler );
             myName = ibis.identifier();
 
             registry = ibis.registry();

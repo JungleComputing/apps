@@ -16,9 +16,9 @@ import ibis.ipl.SendPortIdentifier;
 import ibis.ipl.WriteMessage;
 import ibis.ipl.ReadMessage;
 import ibis.ipl.Upcall;
-import ibis.ipl.StaticProperties;
+import ibis.ipl.CapabilitySet;
 import ibis.ipl.ReceivePortConnectUpcall;
-import ibis.ipl.SendPortConnectUpcall;
+import ibis.ipl.SendPortDisconnectUpcall;
 import ibis.ipl.ResizeHandler;
 
 import ibis.util.TypedProperties;
@@ -28,7 +28,8 @@ import java.util.HashMap;
 
 class RszHandler implements ResizeHandler {
 
-    java.util.Vector idents = new java.util.Vector();
+    java.util.Vector<IbisIdentifier> idents
+            = new java.util.Vector<IbisIdentifier>();
 
     public void joined(IbisIdentifier id) {
         synchronized (this) {
@@ -69,10 +70,10 @@ class RszHandler implements ResizeHandler {
 }
 
 class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
-        SendPortConnectUpcall {
+        SendPortDisconnectUpcall, ibis.ipl.PredefinedCapabilities {
 
     static final TypedProperties tp = new TypedProperties(System.getProperties());
-    private final static int BUFSIZ = tp.intProperty("socketbuffersize", 0);
+    private final static int BUFSIZ = tp.getIntProperty("socketbuffersize", 0);
 
     private final static boolean VARIANCE_TIMER = tp.booleanProperty(
             "variance-timer", false);
@@ -621,12 +622,12 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
 
         if (connectUpcalls) {
             sport = requestPortType.createSendPort("latency-client",
-                    (SendPortConnectUpcall) this);
+                    (SendPortDisconnectUpcall) this);
         } else {
             sport = requestPortType.createSendPort("latency-client");
         }
         if (BUFSIZ != 0) {
-            HashMap dp = new HashMap();
+            HashMap<String, Object> dp = new HashMap<String, Object>();
             dp.put("InputBufferSize", new Integer(BUFSIZ));
             dp.put("OutputBufferSize", new Integer(BUFSIZ));
             sport.setProperties(dp);
@@ -644,7 +645,7 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
         // System.err.println(rank + ": t = " + ((ibis.impl.net.NetIbis)myIbis).now() + "  created \"client port " + rank + "\"");
 
         if (BUFSIZ != 0) {
-            HashMap dp = new HashMap();
+            HashMap<String, Object> dp = new HashMap<String, Object>();
             dp.put("InputBufferSize", new Integer(BUFSIZ));
             dp.put("OutputBufferSize", new Integer(BUFSIZ));
             rport.setProperties(dp);
@@ -698,13 +699,13 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
 
         if (connectUpcalls) {
             sport = replyPortType.createSendPort("latency-server",
-                    (SendPortConnectUpcall) this);
+                    (SendPortDisconnectUpcall) this);
         } else {
             sport = replyPortType.createSendPort("latency-server");
         }
 
         if (BUFSIZ != 0) {
-            HashMap dp = new HashMap();
+            HashMap<String, Object> dp = new HashMap<String, Object>();
             dp.put("InputBufferSize", new Integer(BUFSIZ));
             dp.put("OutputBufferSize", new Integer(BUFSIZ));
             sport.setProperties(dp);
@@ -732,7 +733,7 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
         }
         // System.err.println(rank + ": created \"server port " + (rank - clients) + "\"");
         if (BUFSIZ != 0) {
-            HashMap dp = new HashMap();
+            HashMap<String, Object> dp = new HashMap<String, Object>();
             dp.put("InputBufferSize", new Integer(BUFSIZ));
             dp.put("OutputBufferSize", new Integer(BUFSIZ));
             rport.setProperties(dp);
@@ -948,7 +949,7 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
                 single_object = new Data2(size);
                 break;
             case DATA_HASH:
-                Hashtable h = new Hashtable();
+                Hashtable<Integer, Object> h = new Hashtable<Integer, Object>();
                 for (int i = 0; i < size; i++) {
                     h.put(new Integer(i), new Object());
                 }
@@ -1024,23 +1025,13 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
         } catch (java.net.UnknownHostException e) {
             // let it be the default
         }
-        String basicProps = "OneToOne Reliable AutoUpcalls ExplicitReceipt";
-        String requestProps = "";
-        String replyProps = "";
-        if (requireOneToMany) {
-            requestProps += " OneToMany";
-            replyProps += " ManyToOne";
-            if (rank == 0) {
-                System.err.println("Require a multicast/multireceive PortType");
-            }
-        }
-        if (sequenced) {
-            requestProps += " Numbered";
-        }
-        StaticProperties s = new StaticProperties();
-        s.add("communication", basicProps + requestProps + replyProps);
-        s.add("serialization", "object");
-        myIbis = IbisFactory.createIbis(s, rszHandler);
+
+        CapabilitySet s = new CapabilitySet(SERIALIZATION_OBJECT,
+                COMMUNICATION_RELIABLE, RECEIVE_AUTO_UPCALLS,
+                RECEIVE_EXPLICIT, CONNECTION_UPCALLS,
+                sequenced ? COMMUNICATION_NUMBERED : COMMUNICATION_FIFO,
+                CONNECTION_ONE_TO_MANY, CONNECTION_MANY_TO_ONE);
+
 
         // myIbis.init();
 
@@ -1056,11 +1047,18 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
             }
         });
 
-        s = new StaticProperties();
-        s.add("communication", basicProps + requestProps);
+        s = new CapabilitySet(SERIALIZATION_OBJECT,
+                COMMUNICATION_RELIABLE, RECEIVE_AUTO_UPCALLS,
+                RECEIVE_EXPLICIT, CONNECTION_UPCALLS,
+                sequenced ? COMMUNICATION_NUMBERED : COMMUNICATION_FIFO,
+                CONNECTION_ONE_TO_MANY);
         requestPortType = myIbis.createPortType(s);
-        s = new StaticProperties();
-        s.add("communication", basicProps + replyProps);
+
+        s = new CapabilitySet(SERIALIZATION_OBJECT,
+                COMMUNICATION_RELIABLE, RECEIVE_AUTO_UPCALLS,
+                RECEIVE_EXPLICIT, CONNECTION_UPCALLS,
+                sequenced ? COMMUNICATION_NUMBERED : COMMUNICATION_FIFO,
+                CONNECTION_MANY_TO_ONE);
         replyPortType = myIbis.createPortType(s);
 
         if (rank == -1 && rszHandler != null) {
@@ -1208,7 +1206,7 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
     }
 
     /**
-     * Interface SendPortConnectUpcall
+     * Interface SendPortDisconnectUpcall
      */
     public void lostConnection(SendPort sp, ReceivePortIdentifier rp,
             Throwable e) {

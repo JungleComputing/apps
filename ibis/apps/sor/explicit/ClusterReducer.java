@@ -23,7 +23,7 @@ import ibis.ipl.ReceivePortIdentifier;
 import ibis.ipl.ReadMessage;
 import ibis.ipl.WriteMessage;
 import ibis.ipl.Registry;
-import ibis.ipl.StaticProperties;
+import ibis.ipl.CapabilitySet;
 import ibis.ipl.IbisIdentifier;
 
 import ibis.util.PoolInfo;
@@ -99,17 +99,13 @@ public class ClusterReducer extends TreeReducer {
         // for (int i = 0; i < clusterSize; i++) System.err.print(globalRank[i] + " ");
         // System.err.println("}");
 
-        StaticProperties reqprops = new StaticProperties();
-        reqprops.add("serialization", "data");
-        // reqprops.add("communication", "OneToOne, Reliable, ExplicitReceipt");
-        reqprops.add("communication", "OneToOne, Reliable, ExplicitReceipt");
+        CapabilitySet reqprops = new CapabilitySet(SERIALIZATION_DATA,
+                COMMUNICATION_RELIABLE, RECEIVE_EXPLICIT);
 
         PortType portTypeReduce = ibis.createPortType(reqprops);
 
-        reqprops = new StaticProperties();
-        reqprops.add("serialization", "data");
-        reqprops.add("communication",
-                "OneToMany, OneToOne, Reliable, ExplicitReceipt");
+        reqprops = new CapabilitySet(SERIALIZATION_DATA, CONNECTION_ONE_TO_MANY,
+            COMMUNICATION_RELIABLE, RECEIVE_EXPLICIT);
 
         PortType portTypeBroadcast = ibis.createPortType(reqprops);
 
@@ -171,10 +167,9 @@ public class ClusterReducer extends TreeReducer {
         if (rank == clusterRoot[myCluster]) {
             /* Create and connect ports for the inter-cluster reduce phase */
 
-            reqprops = new StaticProperties();
-            reqprops.add("serialization", "data");
-            reqprops.add("communication",
-                    "OneToMany, OneToOne, Reliable, ExplicitReceipt");
+            reqprops = new CapabilitySet(SERIALIZATION_DATA,
+                    CONNECTION_ONE_TO_MANY, COMMUNICATION_RELIABLE,
+                    RECEIVE_EXPLICIT);
 
             PortType portTypeInter = ibis.createPortType(reqprops);
 

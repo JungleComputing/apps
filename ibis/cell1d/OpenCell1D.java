@@ -154,7 +154,7 @@ class LevelRecorder implements ibis.ipl.Upcall {
     }
 }
 
-class OpenCell1D implements OpenConfig {
+class OpenCell1D implements OpenConfig, PredefinedCapabilities {
     static Ibis ibis;
     static Registry registry;
     static IbisIdentifier leftNeighbour;
@@ -850,23 +850,18 @@ class OpenCell1D implements OpenConfig {
 
         try {
             // The properties of Ibis; the union of the properties below.
-            StaticProperties iprop = new StaticProperties();
-            iprop.add( "serialization", "data" );
-            iprop.add( "communication", "OneToOne, Reliable, AutoUpcalls, ExplicitReceipt" );
-            iprop.add( "worldmodel", "open" );
+            CapabilitySet iprop = new CapabilitySet(WORLDMODEL_OPEN,
+                    SERIALIZATION_DATA, COMMUNICATION_RELIABLE,
+                    RECEIVE_AUTO_UPCALLS, RECEIVE_EXPLICIT);
 
             // The properties of the update port.
-            StaticProperties uprop = new StaticProperties();
-            uprop.add( "serialization", "data" );
-            uprop.add( "communication", "OneToOne, Reliable, ExplicitReceipt" );
-            uprop.add( "worldmodel", "open" );
+            CapabilitySet uprop = new CapabilitySet(SERIALIZATION_DATA,
+                    COMMUNICATION_RELIABLE, RECEIVE_EXPLICIT);
 
             // The properties of the worksteal port.
-            StaticProperties sprop = new StaticProperties();
-            sprop.add( "serialization", "data" );
-            sprop.add( "communication", "OneToOne, Reliable, AutoUpcalls" );
-            sprop.add( "worldmodel", "open" );
-            ibis = IbisFactory.createIbis( iprop, rszHandler );
+            CapabilitySet sprop = new CapabilitySet(SERIALIZATION_DATA,
+                    COMMUNICATION_RELIABLE, RECEIVE_AUTO_UPCALLS);
+            ibis = IbisFactory.createIbis( iprop, null, null, rszHandler );
             myName = ibis.identifier();
 
             registry = ibis.registry();

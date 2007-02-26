@@ -8,10 +8,10 @@ import ibis.ipl.Ibis;
 import ibis.ipl.IbisFactory;
 import ibis.ipl.IbisIdentifier;
 import ibis.ipl.ResizeHandler;
-import ibis.ipl.TypedProperties;
+import ibis.ipl.CapabilitySet;
 import ibis.util.ThreadPool;
 
-final class Application implements Runnable, ResizeHandler {
+final class Application implements Runnable, ResizeHandler, ibis.ipl.PredefinedCapabilities {
 
     private static final Logger logger = Logger.getLogger(Application.class);
 
@@ -53,14 +53,12 @@ final class Application implements Runnable, ResizeHandler {
 
     public void run() {
         try {
-            
-            String[] strings = {"serialization.object","communication.reliable","receive.explicit","worldmodel.Open"}; 
-            
-            Capabilities capabilities = new Capabilities(strings);
-            TypedProperties attributes = new TypedProperties();
+            CapabilitySet s = new CapabilitySet(SERIALIZATION_OBJECT,
+                    WORLDMODEL_OPEN, COMMUNICATION_RELIABLE,
+                    RECEIVE_EXPLICIT);
 
             logger.debug("creating ibis");
-            Ibis ibis = IbisFactory.createIbis(capabilities, null, attributes, this);
+            Ibis ibis = IbisFactory.createIbis(s, null, null, this);
             logger.debug("ibis created, enabling upcalls");
 
             ibis.enableResizeUpcalls();

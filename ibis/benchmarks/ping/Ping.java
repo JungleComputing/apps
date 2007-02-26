@@ -24,7 +24,7 @@ import java.util.Random;
  * </OL>
  * The 'individual results' line also display the test cycle number. The test cycle numbered 0 is a warmup test cycle and is ignored when computing the average results.
  */
-public final class Ping {
+public final class Ping implements PredefinedCapabilities {
 
     /**
      * Flag indicating whether the application should perform one-way
@@ -502,13 +502,10 @@ public final class Ping {
         try {
             // Local initialization
 
-            String name = "tcp";
-            //String name = "ibis.impl.messagePassing.PandaIbis";
-            //String name = "ibis.impl.net.NetIbis";
-
-            StaticProperties props = new StaticProperties();
-            props.add("name", name);
-            ibis = IbisFactory.createIbis(props, null);
+            CapabilitySet props = new CapabilitySet(SERIALIZATION_BYTE,
+                    WORLDMODEL_CLOSED, COMMUNICATION_RELIABLE,
+                    RECEIVE_EXPLICIT);
+            ibis = IbisFactory.createIbis(props, null, null, null);
 
             // Configuration information
             registry = ibis.registry();
@@ -523,36 +520,7 @@ public final class Ping {
             }
 
             // Local communication setup
-            StaticProperties s = new StaticProperties();
-
-            if (false) {
-                String ibis_name = "net.rel.muxer.udp";
-                String ibis_path = "net.NetIbis";
-                String driver = ibis_name.substring("net.".length());
-                String path = "/";
-                while (true) {
-                    int dot = driver.indexOf('.');
-                    int end = dot;
-                    if (end == -1) {
-                        end = driver.length();
-                    }
-                    String top = driver.substring(0, end);
-                    System.err.println("Now register static property \""
-                            + (path + ":Driver") + "\" as \"" + top + "\"");
-                    s.add(path + ":Driver", top);
-                    if (dot == -1) {
-                        break;
-                    }
-                    if (path.equals("/")) {
-                        path = path + top;
-                    } else {
-                        path = path + "/" + top;
-                    }
-                    driver = driver.substring(dot + 1);
-                }
-            }
-
-            PortType t = ibis.createPortType(s);
+            PortType t = ibis.createPortType(null);
             sport = t.createSendPort();
             rport = null;
             ibis.registry().elect("" + rank);

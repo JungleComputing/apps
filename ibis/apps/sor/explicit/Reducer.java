@@ -21,16 +21,16 @@ import ibis.ipl.ReceivePortIdentifier;
 import ibis.ipl.ReadMessage;
 import ibis.ipl.WriteMessage;
 import ibis.ipl.Registry;
-import ibis.ipl.StaticProperties;
+import ibis.ipl.CapabilitySet;
 import ibis.ipl.IbisIdentifier;
 
 import ibis.util.PoolInfo;
 import ibis.util.Timer;
 import ibis.util.TypedProperties;
 
-public class Reducer {
+public class Reducer implements ibis.ipl.PredefinedCapabilities {
 
-    TypedProperties tp = new TypedProperties(System.getProperties());
+    static TypedProperties tp = new TypedProperties(System.getProperties());
 
     private final static boolean TIMINGS = tp.booleanProperty(
             "timing.reduce", false);
@@ -57,18 +57,13 @@ public class Reducer {
         size = info.size();
 
         Registry registry = ibis.registry();
-        StaticProperties reqprops = new StaticProperties();
-        reqprops.add("serialization", "data");
-        // reqprops.add("communication", "OneToOne, Reliable, ExplicitReceipt");
-        reqprops.add("communication",
-                "OneToOne, ManyToOne, Reliable, ExplicitReceipt");
+        CapabilitySet reqprops = new CapabilitySet(SERIALIZATION_DATA,
+            CONNECTION_MANY_TO_ONE, COMMUNICATION_RELIABLE, RECEIVE_EXPLICIT);
 
         PortType portTypeReduce = ibis.createPortType(reqprops);
 
-        reqprops = new StaticProperties();
-        reqprops.add("serialization", "data");
-        reqprops.add("communication",
-                "OneToMany, OneToOne, Reliable, ExplicitReceipt");
+        reqprops = new CapabilitySet(SERIALIZATION_DATA,
+            CONNECTION_ONE_TO_MANY, COMMUNICATION_RELIABLE, RECEIVE_EXPLICIT);
 
         PortType portTypeBroadcast = ibis.createPortType(reqprops);
 

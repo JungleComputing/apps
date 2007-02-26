@@ -313,7 +313,7 @@ class UpcallSender implements Upcall {
     }
 }
 
-class Latency {
+class Latency implements PredefinedCapabilities {
 
     static Logger logger = GetLogger.getLogger(Latency.class.getName());
 
@@ -379,18 +379,19 @@ class Latency {
 
         try {
 
-            StaticProperties s = new StaticProperties();
+            CapabilitySet s = new CapabilitySet(
+                    noneSer ? SERIALIZATION_BYTE : SERIALIZATION_OBJECT,
+                    WORLDMODEL_OPEN, COMMUNICATION_RELIABLE,
+                    RECEIVE_AUTO_UPCALLS, RECEIVE_EXPLICIT);
+            Properties p = new Properties();
             if (ibisSer) {
-                s.add("Serialization", "ibis");
+                p.setProperty("ibis.serialization", "ibis");
             } else if (noneSer) {
-                s.add("Serialization", "byte");
-            } else
-                s.add("Serialization", "sun");
+            } else {
+                p.setProperty("ibis.serialization", "sun");
+            }
 
-            s.add("Communication",
-                    "OneToOne, Reliable, AutoUpcalls, ExplicitReceipt");
-            s.add("worldmodel", "open");
-            ibis = IbisFactory.createIbis(s, null);
+            ibis = IbisFactory.createIbis(s, null, p, null);
 
             registry = ibis.registry();
 

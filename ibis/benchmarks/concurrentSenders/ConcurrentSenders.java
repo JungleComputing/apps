@@ -172,7 +172,7 @@ class Receiver implements Upcall {
     }
 }
 
-class ConcurrentSenders {
+class ConcurrentSenders implements PredefinedCapabilities {
 
     static Ibis ibis;
 
@@ -227,14 +227,12 @@ class ConcurrentSenders {
         }
 
         try {
-            StaticProperties sp = new StaticProperties();
-            sp.add("serialization", "object");
-            sp
-                    .add("communication",
-                            "OneToOne, ManyToOne, OneToMany, Reliable, ExplicitReceipt, AutoUpcalls");
-            sp.add("worldmodel", "closed");
+            CapabilitySet sp = new CapabilitySet(SERIALIZATION_OBJECT,
+                    WORLDMODEL_CLOSED, COMMUNICATION_RELIABLE,
+                    RECEIVE_AUTO_UPCALLS, RECEIVE_EXPLICIT,
+                    CONNECTION_ONE_TO_MANY);
 
-            ibis = IbisFactory.createIbis(sp, null);
+            ibis = IbisFactory.createIbis(sp, null, null, null);
 
             registry = ibis.registry();
 

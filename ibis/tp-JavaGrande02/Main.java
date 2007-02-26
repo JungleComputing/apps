@@ -2,6 +2,7 @@
 
 import ibis.ipl.*;
 import ibis.util.PoolInfo;
+import java.util.Properties;
 
 import java.io.IOException;
 
@@ -88,7 +89,7 @@ final class Receiver implements Upcall {
     } 
 } 
 
-final class Main { 
+final class Main implements PredefinedCapabilities { 
 
     public static boolean verbose = false;
     public static final double MB = (1024.0*1024.0);
@@ -248,15 +249,14 @@ final class Main {
 		}
 	    } 
 
-	    StaticProperties s = new StaticProperties();
-	    s.add("communication", "OneToOne Reliable AutoUpcalls ExplicitReceipt");
-	    if(ibisSer) {
-		s.add("serialization", "ibis");
-	    } else {
-		s.add("serialization", "sun");
-	    }
-	    s.add("worldmodel", "closed");
-	    ibis = IbisFactory.createIbis(s, null);
+	    CapabilitySet s = new CapabilitySet(COMMUNICATION_RELIABLE,
+                    WORLDMODEL_CLOSED, RECEIVE_AUTO_UPCALLS,
+                    RECEIVE_EXPLICIT, SERIALIZATION_OBJECT);
+            Properties attribs = new Properties();
+            attribs.setProperty("ibis.serialization",
+                    ibisSer ? "ibis" : "sun");
+
+	    ibis = IbisFactory.createIbis(s, null, attribs, null);
 
 	    if (verbose) { 
 		System.out.println("Ibis created; getting registry ...");

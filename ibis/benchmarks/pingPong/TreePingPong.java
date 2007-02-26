@@ -7,7 +7,7 @@ import java.util.Properties;
 import java.util.Random;
 
 import java.io.IOException;
-class TreePingPong {
+class TreePingPong implements PredefinedCapabilities {
 
     static final int TREE_NODES=1023;
 
@@ -89,13 +89,10 @@ static class ExplicitReceiver {
         int rank = 0, remoteRank = 1;
 
         try {
-            StaticProperties s = new StaticProperties();
-                s.add("Serialization", "ibis");
-
-            s.add("Communication",
-                    "OneToOne, Reliable, ExplicitReceipt");
-            s.add("worldmodel", "closed");
-            ibis = IbisFactory.createIbis(s, null);
+            CapabilitySet s = new CapabilitySet(
+                    WORLDMODEL_CLOSED, SERIALIZATION_OBJECT,
+                    COMMUNICATION_RELIABLE, RECEIVE_EXPLICIT);
+            ibis = IbisFactory.createIbis(s, null, null, null);
 
             registry = ibis.registry();
 
