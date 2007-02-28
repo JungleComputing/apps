@@ -1,34 +1,33 @@
 /*
- * SAT4J: a SATisfiability library for Java   
- * Copyright (C) 2004 Daniel Le Berre
+ * SAT4J: a SATisfiability library for Java Copyright (C) 2004-2006 Daniel Le Berre
  * 
  * Based on the original minisat specification from:
  * 
- * An extensible SAT solver. Niklas E?n and Niklas S?rensson.
- * Proceedings of the Sixth International Conference on Theory 
- * and Applications of Satisfiability Testing, LNCS 2919, 
- * pp 502-518, 2003.
+ * An extensible SAT solver. Niklas E?n and Niklas S?rensson. Proceedings of the
+ * Sixth International Conference on Theory and Applications of Satisfiability
+ * Testing, LNCS 2919, pp 502-518, 2003.
  * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *  
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package org.sat4j.minisat.constraints.card;
 
 import java.io.Serializable;
 
+import org.sat4j.minisat.constraints.cnf.Lits;
 import org.sat4j.minisat.core.Constr;
 import org.sat4j.minisat.core.ILits;
 import org.sat4j.minisat.core.Undoable;
@@ -49,7 +48,7 @@ public class AtLeast implements Constr, Undoable, Serializable {
     private static final long serialVersionUID = 1L;
 
     /** number of allowed falsified literal */
-    private int n;
+    protected int maxUnsatisfied;
 
     /** current number of falsified literals */
     private int counter;
@@ -57,21 +56,18 @@ public class AtLeast implements Constr, Undoable, Serializable {
     /**
      * constraint literals
      */
-    private final int[] lits;
+    protected final int[] lits;
 
-    // private final ILits voc;
-    private ILits voc;
-
-    private long status = 0L;
+    protected final ILits voc;
 
     /**
      * @param ps
      *            a vector of literals
-     * @param n
+     * @param degree
      *            the minimal number of satisfied literals
      */
-    private AtLeast(ILits voc, IVecInt ps, int n) {
-        this.n = ps.size() - n;
+    protected AtLeast(ILits voc, IVecInt ps, int degree) {
+        maxUnsatisfied = ps.size() - degree;
         this.voc = voc;
         counter = 0;
         lits = new int[ps.size()];
@@ -81,15 +77,18 @@ public class AtLeast implements Constr, Undoable, Serializable {
         }
     }
 
-    public static AtLeast atLeastNew(UnitPropagationListener s, ILits voc,
-        IVecInt ps, int n) throws ContradictionException {
-        if (ps.size() < n) {
+    protected static int niceParameters(UnitPropagationListener s, ILits voc,
+            IVecInt ps, int deg) throws ContradictionException {
+
+        if (ps.size() < deg)
             throw new ContradictionException();
-        }
-        int degree = n;
+        int degree = deg;
         for (int i = 0; i < ps.size();) {
             // on verifie si le litteral est affecte
-            if (!voc.isUnassigned(ps.get(i))) {
+            if (voc.isUnassigned(ps.get(i))) {
+                // go to next literal
+                i++;
+            } else {
                 // Si le litteral est satisfait,
                 // ?a revient ? baisser le degr?
                 if (voc.isSatisfied(ps.get(i))) {
@@ -98,32 +97,14 @@ public class AtLeast implements Constr, Undoable, Serializable {
                 // dans tous les cas, s'il est assign?,
                 // on enleve le ieme litteral
                 ps.delete(i);
-            } else {
-                // on passe au litt?ral suivant
-                i++;
             }
         }
 
         // on trie le vecteur ps
         ps.sortUnique();
-
         // ?limine les clauses tautologiques
         // deux litt?raux de signe oppos?s apparaissent dans la m?me
         // clause
-        for (int i = 0; i < ps.size() - 1;) {
-            if (ps.get(i) == (ps.get(i + 1) ^ 1)) {
-                // la clause est tautologique
-                // TODO
-                // ps.set(i, ps.last());
-                // ps.pop();
-                // ps.set(i, ps.last());
-                // ps.pop();
-                // degree--;
-                i++;
-            } else {
-                i++;
-            }
-        }
 
         if (ps.size() == degree) {
             for (int i = 0; i < ps.size(); i++) {
@@ -131,16 +112,20 @@ public class AtLeast implements Constr, Undoable, Serializable {
                     throw new ContradictionException();
                 }
             }
-            return null;
+            return 0;
         }
 
-        if (ps.size() < degree) {
+        if (ps.size() < degree)
             throw new ContradictionException();
-        }
-        if (degree == 0) {
-            return null;
-        }
+        return degree;
 
+    }
+
+    public static AtLeast atLeastNew(UnitPropagationListener s, ILits voc,
+            IVecInt ps, int n) throws ContradictionException {
+        int degree = niceParameters(s, voc, ps, n);
+        if (degree == 0)
+            return null;
         return new AtLeast(voc, ps, degree);
     }
 
@@ -164,23 +149,19 @@ public class AtLeast implements Constr, Undoable, Serializable {
         // remet la clause dans la liste des clauses regardees
         voc.watch(p, this);
 
-        if (counter == n) {
+        if (counter == maxUnsatisfied)
             return false;
-        }
 
         counter++;
         voc.undos(p).push(this);
 
         // If no more can be false, enqueue the rest:
-        if (counter == n) {
+        if (counter == maxUnsatisfied)
             for (int q : lits) {
-                if (voc.isUnassigned(q)) {
-                    if (!s.enqueue(q, this)) {
-                        return false;
-                    }
+                if (voc.isUnassigned(q) && !s.enqueue(q, this)) {
+                    return false;
                 }
             }
-        }
         return true;
     }
 
@@ -208,9 +189,12 @@ public class AtLeast implements Constr, Undoable, Serializable {
      * @see Constr#calcReason(Solver, Lit, Vec)
      */
     public void calcReason(int p, IVecInt outReason) {
+        int c = (p == ILits.UNDEFINED) ? -1 : 0;
         for (int q : lits) {
             if (voc.isFalsified(q)) {
                 outReason.push(q ^ 1);
+                if (++c == maxUnsatisfied)
+                    return;
             }
         }
     }
@@ -278,25 +262,39 @@ public class AtLeast implements Constr, Undoable, Serializable {
         throw new UnsupportedOperationException();
     }
 
-    public void setVoc(ILits newvoc) {
-        voc = newvoc;
-    }
-
-    public void setStatus(long st) {
-        status = st;
-    }
-
-    public long getStatus() {
-        return status;
-    }
-
+    /**
+     * Cha?ne repr?sentant la contrainte
+     * 
+     * @return Cha?ne repr?sentant la contrainte
+     */
     @Override
-    public Object clone() {
-        // TODO: deep copy
-        try {
-            return super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new InternalError(e.toString());
+    public String toString() {
+        StringBuffer stb = new StringBuffer();
+        stb.append("Card (" + lits.length + ") : ");
+        for (int i = 0; i < lits.length; i++) {
+            // if (voc.isUnassigned(lits[i])) {
+            stb.append(" + "); //$NON-NLS-1$
+            stb.append(Lits.toString(this.lits[i]));
+            stb.append("[");
+            stb.append(voc.valueToString(lits[i]));
+            stb.append("@");
+            stb.append(voc.getLevel(lits[i]));
+            stb.append("]");
+            stb.append(" ");
+            stb.append(" "); //$NON-NLS-1$
         }
+        stb.append(">= "); //$NON-NLS-1$
+        stb.append(size() - maxUnsatisfied);
+
+        return stb.toString();
+    }
+
+    // SATIN
+    public void setLearntGlobal() {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean learntGlobal() {
+        return false;
     }
 }

@@ -1,9 +1,28 @@
 /*
- * Created on 4 juil. 2004
- *
- * To change the template for this generated file go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ * SAT4J: a SATisfiability library for Java Copyright (C) 2004-2006 Daniel Le Berre
+ * 
+ * Based on the original minisat specification from:
+ * 
+ * An extensible SAT solver. Niklas E?n and Niklas S?rensson. Proceedings of the
+ * Sixth International Conference on Theory and Applications of Satisfiability
+ * Testing, LNCS 2919, pp 502-518, 2003.
+ * 
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
+
 package org.sat4j.minisat.constraints.cnf;
 
 import java.io.Serializable;
@@ -21,21 +40,18 @@ public class CBClause implements Constr, Undoable, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private int falsified;
+    protected int falsified;
 
     private boolean learnt;
 
-    private final int[] lits;
+    protected final int[] lits;
 
-    // protected final ILits voc;
-    protected ILits voc;
+    protected final ILits voc;
 
     private double activity;
 
-    private long status = 0L;
-
     public static CBClause brandNewClause(UnitPropagationListener s, ILits voc,
-        IVecInt literals) {
+            IVecInt literals) {
         CBClause c = new CBClause(literals, voc);
         c.register();
         return c;
@@ -49,6 +65,8 @@ public class CBClause implements Constr, Undoable, Serializable {
         this.lits = new int[ps.size()];
         this.voc = voc;
         ps.moveTo(this.lits);
+	// SATIN:
+	this.learntGlobal = false;
     }
 
     public CBClause(IVecInt ps, ILits voc) {
@@ -97,8 +115,8 @@ public class CBClause implements Constr, Undoable, Serializable {
      * @see org.sat4j.minisat.core.Constr#simplify()
      */
     public boolean simplify() {
-        for (int i = 0; i < lits.length; i++) {
-            if (voc.isSatisfied(lits[i])) {
+        for (int p : lits) {
+            if (voc.isSatisfied(p)) {
                 return true;
             }
         }
@@ -122,10 +140,10 @@ public class CBClause implements Constr, Undoable, Serializable {
      */
     public void calcReason(int p, IVecInt outReason) {
         assert outReason.size() == 0;
-        for (int i = 0; i < lits.length; i++) {
-            assert voc.isFalsified(lits[i]) || lits[i] == p;
-            if (voc.isFalsified(lits[i])) {
-                outReason.push(lits[i] ^ 1);
+        for (int q : lits) {
+            assert voc.isFalsified(q) || q == p;
+            if (voc.isFalsified(q)) {
+                outReason.push(q ^ 1);
             }
         }
         assert (p == ILits.UNDEFINED) || (outReason.size() == lits.length - 1);
@@ -182,13 +200,13 @@ public class CBClause implements Constr, Undoable, Serializable {
      * @see org.sat4j.minisat.core.Constr#register()
      */
     public void register() {
-        for (int i = 0; i < lits.length; i++) {
-            voc.watch(lits[i] ^ 1, this);
+        for (int p : lits) {
+            voc.watch(p ^ 1, this);
         }
         if (learnt) {
-            for (int i = 0; i < lits.length; i++) {
-                if (voc.isFalsified(lits[i])) {
-                    voc.undos(lits[i] ^ 1).push(this);
+            for (int p : lits) {
+                if (voc.isFalsified(p)) {
+                    voc.undos(p ^ 1).push(this);
                     falsified++;
                 }
             }
@@ -239,33 +257,22 @@ public class CBClause implements Constr, Undoable, Serializable {
         StringBuffer stb = new StringBuffer();
         for (int i = 0; i < lits.length; i++) {
             stb.append(lits[i]);
-            stb.append(" ");
-            stb.append("[");
+            stb.append("["); //$NON-NLS-1$
             stb.append(voc.valueToString(lits[i]));
-            stb.append("]");
+            stb.append("]"); //$NON-NLS-1$
+            stb.append(" "); //$NON-NLS-1$
         }
         return stb.toString();
     }
 
-    public void setVoc(ILits newvoc) {
-        voc = newvoc;
+    // SATIN
+    private boolean learntGlobal;
+
+    public void setLearntGlobal() {
+	learntGlobal = true;
     }
 
-    public void setStatus(long st) {
-        status = st;
-    }
-
-    public long getStatus() {
-        return status;
-    }
-
-    @Override
-    public Object clone() {
-        // TODO: deep copy
-        try {
-            return super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new InternalError(e.toString());
-        }
+    public boolean learntGlobal() {
+        return learntGlobal;
     }
 }

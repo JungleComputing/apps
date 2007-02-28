@@ -1,28 +1,26 @@
 /*
- * SAT4J: a SATisfiability library for Java   
- * Copyright (C) 2004 Daniel Le Berre
+ * SAT4J: a SATisfiability library for Java Copyright (C) 2004-2006 Daniel Le Berre
  * 
  * Based on the original minisat specification from:
  * 
- * An extensible SAT solver. Niklas E???n and Niklas S???rensson.
- * Proceedings of the Sixth International Conference on Theory 
- * and Applications of Satisfiability Testing, LNCS 2919, 
- * pp 502-518, 2003.
+ * An extensible SAT solver. Niklas E?n and Niklas S?rensson. Proceedings of the
+ * Sixth International Conference on Theory and Applications of Satisfiability
+ * Testing, LNCS 2919, pp 502-518, 2003.
  * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *  
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package org.sat4j.minisat.constraints.cnf;
@@ -42,34 +40,24 @@ import org.sat4j.specs.IVecInt;
 
 /**
  * Lazy data structure for clause using Watched Literals.
- *  
- * @author leberre 
+ * 
+ * @author leberre
  */
-public final class WLClause implements Constr, Serializable, Cloneable {
+public abstract class WLClause implements Constr, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private boolean learnt;
-
     private double activity;
 
-    // private final int[] lits;
-    private int[] lits;
+    protected final int[] lits;
 
-    // private final ILits voc;
-    private ILits voc;
-
-    private static int counter = 0;
-
-    private final int id = ++counter;
-
-    /* Added for global learning: */
-    private long status = 0L;
+    protected final ILits voc;
 
     /**
      * Creates a new basic clause
      * 
-     * @param voc the vocabulary of the formula
+     * @param voc
+     *            the vocabulary of the formula
      * @param ps
      *            A VecInt that WILL BE EMPTY after calling that method.
      */
@@ -79,43 +67,6 @@ public final class WLClause implements Constr, Serializable, Cloneable {
         assert ps.size() == 0;
         this.voc = voc;
         activity = 0;
-        learnt = false;
-    }
-
-    private final boolean debug = false;
-
-    public void setVoc(ILits voc) {
-        // Used for updating voc after clone()
-
-        if (debug) {
-            System.out.println("clause " + this + ": updating voc " + this.voc
-                + " to " + voc);
-        }
-
-        this.voc = voc;
-    }
-
-    @Override
-    public Object clone() {
-        WLClause clone;
-
-        try {
-            clone = (WLClause) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new InternalError(e.toString());
-        }
-
-        clone.lits = clone.lits.clone();
-
-        return clone;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public static void resetIds() {
-        counter = 0;
     }
 
     /**
@@ -138,12 +89,15 @@ public final class WLClause implements Constr, Serializable, Cloneable {
      *             if discovered by unit propagation
      */
     public static IVecInt sanityCheck(IVecInt ps, ILits voc,
-        UnitPropagationListener s) throws ContradictionException {
+            UnitPropagationListener s) throws ContradictionException {
         // si un litt???ral de ps est vrai, retourner vrai
         // enlever les litt???raux falsifi???s de ps
         for (int i = 0; i < ps.size();) {
             // on verifie si le litteral est affecte
-            if (!voc.isUnassigned(ps.get(i))) {
+            if (voc.isUnassigned(ps.get(i))) {
+                // on passe au literal suivant
+                i++;
+            } else {
                 // Si le litteral est satisfait, la clause est
                 // satisfaite
                 if (voc.isSatisfied(ps.get(i))) {
@@ -153,9 +107,6 @@ public final class WLClause implements Constr, Serializable, Cloneable {
                 // on enleve le ieme litteral
                 ps.delete(i);
 
-            } else {
-                // on passe au litt???ral suivant
-                i++;
             }
         }
 
@@ -172,9 +123,8 @@ public final class WLClause implements Constr, Serializable, Cloneable {
             }
         }
 
-        if (propagationCheck(ps, s)) {
+        if (propagationCheck(ps, s))
             return null;
-        }
 
         return ps;
     }
@@ -192,56 +142,17 @@ public final class WLClause implements Constr, Serializable, Cloneable {
      *             when detected by unit propagation
      */
     static boolean propagationCheck(IVecInt ps, UnitPropagationListener s)
-        throws ContradictionException {
+            throws ContradictionException {
         if (ps.size() == 0) {
-            throw new ContradictionException("Creating Empty clause ?");
+            throw new ContradictionException("Creating Empty clause ?"); //$NON-NLS-1$
         } else if (ps.size() == 1) {
             if (!s.enqueue(ps.get(0))) {
-                throw new ContradictionException("Contradictory Unit Clauses");
+                throw new ContradictionException("Contradictory Unit Clauses"); //$NON-NLS-1$
             }
             return true;
         }
 
         return false;
-    }
-
-    /**
-     * declares this clause as learnt
-     * 
-     */
-    public void setLearnt() {
-        learnt = true;
-    }
-
-    /**
-     * Register this clause which means watching the necessary literals If the
-     * clause is learnt, setLearnt() must be called before a call to register()
-     * 
-     * @see #setLearnt()
-     */
-    public void register() {
-        assert lits.length > 1;
-        if (!nondeterministic) {
-            java.util.Arrays.sort(lits);
-        } else if (learnt) {
-            // prendre un deuxieme litt???ral ??? surveiller
-            int maxi = 1;
-            int maxlevel = voc.getLevel(lits[1]);
-            for (int i = 2; i < lits.length; i++) {
-                int level = voc.getLevel(lits[i]);
-                if (level > maxlevel) {
-                    maxi = i;
-                    maxlevel = level;
-                }
-            }
-            int l = lits[1];
-            lits[1] = lits[maxi];
-            lits[maxi] = l;
-        }
-
-        // ajoute la clause a la liste des clauses control???es.
-        voc.watch(lits[0] ^ 1, this);
-        voc.watch(lits[1] ^ 1, this);
     }
 
     /**
@@ -258,8 +169,8 @@ public final class WLClause implements Constr, Serializable, Cloneable {
      *         (tautology for example)
      */
     public static WLClause brandNewClause(UnitPropagationListener s, ILits voc,
-        IVecInt literals) {
-        WLClause c = new WLClause(literals, voc);
+            IVecInt literals) {
+        WLClause c = new DefaultWLClause(literals, voc);
         c.register();
         return c;
     }
@@ -270,15 +181,12 @@ public final class WLClause implements Constr, Serializable, Cloneable {
      * @see Constr#calcReason(Solver, Lit, Vec)
      */
     public void calcReason(int p, IVecInt outReason) {
-        assert outReason.size() == 0;
-        // Debug:
-        if (p != ILits.UNDEFINED && p != lits[0]) {
-            System.out.println("unexpected clause for lit " + p + ": " + this);
-        }
-        assert (p == ILits.UNDEFINED) || (p == lits[0]);
-        for (int i = (p == ILits.UNDEFINED) ? 0 : 1; i < lits.length; i++) {
-            assert voc.isFalsified(lits[i]);
-            outReason.push(lits[i] ^ 1);
+        assert outReason.size() == 0
+                && ((p == ILits.UNDEFINED) || (p == lits[0]));
+        final int[] mylits = lits;
+        for (int i = (p == ILits.UNDEFINED) ? 0 : 1; i < mylits.length; i++) {
+            assert voc.isFalsified(mylits[i]);
+            outReason.push(mylits[i] ^ 1);
         }
     }
 
@@ -307,57 +215,38 @@ public final class WLClause implements Constr, Serializable, Cloneable {
         return false;
     }
 
-    // Just for debugging; determinism causes substantial overhead!!
-    final private boolean nondeterministic = true; // false;
-
     public boolean propagate(UnitPropagationListener s, int p) {
+        final int[] mylits = lits;
         // Lits[1] doit contenir le litt???ral falsifi???
-        if (lits[0] == (p ^ 1)) {
-            lits[0] = lits[1];
-            lits[1] = p ^ 1;
+        if (mylits[0] == (p ^ 1)) {
+            mylits[0] = mylits[1];
+            mylits[1] = p ^ 1;
         }
-        assert lits[1] == (p ^ 1);
-        //        // Si le premier litt???ral est satisfait, la clause est satisfaite
-        //        if (voc.isSatisfied(lits[0])) {
-        //            // reinsert la clause dans la liste des clauses surveillees
-        //            voc.watch(p, this);
-        //            return true;
-        //        }
+        assert mylits[1] == (p ^ 1);
+        // // Si le premier litt???ral est satisfait, la clause est satisfaite
+        // The solver appears to solve more benchmarks (while being sometimes
+        // slower)
+        // if commenting those lines.
+        // if (voc.isSatisfied(lits[0])) {
+        // // reinsert la clause dans la liste des clauses surveillees
+        // voc.watch(p, this);
+        // return true;
+        // }
 
         // Recherche un nouveau litt???ral ??? regarder
-        if (nondeterministic) {
-            for (int i = 2; i < lits.length; i++) {
-                if (!voc.isFalsified(lits[i])) {
-                    lits[1] = lits[i];
-                    lits[i] = p ^ 1;
-                    voc.watch(lits[1] ^ 1, this);
-                    return true;
-                }
-            }
-        } else {
-            int litmin = -1;
-            int imin = -1;
-            for (int i = 2; i < lits.length; i++) {
-                if (!voc.isFalsified(lits[i])) {
-                    if (lits[i] < litmin || litmin < 0) {
-                        imin = i;
-                        litmin = lits[i];
-                    }
-                }
-            }
-
-            if (imin > 0) {
-                lits[1] = lits[imin];
-                lits[imin] = p ^ 1;
-                voc.watch(lits[1] ^ 1, this);
+        for (int i = 2; i < mylits.length; i++) {
+            if (!voc.isFalsified(mylits[i])) {
+                mylits[1] = mylits[i];
+                mylits[i] = p ^ 1;
+                voc.watch(mylits[1] ^ 1, this);
                 return true;
             }
         }
-        assert voc.isFalsified(lits[1]);
+        assert voc.isFalsified(mylits[1]);
         // La clause est unitaire ou nulle
         voc.watch(p, this);
         // avance pour la propagation
-        return s.enqueue(lits[0], this);
+        return s.enqueue(mylits[0], this);
     }
 
     /*
@@ -378,18 +267,11 @@ public final class WLClause implements Constr, Serializable, Cloneable {
     public String toString() {
         StringBuffer stb = new StringBuffer();
         for (int i = 0; i < lits.length; i++) {
-            stb.append(lits[i]);
-            stb.append(" ");
-            stb.append("[");
+            stb.append(Lits.toString(lits[i]));
+            stb.append("["); //$NON-NLS-1$
             stb.append(voc.valueToString(lits[i]));
-            stb.append("]");
-        }
-        // stb.append(" id " + id);
-        if (learnt()) {
-            stb.append(" learnt");
-            if (locked()) {
-                stb.append(" locked");
-            }
+            stb.append("]"); //$NON-NLS-1$
+            stb.append(" "); //$NON-NLS-1$
         }
         return stb.toString();
     }
@@ -398,7 +280,8 @@ public final class WLClause implements Constr, Serializable, Cloneable {
      * Retourne le ieme literal de la clause. Attention, cet ordre change durant
      * la recherche.
      * 
-     * @param i the index of the literal
+     * @param i
+     *            the index of the literal
      * @return the literal
      */
     public int get(int i) {
@@ -419,38 +302,23 @@ public final class WLClause implements Constr, Serializable, Cloneable {
         activity *= d;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.sat4j.minisat.datatype.Constr#learnt()
-     */
-    public boolean learnt() {
-        return learnt;
-    }
-
-    /* Added for global learning: */
-    public void setStatus(long st) {
-        status = st;
-    }
-
-    /* Added for global learning: */
-    public long getStatus() {
-        return status;
-    }
-
     public int size() {
         return lits.length;
-    }
-
-    /**
-     * @return the id the the last created clause.
-     */
-    public static int lastid() {
-        return counter;
     }
 
     public void assertConstraint(UnitPropagationListener s) {
         boolean ret = s.enqueue(lits[0], this);
         assert ret;
     }
+
+    public ILits getVocabulary() {
+        return voc;
+    }
+
+    public int[] getLits() {
+        int[] tmp = new int[size()];
+        System.arraycopy(lits, 0, tmp, 0, size());
+        return tmp;
+    }
+
 }

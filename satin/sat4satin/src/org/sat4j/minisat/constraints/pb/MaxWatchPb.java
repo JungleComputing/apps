@@ -1,10 +1,9 @@
 /*
- * MiniSAT in Java, a Java based-SAT framework Copyright (C) 2004 Daniel Le
- * Berre
+ * SAT4J: a SATisfiability library for Java Copyright (C) 2004-2006 Daniel Le Berre
  * 
  * Based on the original minisat specification from:
  * 
- * An extensible SAT solver. Niklas Een and Niklas Serensson. Proceedings of the
+ * An extensible SAT solver. Niklas E?n and Niklas S?rensson. Proceedings of the
  * Sixth International Conference on Theory and Applications of Satisfiability
  * Testing, LNCS 2919, pp 502-518, 2003.
  * 
@@ -21,8 +20,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- *  
+ * 
  */
+
 package org.sat4j.minisat.constraints.pb;
 
 import java.io.Serializable;
@@ -40,26 +40,23 @@ public class MaxWatchPb extends WatchPb implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private long status = 0L;
-
     /**
-     * Constructeur de base creant des contraintes vides
+     * Constructeur de base cr?ant des contraintes vides
      * 
      * @param voc
-     *            Informations sur le vocabulaire employe
+     *            Informations sur le vocabulaire employ?
      * @param ps
-     *            Liste des litteraux
+     *            Liste des litt?raux
      * @param coefs
      *            Liste des coefficients
      * @param moreThan
      *            Indication sur le comparateur
      * @param degree
-     *            Stockage du degre de la contrainte
+     *            Stockage du degr? de la contrainte
      */
-    private MaxWatchPb(ILits voc, IVecInt ps, IVec<BigInteger> bigCoefs,
-        boolean moreThan, BigInteger bigDeg) {
+    private MaxWatchPb(ILits voc, IDataStructurePB mpb) {
 
-        super(ps, bigCoefs, moreThan, bigDeg);
+        super(mpb);
         this.voc = voc;
 
         activity = 0;
@@ -68,7 +65,7 @@ public class MaxWatchPb extends WatchPb implements Serializable {
     }
 
     /**
-     * Permet l'observation de tous les litteraux
+     * Permet l'observation de tous les litt???raux
      * 
      * @see org.sat4j.minisat.constraints.WatchPb#computeWatches()
      */
@@ -76,15 +73,19 @@ public class MaxWatchPb extends WatchPb implements Serializable {
     protected void computeWatches() throws ContradictionException {
         assert watchCumul.equals(BigInteger.ZERO);
         for (int i = 0; i < lits.length; i++) {
-            // Mise e jour de la possibilite initiale
-            voc.watch(lits[i] ^ 1, this);
-            watchCumul = watchCumul.add(coefs[i]);
-        }
-        assert watchCumul.compareTo(recalcLeftSide()) >= 0;
-        if (!learnt) {
-            if (watchCumul.compareTo(degree) < 0) {
-                throw new ContradictionException("non satisfiable constraint");
+            if (voc.isFalsified(lits[i])) {
+                if (learnt)
+                    voc.undos(lits[i] ^ 1).push(this);
+            } else {
+                // Mise ? jour de la possibilit? initiale
+                voc.watch(lits[i] ^ 1, this);
+                watchCumul = watchCumul.add(coefs[i]);
             }
+        }
+
+        assert watchCumul.compareTo(recalcLeftSide()) >= 0;
+        if (!learnt && watchCumul.compareTo(degree) < 0) {
+            throw new ContradictionException("non satisfiable constraint");
         }
     }
 
@@ -95,16 +96,13 @@ public class MaxWatchPb extends WatchPb implements Serializable {
      */
     @Override
     protected void computePropagation(UnitPropagationListener s)
-        throws ContradictionException {
+            throws ContradictionException {
         // On propage
         int ind = 0;
         while (ind < coefs.length
-            && watchCumul.subtract(coefs[ind]).compareTo(degree) < 0) {
-            if (voc.isUnassigned(lits[ind])) {
-                if (!s.enqueue(lits[ind], this)) {
-                    throw new ContradictionException(
-                        "non satisfiable constraint");
-                }
+                && watchCumul.subtract(coefs[ind]).compareTo(degree) < 0) {
+            if (voc.isUnassigned(lits[ind]) && !s.enqueue(lits[ind], this)) {
+                throw new ContradictionException("non satisfiable constraint");
             }
             ind++;
         }
@@ -113,57 +111,59 @@ public class MaxWatchPb extends WatchPb implements Serializable {
 
     /**
      * @param s
-     *            outil pour la propagation des litteraux
+     *            outil pour la propagation des litt?raux
      * @param ps
-     *            liste des litteraux de la nouvelle contrainte
+     *            liste des litt?raux de la nouvelle contrainte
      * @param coefs
-     *            liste des coefficients des litteraux de la contrainte
+     *            liste des coefficients des litt?raux de la contrainte
      * @param moreThan
-     *            determine si c'est une superieure ou egal e l'origine
+     *            d?termine si c'est une sup?rieure ou ?gal ? l'origine
      * @param degree
-     *            fournit le degre de la contrainte
+     *            fournit le degr? de la contrainte
      * @return une nouvelle clause si tout va bien, ou null si un conflit est
-     *         detecte
+     *         d?tect?
      */
     public static MaxWatchPb maxWatchPbNew(UnitPropagationListener s,
-        ILits voc, IVecInt ps, IVecInt coefs, boolean moreThan, int degree)
-        throws ContradictionException {
+            ILits voc, IVecInt ps, IVecInt coefs, boolean moreThan, int degree)
+            throws ContradictionException {
         return maxWatchPbNew(s, voc, ps, toVecBigInt(coefs), moreThan,
-            toBigInt(degree));
+                toBigInt(degree));
     }
 
     /**
      * @param s
-     *            outil pour la propagation des litteraux
+     *            outil pour la propagation des litt?raux
      * @param ps
-     *            liste des litteraux de la nouvelle contrainte
+     *            liste des litt?raux de la nouvelle contrainte
      * @param coefs
-     *            liste des coefficients des litteraux de la contrainte
+     *            liste des coefficients des litt?raux de la contrainte
      * @param moreThan
-     *            determine si c'est une superieure ou egal e l'origine
+     *            d?termine si c'est une sup?rieure ou ?gal ? l'origine
      * @param degree
-     *            fournit le degre de la contrainte
+     *            fournit le degr? de la contrainte
      * @return une nouvelle clause si tout va bien, ou null si un conflit est
-     *         detecte
+     *         d?tect?
      */
     public static MaxWatchPb maxWatchPbNew(UnitPropagationListener s,
-        ILits voc, IVecInt ps, IVec<BigInteger> coefs, boolean moreThan,
-        BigInteger degree) throws ContradictionException {
+            ILits voc, IVecInt ps, IVec<BigInteger> coefs, boolean moreThan,
+            BigInteger degree) throws ContradictionException {
 
-        // Il ne faut pas modifier les parametres
+        // Il ne faut pas modifier les param?tres
         VecInt litsVec = new VecInt();
         IVec<BigInteger> coefsVec = new Vec<BigInteger>();
         ps.copyTo(litsVec);
         coefs.copyTo(coefsVec);
 
-        niceParameter(litsVec, coefsVec);
+        IDataStructurePB mpb = niceParameters(litsVec, coefsVec, moreThan,
+                degree, voc);
 
-        MaxWatchPb outclause = new MaxWatchPb(voc, litsVec, coefsVec, moreThan,
-            degree);
-
-        if (outclause.degree.signum() <= 0) {
+        if (mpb == null) {
             return null;
         }
+        MaxWatchPb outclause = new MaxWatchPb(voc, mpb);
+
+        if (outclause.degree.signum() <= 0)
+            return null;
         outclause.computeWatches();
         outclause.computePropagation(s);
 
@@ -172,52 +172,46 @@ public class MaxWatchPb extends WatchPb implements Serializable {
     }
 
     /**
-     * Propagation de la valeur de verite d'un litteral falsifie
+     * Propagation de la valeur de v?rit? d'un litt?ral falsifi?
      * 
      * @param s
      *            un prouveur
      * @param p
-     *            le litteral propage (il doit etre falsifie)
-     * @return false ssi une inconsistance est detectee
+     *            le litt?ral propag? (il doit etre falsifie)
+     * @return false ssi une inconsistance est d?tect?e
      */
     public boolean propagate(UnitPropagationListener s, int p) {
         voc.watch(p, this);
 
-        assert watchCumul.compareTo(recalcLeftSide()) >= 0;
+        assert watchCumul.compareTo(recalcLeftSide()) >= 0 : "" + watchCumul
+                + "/" + recalcLeftSide() + ":" + learnt;
 
-        // Si le litteral est implique il y a un conflit
+        // Si le litt?ral est impliqu? il y a un conflit
         int indiceP = 0;
-        while ((lits[indiceP] ^ 1) != p) {
+        while ((lits[indiceP] ^ 1) != p)
             indiceP++;
-        }
 
         BigInteger coefP = coefs[indiceP];
 
-        if (watchCumul.subtract(coefP).compareTo(degree) < 0) {
+        BigInteger newcumul = watchCumul.subtract(coefP);
+        if (newcumul.compareTo(degree) < 0) {
             // System.out.println(this.analyse(new ConstrHandle()));
 
             assert !isSatisfiable();
             return false;
         }
 
-        // On met en place la mise e jour du compteur
+        // On met en place la mise ? jour du compteur
         voc.undos(p).push(this);
-        watchCumul = watchCumul.subtract(coefP);
+        watchCumul = newcumul;
 
         // On propage
         int ind = 0;
-        while (ind < coefs.length
-            && watchCumul.subtract(coefs[ind]).compareTo(degree) < 0) {
-            if (voc.isUnassigned(lits[ind])) {
-                if (!s.enqueue(lits[ind], this)) {
-                    // lastConfl = p;
-                    // System.out.println(this.analyse(new ConstrHandle()));
-                    assert !isSatisfiable();
-                    return false;
-                }
-                // logger.fine("litt\ufffd\ufffd\ufffdral impliqu\ufffd\ufffd\ufffd " +
-                // Lits.toString(lits[ind]));
-                // logger.fine(" par la contrainte " + this);
+        BigInteger limit = watchCumul.subtract(degree);
+        while (ind < coefs.length && limit.compareTo(coefs[ind]) < 0) {
+            if (voc.isUnassigned(lits[ind]) && (!s.enqueue(lits[ind], this))) {
+                assert !isSatisfiable();
+                return false;
             }
             ind++;
         }
@@ -228,27 +222,25 @@ public class MaxWatchPb extends WatchPb implements Serializable {
     }
 
     /**
-     * Enleeeve une contrainte du prouveur
+     * Enl???ve une contrainte du prouveur
      */
     public void remove() {
         for (int i = 0; i < lits.length; i++) {
-            if (!voc.isFalsified(lits[i])) {
+            if (!voc.isFalsified(lits[i]))
                 voc.watches(lits[i] ^ 1).remove(this);
-            }
         }
     }
 
     /**
-     * Methode appelee lors du backtrack
+     * M?thode appel?e lors du backtrack
      * 
      * @param p
-     *            un litteral desaffecte
+     *            un litt?ral d?saffect?
      */
     public void undo(int p) {
         int indiceP = 0;
-        while ((lits[indiceP] ^ 1) != p) {
+        while ((lits[indiceP] ^ 1) != p)
             indiceP++;
-        }
 
         assert coefs[indiceP].signum() > 0;
 
@@ -259,38 +251,46 @@ public class MaxWatchPb extends WatchPb implements Serializable {
      * 
      */
     public static WatchPb watchPbNew(ILits voc, IVecInt lits, IVecInt coefs,
-        boolean moreThan, int degree) {
-        return new MaxWatchPb(voc, lits, toVecBigInt(coefs), moreThan,
-            toBigInt(degree));
+            boolean moreThan, int degree) {
+        return watchPbNew(voc, lits, toVecBigInt(coefs), moreThan,
+                toBigInt(degree));
     }
 
     /**
      * 
      */
     public static WatchPb watchPbNew(ILits voc, IVecInt lits,
-        IVec<BigInteger> coefs, boolean moreThan, BigInteger degree) {
-        return new MaxWatchPb(voc, lits, coefs, moreThan, degree);
+            IVec<BigInteger> coefs, boolean moreThan, BigInteger degree) {
+        IDataStructurePB mpb = null;
+        mpb = niceCheckedParameters(lits, coefs, moreThan, degree, voc);
+        return new MaxWatchPb(voc, mpb);
     }
 
-    public void setVoc(ILits newvoc) {
-        voc = newvoc;
-    }
+    /**
+     * @param s
+     *            a unit propagation listener
+     * @param voc
+     *            the vocabulary
+     * @param mpb
+     *            the PB constraint to normalize.
+     * @return a new PB contraint or null if a trivial inconsistency is
+     *         detected.
+     */
+    public static MaxWatchPb normalizedMaxWatchPbNew(UnitPropagationListener s,
+            ILits voc, IDataStructurePB mpb) throws ContradictionException {
+        // Il ne faut pas modifier les param?tres
+        MaxWatchPb outclause = new MaxWatchPb(voc, mpb);
 
-    public void setStatus(long st) {
-        status = st;
-    }
-
-    public long getStatus() {
-        return status;
-    }
-
-    @Override
-    public Object clone() {
-        // TODO: deep copy
-        try {
-            return super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new InternalError(e.toString());
+        if (outclause.degree.signum() <= 0) {
+            return null;
         }
+
+        outclause.computeWatches();
+
+        outclause.computePropagation(s);
+
+        return outclause;
+
     }
+
 }

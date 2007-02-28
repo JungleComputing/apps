@@ -1,12 +1,11 @@
 /*
- * MiniSAT in Java, a Java based-SAT framework Copyright (C) 2004 Daniel Le
- * Berre
+ * SAT4J: a SATisfiability library for Java Copyright (C) 2004-2006 Daniel Le Berre
  * 
  * Based on the original minisat specification from:
  * 
- * An extensible SAT solver. Niklas E???n and Niklas S???rensson. Proceedings of
- * the Sixth International Conference on Theory and Applications of
- * Satisfiability Testing, LNCS 2919, pp 502-518, 2003.
+ * An extensible SAT solver. Niklas E?n and Niklas S?rensson. Proceedings of the
+ * Sixth International Conference on Theory and Applications of Satisfiability
+ * Testing, LNCS 2919, pp 502-518, 2003.
  * 
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,8 +20,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- *  
+ * 
  */
+
 package org.sat4j.minisat.constraints.pb;
 
 import java.io.Serializable;
@@ -43,19 +43,17 @@ public class MinWatchPb extends WatchPb implements Serializable {
     /**
      * Liste des indices des litt???raux regardant la contrainte
      */
-    private boolean[] watched;
+    protected boolean[] watched;
 
     /**
      * Sert ??? d???terminer si la clause est watched par le litt???ral
      */
-    private int[] watching;
+    protected int[] watching;
 
     /**
      * Liste des indices des litt???raux regardant la contrainte
      */
-    private int watchingCount = 0;
-
-    private long status = 0L;
+    protected int watchingCount = 0;
 
     /**
      * Constructeur de base des contraintes
@@ -71,10 +69,9 @@ public class MinWatchPb extends WatchPb implements Serializable {
      * @param degree
      *            Stockage du degr??? de la contrainte
      */
-    private MinWatchPb(ILits voc, IVecInt ps, IVec<BigInteger> bigCoefs,
-        boolean moreThan, BigInteger bigDeg) {
+    protected MinWatchPb(ILits voc, IDataStructurePB mpb) {
 
-        super(ps, bigCoefs, moreThan, bigDeg);
+        super(mpb);
         this.voc = voc;
 
         watching = new int[this.coefs.length];
@@ -82,7 +79,6 @@ public class MinWatchPb extends WatchPb implements Serializable {
         activity = 0;
         watchCumul = BigInteger.ZERO;
         locked = false;
-        undos = new VecInt();
 
         watchingCount = 0;
 
@@ -98,7 +94,7 @@ public class MinWatchPb extends WatchPb implements Serializable {
         assert watchCumul.signum() == 0;
         assert watchingCount == 0;
         for (int i = 0; i < lits.length
-            && watchCumul.subtract(coefs[0]).compareTo(degree) < 0; i++) {
+                && watchCumul.subtract(coefs[0]).compareTo(degree) < 0; i++) {
             if (!voc.isFalsified(lits[i])) {
                 voc.watch(lits[i] ^ 1, this);
                 watching[watchingCount++] = i;
@@ -108,46 +104,50 @@ public class MinWatchPb extends WatchPb implements Serializable {
             }
         }
 
-        if (learnt) {
-            // chercher tous les litteraux a regarder
-            // par ordre de niveau decroissant
-            int free = 1;
-
-            while ((watchCumul.subtract(coefs[0]).compareTo(degree) < 0)
-                && (free > 0)) {
-                free = 0;
-                // regarder le litteral falsifie au plus bas niveau
-                int maxlevel = -1, maxi = -1;
-                for (int i = 0; i < lits.length; i++) {
-
-                    if (voc.isFalsified(lits[i]) && !watched[i]) {
-                        free++;
-                        int level = voc.getLevel(lits[i]);
-                        if (level > maxlevel) {
-                            maxi = i;
-                            maxlevel = level;
-                        }
-                    }
-
-                }
-                if (free > 0) {
-                    assert maxi >= 0;
-                    voc.watch(lits[maxi] ^ 1, this);
-                    watching[watchingCount++] = maxi;
-                    watched[maxi] = true;
-                    // Mise ??? jour de la possibilit??? initiale
-                    watchCumul = watchCumul.add(coefs[maxi]);
-                    free--;
-                    assert free >= 0;
-                }
-            }
-            assert lits.length == 1 || watchingCount > 1;
-        }
+        if (learnt)
+            watchMoreForLearntConstraint();
 
         if (watchCumul.compareTo(degree) < 0) {
             throw new ContradictionException("non satisfiable constraint");
         }
         assert nbOfWatched() == watchingCount;
+    }
+
+    private void watchMoreForLearntConstraint() {
+        // chercher tous les litteraux a regarder
+        // par ordre de niveau decroissant
+        int free = 1;
+        int maxlevel, maxi, level;
+
+        while ((watchCumul.subtract(coefs[0]).compareTo(degree) < 0)
+                && (free > 0)) {
+            free = 0;
+            // regarder le litteral falsifie au plus bas niveau
+            maxlevel = -1;
+            maxi = -1;
+            for (int i = 0; i < lits.length; i++) {
+                if (voc.isFalsified(lits[i]) && !watched[i]) {
+                    free++;
+                    level = voc.getLevel(lits[i]);
+                    if (level > maxlevel) {
+                        maxi = i;
+                        maxlevel = level;
+                    }
+                }
+            }
+
+            if (free > 0) {
+                assert maxi >= 0;
+                voc.watch(lits[maxi] ^ 1, this);
+                watching[watchingCount++] = maxi;
+                watched[maxi] = true;
+                // Mise ??? jour de la possibilit??? initiale
+                watchCumul = watchCumul.add(coefs[maxi]);
+                free--;
+                assert free >= 0;
+            }
+        }
+        assert lits.length == 1 || watchingCount > 1;
     }
 
     /*
@@ -157,16 +157,13 @@ public class MinWatchPb extends WatchPb implements Serializable {
      */
     @Override
     protected void computePropagation(UnitPropagationListener s)
-        throws ContradictionException {
+            throws ContradictionException {
         // On propage si n???cessaire
         int ind = 0;
         while (ind < lits.length
-            && watchCumul.subtract(coefs[watching[ind]]).compareTo(degree) < 0) {
-            if (voc.isUnassigned(lits[ind])) {
-                if (!s.enqueue(lits[ind], this)) {
-                    throw new ContradictionException(
-                        "non satisfiable constraint");
-                }
+                && watchCumul.subtract(coefs[watching[ind]]).compareTo(degree) < 0) {
+            if (voc.isUnassigned(lits[ind]) && !s.enqueue(lits[ind], this)) {
+                throw new ContradictionException("non satisfiable constraint");
             }
             ind++;
         }
@@ -187,10 +184,10 @@ public class MinWatchPb extends WatchPb implements Serializable {
      *         d???tect???
      */
     public static MinWatchPb minWatchPbNew(UnitPropagationListener s,
-        ILits voc, IVecInt ps, IVecInt coefs, boolean moreThan, int degree)
-        throws ContradictionException {
+            ILits voc, IVecInt ps, IVecInt coefs, boolean moreThan, int degree)
+            throws ContradictionException {
         return minWatchPbNew(s, voc, ps, toVecBigInt(coefs), moreThan,
-            toBigInt(degree));
+                toBigInt(degree));
     }
 
     /**
@@ -208,8 +205,8 @@ public class MinWatchPb extends WatchPb implements Serializable {
      *         d???tect???
      */
     public static MinWatchPb minWatchPbNew(UnitPropagationListener s,
-        ILits voc, IVecInt ps, IVec<BigInteger> coefs, boolean moreThan,
-        BigInteger degree) throws ContradictionException {
+            ILits voc, IVecInt ps, IVec<BigInteger> coefs, boolean moreThan,
+            BigInteger degree) throws ContradictionException {
         // Il ne faut pas modifier les param?tres
         VecInt litsVec = new VecInt(ps.size());
         IVec<BigInteger> coefsVec = new Vec<BigInteger>(coefs.size());
@@ -217,9 +214,40 @@ public class MinWatchPb extends WatchPb implements Serializable {
         coefs.copyTo(coefsVec);
 
         // Ajouter les simplifications quand la structure sera d???finitive
-        niceParameter(litsVec, coefsVec);
-        MinWatchPb outclause = new MinWatchPb(voc, litsVec, coefsVec, moreThan,
-            degree);
+        IDataStructurePB mpb = niceParameters(litsVec, coefsVec, moreThan,
+                degree, voc);
+
+        if (mpb == null)
+            return null;
+
+        MinWatchPb outclause = new MinWatchPb(voc, mpb);
+
+        if (outclause.degree.signum() <= 0) {
+            return null;
+        }
+
+        outclause.computeWatches();
+
+        outclause.computePropagation(s);
+
+        return outclause;
+
+    }
+
+    /**
+     * @param s
+     *            a unit propagation listener
+     * @param voc
+     *            the vocabulary
+     * @param mpb
+     *            the PB constraint to normalize.
+     * @return a new PB contraint or null if a trivial inconsistency is
+     *         detected.
+     */
+    public static MinWatchPb normalizedMinWatchPbNew(UnitPropagationListener s,
+            ILits voc, IDataStructurePB mpb) throws ContradictionException {
+        // Il ne faut pas modifier les param?tres
+        MinWatchPb outclause = new MinWatchPb(voc, mpb);
 
         if (outclause.degree.signum() <= 0) {
             return null;
@@ -241,11 +269,9 @@ public class MinWatchPb extends WatchPb implements Serializable {
     protected int nbOfWatched() {
         int retour = 0;
         for (int ind = 0; ind < this.watched.length; ind++) {
-            for (int i = 0; i < watchingCount; i++) {
-                if (watching[i] == ind) {
+            for (int i = 0; i < watchingCount; i++)
+                if (watching[i] == ind)
                     assert watched[ind];
-                }
-            }
             retour += (this.watched[ind]) ? 1 : 0;
         }
         return retour;
@@ -262,14 +288,13 @@ public class MinWatchPb extends WatchPb implements Serializable {
      */
     public boolean propagate(UnitPropagationListener s, int p) {
         assert nbOfWatched() == watchingCount;
-
         assert watchingCount > 1;
+
         // Recherche de l'indice du litt???ral p
         int pIndiceWatching = 0;
         while (pIndiceWatching < watchingCount
-            && (lits[watching[pIndiceWatching]] ^ 1) != p) {
+                && (lits[watching[pIndiceWatching]] ^ 1) != p)
             pIndiceWatching++;
-        }
         int pIndice = watching[pIndiceWatching];
 
         assert p == (lits[pIndice] ^ 1);
@@ -277,61 +302,33 @@ public class MinWatchPb extends WatchPb implements Serializable {
 
         // Recherche du coefficient maximal parmi ceux des litt???raux
         // observ???s
-        BigInteger maxCoef = BigInteger.ZERO;
-        for (int i = 0; i < watchingCount; i++) {
-            if (coefs[watching[i]].compareTo(maxCoef) > 0
-                && watching[i] != pIndice) {
-                maxCoef = coefs[watching[i]];
-            }
-        }
-
-        assert learnt || maxCoef.signum() != 0;
-        // DLB assert maxCoef!=0;
+        BigInteger maxCoef = maximalCoefficient(pIndice);
 
         // Recherche de la compensation
-        int ind;
-        if (watchingCount >= size()) {
-            ind = lits.length;
-        } else {
-            ind = 0;
-            while (ind < lits.length
-                && watchCumul.subtract(coefs[pIndice]).subtract(maxCoef)
-                    .compareTo(degree) < 0) {
-                if (!voc.isFalsified(lits[ind]) && !watched[ind]) {
-                    watchCumul = watchCumul.add(coefs[ind]);
-                    watched[ind] = true;
-                    assert watchingCount < size();
-                    watching[watchingCount++] = ind;
-                    voc.watch(lits[ind] ^ 1, this);
-                    // Si on obtient un nouveau coefficient maximum
-                    if (coefs[ind].compareTo(maxCoef) > 0) {
-                        maxCoef = coefs[ind];
-                    }
-                }
-                ind++;
-            }
-        }
+        maxCoef = updateWatched(maxCoef, pIndice);
+
+        BigInteger upWatchCumul = watchCumul.subtract(coefs[pIndice]);
         assert nbOfWatched() == watchingCount;
 
         // Effectuer les propagations, return si l'une est impossible
-        if (watchCumul.subtract(coefs[pIndice]).compareTo(degree) < 0) {
+        if (upWatchCumul.compareTo(degree) < 0) {
+            // conflit
             voc.watch(p, this);
             assert watched[pIndice];
             assert !isSatisfiable();
             return false;
-        } else if (ind >= lits.length) {
+        } else if (upWatchCumul.compareTo(degree.add(maxCoef)) < 0) {
 
             assert watchingCount != 0;
+            BigInteger limit = upWatchCumul.subtract(degree);
             for (int i = 0; i < watchingCount; i++) {
-                if (watchCumul.subtract(coefs[pIndice]).subtract(
-                    coefs[watching[i]]).compareTo(degree) < 0
-                    && i != pIndiceWatching) {
-                    if (!voc.isSatisfied(lits[watching[i]])
+                if (limit.compareTo(coefs[watching[i]]) < 0
+                        && i != pIndiceWatching
+                        && !voc.isSatisfied(lits[watching[i]])
                         && !s.enqueue(lits[watching[i]], this)) {
-                        voc.watch(p, this);
-                        assert !isSatisfiable();
-                        return false;
-                    }
+                    voc.watch(p, this);
+                    assert !isSatisfiable();
+                    return false;
                 }
             }
             // Si propagation ajoute la contrainte aux undos de p, conserver p
@@ -340,7 +337,7 @@ public class MinWatchPb extends WatchPb implements Serializable {
 
         // sinon p peut sortir de la liste de watched
         watched[pIndice] = false;
-        watchCumul = watchCumul.subtract(coefs[pIndice]);
+        watchCumul = upWatchCumul;
         watching[pIndiceWatching] = watching[--watchingCount];
 
         assert watchingCount != 0;
@@ -370,9 +367,8 @@ public class MinWatchPb extends WatchPb implements Serializable {
     public void undo(int p) {
         voc.watch(p, this);
         int pIndice = 0;
-        while ((lits[pIndice] ^ 1) != p) {
+        while ((lits[pIndice] ^ 1) != p)
             pIndice++;
-        }
 
         assert pIndice < lits.length;
 
@@ -390,38 +386,80 @@ public class MinWatchPb extends WatchPb implements Serializable {
      * 
      */
     public static WatchPb watchPbNew(ILits voc, IVecInt lits, IVecInt coefs,
-        boolean moreThan, int degree) {
-        return new MinWatchPb(voc, lits, toVecBigInt(coefs), moreThan,
-            toBigInt(degree));
+            boolean moreThan, int degree) {
+        return watchPbNew(voc, lits, toVecBigInt(coefs), moreThan,
+                toBigInt(degree));
     }
 
     /**
      * 
      */
     public static WatchPb watchPbNew(ILits voc, IVecInt lits,
-        IVec<BigInteger> coefs, boolean moreThan, BigInteger degree) {
-        return new MinWatchPb(voc, lits, coefs, moreThan, degree);
+            IVec<BigInteger> coefs, boolean moreThan, BigInteger degree) {
+        IDataStructurePB mpb = null;
+        mpb = niceCheckedParameters(lits, coefs, moreThan, degree, voc);
+        return new MinWatchPb(voc, mpb);
     }
 
-    public void setVoc(ILits newvoc) {
-        voc = newvoc;
+    /**
+     * 
+     */
+    public static WatchPb normalizedWatchPbNew(ILits voc, IDataStructurePB mpb)
+            throws ContradictionException {
+        return new MinWatchPb(voc, mpb);
     }
 
-    public void setStatus(long st) {
-        status = st;
+    /**
+     * returns the maximal coefficient for the watched literals
+     * 
+     * @param pIndice
+     *            propagated literal : its coefficient is excluded from the
+     *            search of the maximal coefficient
+     * @return
+     */
+    protected BigInteger maximalCoefficient(int pIndice) {
+        BigInteger maxCoef = BigInteger.ZERO;
+        for (int i = 0; i < watchingCount; i++)
+            if (coefs[watching[i]].compareTo(maxCoef) > 0
+                    && watching[i] != pIndice) {
+                maxCoef = coefs[watching[i]];
+            }
+
+        assert learnt || maxCoef.signum() != 0;
+        // DLB assert maxCoef!=0;
+        return maxCoef;
     }
 
-    public long getStatus() {
-        return status;
-    }
+    protected BigInteger updateWatched(BigInteger mc, int pIndice) {
+        BigInteger maxCoef = mc;
+        if (watchingCount < size()) {
+            BigInteger upWatchCumul = watchCumul.subtract(coefs[pIndice]);
 
-    @Override
-    public Object clone() {
-        // TODO: deep copy
-        try {
-            return super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new InternalError(e.toString());
+            BigInteger degreePlusMaxCoef = degree.add(maxCoef); // dvh
+            for (int ind = 0; ind < lits.length; ind++) {
+                if (upWatchCumul.compareTo(degreePlusMaxCoef) >= 0) {
+                    // note: logic negated to old version // dvh
+                    break;
+                }
+
+                if (!voc.isFalsified(lits[ind]) && !watched[ind]) {
+                    upWatchCumul = upWatchCumul.add(coefs[ind]);
+                    watched[ind] = true;
+                    assert watchingCount < size();
+                    watching[watchingCount++] = ind;
+                    voc.watch(lits[ind] ^ 1, this);
+                    // Si on obtient un nouveau coefficient maximum
+                    if (coefs[ind].compareTo(maxCoef) > 0) {
+                        maxCoef = coefs[ind];
+                        degreePlusMaxCoef = degree.add(maxCoef); // update
+                        // that one
+                        // too
+                    }
+                }
+            }
+            watchCumul = upWatchCumul.add(coefs[pIndice]);
         }
+        return maxCoef;
     }
+
 }

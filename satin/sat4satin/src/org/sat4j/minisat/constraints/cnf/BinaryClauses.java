@@ -1,9 +1,28 @@
 /*
- * Created on 25 mai 2004
- *
- * To change the template for this generated file go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ * SAT4J: a SATisfiability library for Java Copyright (C) 2004-2006 Daniel Le Berre
+ * 
+ * Based on the original minisat specification from:
+ * 
+ * An extensible SAT solver. Niklas E?n and Niklas S?rensson. Proceedings of the
+ * Sixth International Conference on Theory and Applications of Satisfiability
+ * Testing, LNCS 2919, pp 502-518, 2003.
+ * 
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
+
 package org.sat4j.minisat.constraints.cnf;
 
 import java.io.Serializable;
@@ -18,21 +37,17 @@ import org.sat4j.specs.IVecInt;
  * @author leberre To change the template for this generated type comment go to
  *         Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
-public class BinaryClauses implements Constr, Cloneable, Serializable {
+public class BinaryClauses implements Constr, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    // private final ILits voc;
-    private ILits voc;
+    private final ILits voc;
 
-    // private final IVecInt clauses = new VecInt();
-    private IVecInt clauses = new VecInt();
+    private final IVecInt clauses = new VecInt();
 
     private final int reason;
 
     private int conflictindex = -1;
-
-    private long status = 0L;
 
     /**
      * 
@@ -80,15 +95,14 @@ public class BinaryClauses implements Constr, Cloneable, Serializable {
      * @see org.sat4j.minisat.Constr#simplify()
      */
     public boolean simplify() {
-        System.out.println("simplify BC:" + this);
-        for (int i = 0; i < clauses.size(); i++) {
-            if (voc.isSatisfied(clauses.get(i))) {
-                System.out.println("satisfied " + clauses.get(i));
+        IVecInt locclauses = clauses;
+        final int size = clauses.size();
+        for (int i = 0; i < size; i++) {
+            if (voc.isSatisfied(locclauses.get(i))) {
                 return true;
             }
-            if (voc.isFalsified(clauses.get(i))) {
-                System.out.println("delete falsified " + clauses.get(i));
-                clauses.delete(i);
+            if (voc.isFalsified(locclauses.get(i))) {
+                locclauses.delete(i);
             }
 
         }
@@ -208,58 +222,12 @@ public class BinaryClauses implements Constr, Cloneable, Serializable {
         throw new UnsupportedOperationException();
     }
 
-    final boolean debug = false;
-
-    public void setVoc(ILits newvoc) {
-        if (debug) {
-            System.out.println("BC setVoc " + this.toString() + ": " + newvoc);
-        }
-        voc = newvoc;
+    // SATIN
+    public void setLearntGlobal() {
+	// TODO
     }
 
-    public void updateVoc(ILits newvoc) {
-        if (debug) {
-            System.out.println("BC updateVoc " + this.toString() + ": "
-                + newvoc);
-        }
-        voc = newvoc;
-    }
-
-    @Override
-    public String toString() {
-        StringBuffer stb = new StringBuffer();
-
-        stb.append("BC:");
-        for (int i = 0; i < clauses.size() - 1; i++) {
-            stb.append(clauses.get(i));
-            stb.append(",");
-        }
-        if (clauses.size() > 0) {
-            stb.append(clauses.get(clauses.size() - 1));
-        }
-        return stb.toString();
-    }
-
-    public void setStatus(long st) {
-        status = st;
-    }
-
-    public long getStatus() {
-        return status;
-    }
-
-    @Override
-    public Object clone() {
-        BinaryClauses clone;
-
-        try {
-            clone = (BinaryClauses) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new InternalError(e.toString());
-        }
-
-        clone.clauses = (VecInt) clone.clauses.clone();
-
-        return clone;
+    public boolean learntGlobal() {
+        return false;
     }
 }

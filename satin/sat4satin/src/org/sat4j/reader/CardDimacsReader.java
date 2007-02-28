@@ -1,3 +1,27 @@
+/*
+ * SAT4J: a SATisfiability library for Java Copyright (C) 2004-2006 Daniel Le Berre
+ * 
+ * Based on the original minisat specification from:
+ * 
+ * An extensible SAT solver. Niklas E?n and Niklas S?rensson. Proceedings of the
+ * Sixth International Conference on Theory and Applications of Satisfiability
+ * Testing, LNCS 2919, pp 502-518, 2003.
+ * 
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
+ */
 package org.sat4j.reader;
 
 import java.io.IOException;
@@ -13,7 +37,6 @@ import org.sat4j.specs.IVecInt;
  * A reader for cardinality contraints.
  * 
  * @author leberre
- *
  */
 @Deprecated
 public class CardDimacsReader extends DimacsReader {
@@ -39,7 +62,7 @@ public class CardDimacsReader extends DimacsReader {
      */
     @Override
     protected void readConstrs(LineNumberReader in) throws IOException,
-        ParseFormatException, ContradictionException {
+            ParseFormatException, ContradictionException {
         int lit;
         String line;
         StringTokenizer stk;
@@ -68,7 +91,7 @@ public class CardDimacsReader extends DimacsReader {
             }
             if (line.startsWith("%") && expectedNbOfConstr == realNbOfClauses) {
                 System.out
-                    .println("Ignoring the rest of the file (SATLIB format");
+                        .println("Ignoring the rest of the file (SATLIB format");
                 break;
             }
             stk = new StringTokenizer(line);
@@ -78,46 +101,44 @@ public class CardDimacsReader extends DimacsReader {
                 // on lit le prochain token
                 token = stk.nextToken();
 
-                if ((token.equals("<=")) || (token.equals(">="))) {
+                if ("<=".equals(token) || ">=".equals(token)) {
                     // on est sur une contrainte de cardinalit?
                     readCardinalityConstr(token, stk, literals);
                     literals.clear();
                     realNbOfClauses++;
                 } else {
                     lit = Integer.parseInt(token);
-
-                    if (lit != 0) {
-                        literals.push(lit);
-                    } else {
+                    if (lit == 0) {
                         if (literals.size() > 0) {
                             solver.addClause(literals);
                             literals.clear();
                             realNbOfClauses++;
                         }
+                    } else {
+                        literals.push(lit);
                     }
-
                 }
             }
         }
         if (expectedNbOfConstr != realNbOfClauses) {
             throw new ParseFormatException("wrong nbclauses parameter. Found "
-                + realNbOfClauses + ", " + expectedNbOfConstr + " expected");
+                    + realNbOfClauses + ", " + expectedNbOfConstr + " expected");
         }
     }
 
     private void readCardinalityConstr(String token, StringTokenizer stk,
-        IVecInt literals) throws ContradictionException, ParseFormatException {
+            IVecInt literals) throws ContradictionException,
+            ParseFormatException {
         int card = Integer.parseInt(stk.nextToken());
         int lit = Integer.parseInt(stk.nextToken());
         if (lit == 0) {
-            if (token.equals("<=")) {
+            if ("<=".equals(token)) {
                 solver.addAtMost(literals, card);
-            } else if (token.equals(">=")) {
+            } else if (">=".equals(token)) {
                 solver.addAtLeast(literals, card);
             }
-        } else {
+        } else
             throw new ParseFormatException();
-        }
     }
 
 }

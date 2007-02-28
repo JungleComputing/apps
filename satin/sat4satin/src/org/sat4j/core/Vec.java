@@ -1,33 +1,32 @@
 /*
- * SAT4J: a SATisfiability library for Java   
- * Copyright (C) 2004 Daniel Le Berre
+ * SAT4J: a SATisfiability library for Java Copyright (C) 2004-2006 Daniel Le Berre
  * 
  * Based on the original minisat specification from:
  * 
- * An extensible SAT solver. Niklas En and Niklas Srensson.
- * Proceedings of the Sixth International Conference on Theory 
- * and Applications of Satisfiability Testing, LNCS 2919, 
- * pp 502-518, 2003.
+ * An extensible SAT solver. Niklas E?n and Niklas S?rensson. Proceedings of the
+ * Sixth International Conference on Theory and Applications of Satisfiability
+ * Testing, LNCS 2919, pp 502-518, 2003.
  * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *  
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package org.sat4j.core;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -35,38 +34,60 @@ import java.util.Random;
 
 import org.sat4j.specs.IVec;
 
-//
-import java.lang.reflect.Method;
-
 /**
- * Simple but efficient vector implementation, based on the 
- * vector implementation available in MiniSAT.
+ * Simple but efficient vector implementation, based on the vector
+ * implementation available in MiniSAT. Note that the elements are compared
+ * using their references, not using the equals method.
  * 
  * @author leberre
  */
-public class Vec<T> implements Serializable, Cloneable, IVec<T> {
+public class Vec<T> implements Serializable, IVec<T> {
 
     private static final long serialVersionUID = 1L;
 
     private static final int RANDOM_SEED = 91648253;
 
+    /**
+     * Create a Vector with an initial capacity of 5 elements.
+     */
     public Vec() {
         this(5);
     }
 
+    /**
+     * Adapter method to translate an array of int into an IVec.
+     * 
+     * The array is used inside the Vec, so the elements may be modified outside
+     * the Vec. But it should not take much memory. The size of the created Vec
+     * is the length of the array.
+     * 
+     * @param elts
+     *            a filled array of T.
+     */
+    public Vec(T[] elts) {
+        myarray = elts;
+        nbelem = elts.length;
+    }
+
+    /**
+     * Create a Vector with a given capacity.
+     * 
+     * @param size
+     *            the capacity of the vector.
+     */
     @SuppressWarnings("unchecked")
     public Vec(int size) {
         myarray = (T[]) new Object[size];
     }
 
     /**
-     * Construit un vecteur contenant de taille size rempli  l'aide de size
+     * Construit un vecteur contenant de taille size rempli � l'aide de size
      * pad.
      * 
      * @param size
      *            la taille du vecteur
      * @param pad
-     *            l'objet servant  remplir le vecteur
+     *            l'objet servant � remplir le vecteur
      */
     @SuppressWarnings("unchecked")
     public Vec(int size, T pad) {
@@ -90,7 +111,7 @@ public class Vec<T> implements Serializable, Cloneable, IVec<T> {
      *            the number of elements to remove.
      */
     public void shrink(int nofelems) {
-        assert nofelems <= size();
+        assert nofelems <= nbelem;
         while (nofelems-- > 0) {
             myarray[--nbelem] = null;
         }
@@ -180,9 +201,8 @@ public class Vec<T> implements Serializable, Cloneable, IVec<T> {
     }
 
     public void clear() {
-        while (nbelem > 0) {
-            myarray[--nbelem] = null;
-        }
+        Arrays.fill(myarray, 0, nbelem, null);
+        nbelem = 0;
     }
 
     /**
@@ -196,19 +216,20 @@ public class Vec<T> implements Serializable, Cloneable, IVec<T> {
         return myarray[nbelem - 1];
     }
 
-    public T get(int i) {
-        return myarray[i];
+    public T get(final int index) {
+        return myarray[index];
     }
 
-    public void set(int i, T o) {
-        myarray[i] = o;
+    public void set(int index, T elem) {
+        myarray[index] = elem;
     }
 
     /**
-     * Enleve un element qui se trouve dans le vecteur!!!
+     * Remove an element that belongs to the Vector. The method will break if
+     * the element does not belong to the vector.
      * 
      * @param elem
-     *            un element du vecteur
+     *            an element from the vector.
      */
     public void remove(T elem) {
         assert size() > 0;
@@ -216,65 +237,40 @@ public class Vec<T> implements Serializable, Cloneable, IVec<T> {
         for (; myarray[j] != elem; j++) {
             assert j < size();
         }
-        for (; j < size() - 1; j++) {
-            myarray[j] = myarray[j + 1];
-        }
-        pop();
+        // arraycopy is always faster than manual copy
+        System.arraycopy(myarray, j + 1, myarray, j, size() - j - 1);
+        myarray[--nbelem] = null;
     }
 
     /**
      * Delete the ith element of the vector. The latest element of the vector
      * replaces the removed element at the ith indexer.
      * 
-     * @param i
+     * @param index
      *            the indexer of the element in the vector
      * @return the former ith element of the vector that is now removed from the
      *         vector
      */
-    public T delete(int i) {
-        assert i >= 0;
-        assert i < nbelem;
-        T ith = myarray[i];
-        myarray[i] = myarray[--nbelem];
+    public T delete(int index) {
+        assert index >= 0 && index < nbelem;
+        T ith = myarray[index];
+        myarray[index] = myarray[--nbelem];
         myarray[nbelem] = null;
         return ith;
     }
 
     /**
-     * Ces operations devraient se faire en temps constant. Ce n'est pas le
+     * Ces op�rations devraient se faire en temps constant. Ce n'est pas le
      * cas ici.
      * 
      * @param copy
      */
     public void copyTo(IVec<T> copy) {
-        Vec<T> ncopy = (Vec<T>) copy;
-        int nsize = nbelem + ncopy.nbelem;
+        final Vec<T> ncopy = (Vec<T>) copy;
+        final int nsize = nbelem + ncopy.nbelem;
         copy.ensure(nsize);
-        for (int i = 0; i < nbelem; i++) {
-            ncopy.myarray[i + ncopy.nbelem] = myarray[i];
-        }
+        System.arraycopy(myarray, 0, ncopy.myarray, ncopy.nbelem, nbelem);
         ncopy.nbelem = nsize;
-    }
-
-    @Override
-    public Vec<T> clone() {
-        Vec<T> clone;
-
-        try {
-            clone = (Vec<T>) super.clone();
-
-            clone.myarray = (T[]) new Object[this.myarray.length];
-            for (int i = 0; i < nbelem; i++) {
-                Class<?> clzz = this.myarray[i].getClass();
-                Method meth = clzz.getMethod("clone", new Class[0]);
-                Object dupl = meth.invoke(this.myarray[i], new Object[0]);
-                clone.myarray[i] = (T) dupl;
-            }
-        } catch (Exception e) {
-            throw new InternalError(e.toString());
-        }
-
-        return clone;
     }
 
     /**
@@ -298,6 +294,10 @@ public class Vec<T> implements Serializable, Cloneable, IVec<T> {
         myarray[source] = null;
     }
 
+    public T[] toArray() {
+        return myarray;
+    }
+
     private int nbelem;
 
     private T[] myarray;
@@ -312,7 +312,7 @@ public class Vec<T> implements Serializable, Cloneable, IVec<T> {
         StringBuffer stb = new StringBuffer();
         for (int i = 0; i < nbelem - 1; i++) {
             stb.append(myarray[i]);
-            stb.append(",\n");
+            stb.append(","); //$NON-NLS-1$
         }
         if (nbelem > 0) {
             stb.append(myarray[nbelem - 1]);
@@ -329,9 +329,8 @@ public class Vec<T> implements Serializable, Cloneable, IVec<T> {
         for (i = from; i < to - 1; i++) {
             best_i = i;
             for (j = i + 1; j < to; j++) {
-                if (cmp.compare(myarray[j], myarray[best_i]) < 0) {
+                if (cmp.compare(myarray[j], myarray[best_i]) < 0)
                     best_i = j;
-                }
             }
             tmp = myarray[i];
             myarray[i] = myarray[best_i];
@@ -341,25 +340,25 @@ public class Vec<T> implements Serializable, Cloneable, IVec<T> {
 
     void sort(int from, int to, Comparator<T> cmp) {
         int width = to - from;
-        if (to - from <= 15) {
+        if (to - from <= 15)
             selectionSort(from, to, cmp);
-        } else {
+
+        else {
             T pivot = myarray[rand.nextInt(width) + from];
             T tmp;
             int i = from - 1;
             int j = to;
 
             for (;;) {
-                do {
+                do
                     i++;
-                } while (cmp.compare(myarray[i], pivot) < 0);
-                do {
+                while (cmp.compare(myarray[i], pivot) < 0);
+                do
                     j--;
-                } while (cmp.compare(pivot, myarray[j]) < 0);
+                while (cmp.compare(pivot, myarray[j]) < 0);
 
-                if (i >= j) {
+                if (i >= j)
                     break;
-                }
 
                 tmp = myarray[i];
                 myarray[i] = myarray[j];
@@ -382,9 +381,8 @@ public class Vec<T> implements Serializable, Cloneable, IVec<T> {
         int i, j;
         T last;
 
-        if (nbelem == 0) {
+        if (nbelem == 0)
             return;
-        }
 
         sort(0, nbelem, cmp);
 
@@ -400,14 +398,6 @@ public class Vec<T> implements Serializable, Cloneable, IVec<T> {
         nbelem = i;
     }
 
-    public static final <A extends Comparable<A>> Comparator<A> defaultComparator() {
-        return new Comparator<A>() {
-            public int compare(A a, A b) {
-                return a.compareTo(b);
-            }
-        };
-    }
-
     /*
      * (non-Javadoc)
      * 
@@ -417,9 +407,8 @@ public class Vec<T> implements Serializable, Cloneable, IVec<T> {
     public boolean equals(Object obj) {
         if (obj instanceof IVec) {
             IVec<?> v = (IVec<?>) obj;
-            if (v.size() != size()) {
+            if (v.size() != size())
                 return false;
-            }
             for (int i = 0; i < size(); i++) {
                 if (!v.get(i).equals(get(i))) {
                     return false;
@@ -439,7 +428,7 @@ public class Vec<T> implements Serializable, Cloneable, IVec<T> {
     public int hashCode() {
         int sum = 0;
         for (int i = 0; i < nbelem; i++) {
-            sum += myarray.hashCode() / nbelem;
+            sum += myarray[i].hashCode() / nbelem;
         }
         return sum;
     }
@@ -453,9 +442,8 @@ public class Vec<T> implements Serializable, Cloneable, IVec<T> {
             }
 
             public T next() {
-                if (i == nbelem) {
+                if (i == nbelem)
                     throw new NoSuchElementException();
-                }
                 return myarray[i++];
             }
 
@@ -463,5 +451,9 @@ public class Vec<T> implements Serializable, Cloneable, IVec<T> {
                 throw new UnsupportedOperationException();
             }
         };
+    }
+
+    public boolean isEmpty() {
+        return nbelem == 0;
     }
 }

@@ -1,9 +1,28 @@
 /*
- * Created on 1 juin 2004
- *
- * To change the template for this generated file go to
- * Window - Preferences - Java - Code Generation - Code and Comments
+ * SAT4J: a SATisfiability library for Java Copyright (C) 2004-2006 Daniel Le Berre
+ * 
+ * Based on the original minisat specification from:
+ * 
+ * An extensible SAT solver. Niklas E?n and Niklas S?rensson. Proceedings of the
+ * Sixth International Conference on Theory and Applications of Satisfiability
+ * Testing, LNCS 2919, pp 502-518, 2003.
+ * 
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
+
 package org.sat4j.minisat.constraints.cnf;
 
 import java.io.Serializable;
@@ -22,15 +41,11 @@ public class TernaryClauses implements Constr, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    // private final IVecInt stubs = new VecInt();
-    private IVecInt stubs = new VecInt();
+    private final IVecInt stubs = new VecInt();
 
-    // private final ILits voc;
-    private ILits voc;
+    private final ILits voc;
 
     private final int phead;
-
-    private long status = 0L;
 
     public TernaryClauses(ILits voc, int p) {
         this.voc = voc;
@@ -67,16 +82,10 @@ public class TernaryClauses implements Constr, Serializable {
             if (voc.isSatisfied(a) || voc.isSatisfied(b)) {
                 continue;
             }
-            if (voc.isFalsified(a)) {
-                if (!s.enqueue(b, this)) {
-                    return false;
-                }
-            } else {
-                if (voc.isFalsified(b)) {
-                    if (!s.enqueue(a, this)) {
-                        return false;
-                    }
-                }
+            if (voc.isFalsified(a) && !s.enqueue(b, this)) {
+                return false;
+            } else if (voc.isFalsified(b) && !s.enqueue(a, this)) {
+                return false;
             }
         }
         return true;
@@ -109,7 +118,7 @@ public class TernaryClauses implements Constr, Serializable {
         if (p == ILits.UNDEFINED) {
             int i = 0;
             while (!voc.isFalsified(stubs.get(i))
-                || !voc.isFalsified(stubs.get(i + 1))) {
+                    || !voc.isFalsified(stubs.get(i + 1))) {
                 i += 2;
             }
             outReason.push(this.phead ^ 1);
@@ -213,30 +222,11 @@ public class TernaryClauses implements Constr, Serializable {
         throw new UnsupportedOperationException();
     }
 
-    public void setVoc(ILits newvoc) {
-        voc = newvoc;
+    // SATIN
+    public void setLearntGlobal() {
     }
 
-    public void setStatus(long st) {
-        status = st;
-    }
-
-    public long getStatus() {
-        return status;
-    }
-
-    @Override
-    public Object clone() {
-        TernaryClauses clone;
-
-        try {
-            clone = (TernaryClauses) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new InternalError(e.toString());
-        }
-
-        clone.stubs = (VecInt) clone.stubs.clone();
-
-        return clone;
+    public boolean learntGlobal() {
+        return false;
     }
 }

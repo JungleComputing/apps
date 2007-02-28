@@ -1,51 +1,46 @@
 /*
- * SAT4J: a SATisfiability library for Java Copyright (C) 2004 Daniel Le Berre
+ * SAT4J: a SATisfiability library for Java Copyright (C) 2004-2006 Daniel Le Berre
  * 
  * Based on the original minisat specification from:
  * 
- * An extensible SAT solver. Niklas E?n and Niklas S?rensson. Proceedings of
- * the Sixth International Conference on Theory and Applications of
- * Satisfiability Testing, LNCS 2919, pp 502-518, 2003.
+ * An extensible SAT solver. Niklas E?n and Niklas S?rensson. Proceedings of the
+ * Sixth International Conference on Theory and Applications of Satisfiability
+ * Testing, LNCS 2919, pp 502-518, 2003.
  * 
- * This library is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation; either version 2.1 of the License, or (at your
- * option) any later version.
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
  * 
  * This library is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
  * 
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library; if not, write to the Free Software Foundation,
- * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- *  
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package org.sat4j.minisat.core;
 
-import ibis.satin.SatinObject;
+import static org.sat4j.minisat.core.LiteralsUtils.neg;
+import static org.sat4j.minisat.core.LiteralsUtils.var;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Properties;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import org.sat4j.core.Vec;
 import org.sat4j.core.VecInt;
 import org.sat4j.minisat.constraints.cnf.WLClause;
-import org.sat4j.minisat.learning.LimitedLearning;
-import org.sat4j.minisat.learning.MiniSATLearning;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IConstr;
 import org.sat4j.specs.ISolver;
@@ -53,13 +48,32 @@ import org.sat4j.specs.IVec;
 import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.TimeoutException;
 
+// SATIN BEGIN
+import ibis.satin.SatinObject;
+import java.util.Enumeration;
+import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream;
+import java.util.Hashtable;
+import java.util.Properties;
+// SATIN END
+
 /**
+ * The backbone of the library providing the modular implementation of a MiniSAT
+ * (Chaff) like solver.
+ * 
  * @author leberre
+ *
  * Modified to use Ibis/Satin by Kees Verstoep (versto@cs.vu.nl)
  */
-public class Solver extends SatinObject implements ISolver,
-        UnitPropagationListener, ActivityListener, Learner, Serializable,
-        Cloneable, solverSatinInterface {
+
+// pre-SATIN: public class Solver implements ISolver, UnitPropagationListener,
+//            ActivityListener, Learner {
+public class Solver extends SatinObject
+                    implements ISolver, UnitPropagationListener,
+			       ActivityListener, Learner, Serializable
+{
 
     private static final long serialVersionUID = 1L;
 
@@ -70,33 +84,23 @@ public class Solver extends SatinObject implements ISolver,
     /**
      * List des contraintes du probl?me.
      */
-    // private final IVec<Constr> constrs = new Vec<Constr>(); // Constr
-    protected IVec<Constr> constrs = new Vec<Constr>(); // Constr
-
-    // Added: list of all initial constraints:
-    protected Vec<VecInt> allConstrs = new Vec<VecInt>();
-
-    // vector
+    // pre-SATIN: private final IVec<Constr> constrs = new Vec<Constr>(); // Constr
+    private IVec<Constr> constrs = new Vec<Constr>(); // Constr
 
     /**
      * Liste des clauses apprises.
      */
-    // private final IVec<Constr> learnts = new Vec<Constr>(); // Clause
-    private IVec<Constr> learnts = new Vec<Constr>(); // Clause
-
-    // vector
+    private final IVec<Constr> learnts = new Vec<Constr>(); // Clause
 
     /**
      * incr?ment pour l'activit? des clauses.
      */
-    // private double claInc = 1.0;
-    protected double claInc = 1.0;
+    private double claInc = 1.0;
 
     /**
      * decay factor pour l'activit? des clauses.
      */
-    // private double claDecay = 1.0;
-    protected double claDecay = 1.0;
+    private double claDecay = 1.0;
 
     /**
      * Queue de propagation
@@ -110,16 +114,14 @@ public class Solver extends SatinObject implements ISolver,
     /**
      * affectation en ordre chronologique
      */
-    // protected final IVecInt trail = new VecInt(); // lit
-    protected IVecInt trail = new VecInt(); // lit
+    protected final IVecInt trail = new VecInt(); // lit
 
     // vector
 
     /**
      * indice des s?parateurs des diff?rents niveau de d?cision dans trail
      */
-    // protected final IVecInt trailLim = new VecInt(); // int
-    protected IVecInt trailLim = new VecInt(); // int
+    protected final IVecInt trailLim = new VecInt(); // int
 
     // vector
 
@@ -128,44 +130,37 @@ public class Solver extends SatinObject implements ISolver,
      */
     protected int rootLevel;
 
-    // private int[] model = null;
-    protected int[] model = null;
+    private int[] model = null;
 
-    // protected final ILits voc;
     protected ILits voc;
 
-    // private IOrder order;
-    protected IOrder order;
+    private IOrder order;
 
-    private final Comparator<Constr> comparator = new ActivityComparator();
+    private final ActivityComparator comparator = new ActivityComparator();
 
-    // private final SolverStats stats = new SolverStats();
+    // pre-SATIN: private final SolverStats stats = new SolverStats();
     protected SolverStats stats = new SolverStats();
 
-    // private final LearningStrategy learner;
-    protected LearningStrategy learner;
+    private final LearningStrategy learner;
 
     protected final AssertingClauseGenerator analyzer;
 
     private boolean undertimeout;
 
-    private int timeout = Integer.MAX_VALUE;
+    private long timeout = Integer.MAX_VALUE;
 
-    // protected final DataStructureFactory dsfactory;
     protected DataStructureFactory dsfactory;
 
-    // private final SearchParams params;
-    protected SearchParams params;
+    private SearchParams params;
 
-    // private final IVecInt __dimacs_out = new VecInt();
-    protected IVecInt __dimacs_out = new VecInt();
+    private final IVecInt __dimacs_out = new VecInt();
 
     private SearchListener slistener = new NullSearchListener();
 
-    private IVecInt dimacs2internal(IVecInt in) {
+    protected IVecInt dimacs2internal(IVecInt in) {
         if (voc.nVars() == 0) {
             throw new RuntimeException(
-                "Please set the number of variables (solver.newVar() or solver.newVar(maxvar)) before adding constraints!");
+                    "Please set the number of variables (solver.newVar() or solver.newVar(maxvar)) before adding constraints!");
         }
         __dimacs_out.clear();
         __dimacs_out.ensure(in.size());
@@ -186,21 +181,32 @@ public class Solver extends SatinObject implements ISolver,
      */
 
     public Solver(AssertingClauseGenerator acg, LearningStrategy learner,
-        DataStructureFactory dsf, IOrder order) {
+            DataStructureFactory dsf, IOrder order) {
         this(acg, learner, dsf, new SearchParams(), order);
     }
 
     public Solver(AssertingClauseGenerator acg, LearningStrategy learner,
-        DataStructureFactory dsf, SearchParams params, IOrder order) {
+            DataStructureFactory dsf, SearchParams params, IOrder order) {
         analyzer = acg;
         this.learner = learner;
+        this.order = order;
+        this.params = params;
+        setDataStructureFactory(dsf);
+    }
+
+    /**
+     * Change the internatal representation of the contraints. Note that the
+     * heuristics must be changed prior to calling that method.
+     * 
+     * @param dsf
+     *            the internal factory
+     */
+    public final void setDataStructureFactory(DataStructureFactory dsf) {
         dsfactory = dsf;
         dsfactory.setUnitPropagationListener(this);
         dsfactory.setLearner(this);
-        this.order = order;
         voc = dsf.getVocabulary();
         order.setLits(voc);
-        this.params = params;
     }
 
     public void setSearchListener(SearchListener sl) {
@@ -208,7 +214,15 @@ public class Solver extends SatinObject implements ISolver,
     }
 
     public void setTimeout(int t) {
+        timeout = t*1000L;
+    }
+
+    public void setTimeoutMs(long t) {
         timeout = t;
+    }
+    
+    public void setSearchParams(SearchParams sp) {
+        params = sp;
     }
 
     protected int nAssigns() {
@@ -219,23 +233,7 @@ public class Solver extends SatinObject implements ISolver,
         return constrs.size();
     }
 
-    private int nLearnts() {
-        return learnts.size();
-    }
-
     public void learn(Constr c) {
-        // slistener.learn(c);
-
-        if (learntDebug) {
-            if (c.size() <= satinMaxGlobalLearnSize) {
-                System.out.print(this.name + ": learnt small clause: ");
-                for (int j = 0; j < c.size(); j++) {
-                    System.out.print(" " + c.get(j));
-                }
-                System.out.println();
-            }
-        }
-
         learnts.push(c);
         c.setLearnt();
         c.register();
@@ -247,6 +245,8 @@ public class Solver extends SatinObject implements ISolver,
         case 3:
             stats.learnedternaryclauses++;
             break;
+        default:
+            // do nothing
         }
     }
 
@@ -257,10 +257,9 @@ public class Solver extends SatinObject implements ISolver,
     public int newVar() {
         int index = voc.nVars() + 1;
         voc.ensurePool(index);
-        seen = new boolean[index + 1];
+        mseen = new boolean[index + 1];
         trail.ensure(index);
         trailLim.ensure(index);
-        // propQ.ensure(index);
         order.newVar();
         return index;
     }
@@ -268,25 +267,22 @@ public class Solver extends SatinObject implements ISolver,
     public int newVar(int howmany) {
         voc.ensurePool(howmany);
         order.newVar(howmany);
-        seen = new boolean[howmany + 1];
+        mseen = new boolean[howmany + 1];
         trail.ensure(howmany);
         trailLim.ensure(howmany);
-        // propQ.ensure(howmany);
         return voc.nVars();
     }
 
     public IConstr addClause(IVecInt literals) throws ContradictionException {
         IVecInt vlits = dimacs2internal(literals);
-        // save copy of initial constraints
-        VecInt vlits_clone = (VecInt) vlits.clone();
-        Constr c = dsfactory.createClause(vlits);
-        if (c != null) {
-            allConstrs.push(vlits_clone);
-        }
-        return addConstr(c);
+        return addConstr(dsfactory.createClause(vlits));
     }
 
     public boolean removeConstr(IConstr co) {
+        if (co == null) {
+            throw new UnsupportedOperationException(
+                    "Reference to the constraint to remove needed!"); //$NON-NLS-1$
+        }
         Constr c = (Constr) co;
         c.remove();
         constrs.remove(c);
@@ -295,41 +291,34 @@ public class Solver extends SatinObject implements ISolver,
         return true;
     }
 
-    // public IConstr addPseudoBoolean(IVecInt literals, IVecInt coeffs,
-    // boolean moreThan, int degree) throws ContradictionException {
-    // IVecInt vlits = dimacs2internal(literals);
-    // assert vlits.size() == literals.size();
-    // assert literals.size() == coeffs.size();
-    // return addConstr(dsfactory.createPseudoBooleanConstraint(vlits, coeffs,
-    // moreThan, degree));
-    // }
-
     public IConstr addPseudoBoolean(IVecInt literals, IVec<BigInteger> coeffs,
-        boolean moreThan, BigInteger degree) throws ContradictionException {
+            boolean moreThan, BigInteger degree) throws ContradictionException {
         IVecInt vlits = dimacs2internal(literals);
         assert vlits.size() == literals.size();
         assert literals.size() == coeffs.size();
         return addConstr(dsfactory.createPseudoBooleanConstraint(vlits, coeffs,
-            moreThan, degree));
+                moreThan, degree));
     }
 
     public void addAllClauses(IVec<IVecInt> clauses)
-        throws ContradictionException {
-        for (int i = 0; i < clauses.size(); i++) {
-            addClause(clauses.get(i));
+            throws ContradictionException {
+        for (IVecInt clause : clauses) {
+            addClause(clause);
         }
     }
 
     public IConstr addAtMost(IVecInt literals, int degree)
-        throws ContradictionException {
-        for (int i = 0; i < literals.size(); i++) {
-            literals.set(i, -literals.get(i));
+            throws ContradictionException {
+        int n = literals.size();
+        IVecInt opliterals = new VecInt(n);
+        for (int p : literals) {
+            opliterals.push(-p);
         }
-        return addAtLeast(literals, literals.size() - degree);
+        return addAtLeast(opliterals, n - degree);
     }
 
     public IConstr addAtLeast(IVecInt literals, int degree)
-        throws ContradictionException {
+            throws ContradictionException {
         IVecInt vlits = dimacs2internal(literals);
         return addConstr(dsfactory.createCardinalityConstraint(vlits, degree));
     }
@@ -352,7 +341,7 @@ public class Solver extends SatinObject implements ISolver,
                     // enleve les contraintes satisfaites de la base
                     cs[type].get(i).remove();
                 } else {
-                    cs[type].set(j++, cs[type].get(i));
+                    cs[type].moveTo(j++, i);
                 }
             }
             cs[type].shrinkTo(j);
@@ -368,7 +357,7 @@ public class Solver extends SatinObject implements ISolver,
     public int[] model() {
         if (model == null) {
             throw new UnsupportedOperationException(
-                "Call the solve method first!!!");
+                    "Call the solve method first!!!"); //$NON-NLS-1$
         }
         int[] nmodel = new int[model.length];
         System.arraycopy(model, 0, nmodel, 0, model.length);
@@ -397,17 +386,9 @@ public class Solver extends SatinObject implements ISolver,
      *         detected.
      */
     public boolean enqueue(int p, Constr from) {
-        // System.err.println("prop "+Lits.toString(p)+" thanks to "+from);
         assert p > 1;
         if (voc.isSatisfied(p)) {
-            // Constr old = voc.getReason(p);
-            // if
-            // (from!=null&&old!=null&&voc.getLevel(p)==decisionLevel()&&from.size()<old.size())
-            // {
-            // assert from.get(0)==p;
-            // voc.setReason(p,from);
-            // stats.changedreason++;
-            // }
+            // literal is already satisfied. Skipping.
             return true;
         }
         if (voc.isFalsified(p)) {
@@ -419,48 +400,20 @@ public class Solver extends SatinObject implements ISolver,
         voc.setLevel(p, decisionLevel());
         voc.setReason(p, from);
         trail.push(p);
-        // propQ.insert(p);
         return true;
     }
 
-    // private boolean[] seen = new boolean[0];
-    protected boolean[] seen = new boolean[0];
+    private boolean[] mseen = new boolean[0];
 
-    // private final IVecInt preason = new VecInt();
-    protected IVecInt preason = new VecInt();
+    private final IVecInt preason = new VecInt();
 
-    // private final IVecInt outLearnt = new VecInt();
-    protected IVecInt outLearnt = new VecInt();
-
-    final private static boolean satinGlobalDebug = false; // true;
-
-    final private static boolean analyzeDebug = satinGlobalDebug;
-
-    final private static boolean splitDebug = satinGlobalDebug;
-
-    public int satinFixes = 0x26; // Temporary workarounds/experiments/..
-
-    /* Current semantics of satinFixes:
-     * 0x01: workarounds in analyze() that may be needed for proper stack split
-     * 0x02: disable simplifyDB, because of possible interaction with
-     *       stack splits (Note: may be an old issue that has been resolved)
-     * 0x04: use external spawner to get a logical separation of the restricted
-     *       sequential SAT search and the spawning logistics (default now)
-     * 0x08: in external spawner: only clone solver state for one of the
-     *       children, and pass on the current one to the other child
-     * 0x10: incorporate variable selection statistics from children
-     *       (potentially useful during iterative restarts)
-     * 0x20: alternative way to avoid problem with split vars in analyze()
-     * 0x40: pass reason vectors separately (and in fact additionally);
-     *       seems to trigger an assert in WLClause though, since var
-     *       order in reason might be changed from regular one?
-     */
+    private final IVecInt outLearnt = new VecInt();
 
     public int analyze(Constr confl, Handle<Constr> outLearntRef) {
-        boolean satinWorkaround = ((satinFixes & 0x1) != 0);
-        int counter = 0; // For workaround
         assert confl != null;
         outLearnt.clear();
+
+        final boolean[] seen = mseen;
 
         assert outLearnt.size() == 0;
         for (int i = 0; i < seen.length; i++) {
@@ -474,66 +427,48 @@ public class Solver extends SatinObject implements ISolver,
         // reserve de la place pour le litteral falsifie
         int outBtlevel = 0;
 
-        if (analyzeDebug) {
-            System.out.println(this.name + ": analyze: ");
-            printTrail();
-        }
-
-        // Update conflict statistics:
-        if (confl.learnt()) {
-            if ((confl.getStatus() & 0x1) != 0) {
-                stats.learntGlobalFired++;
-            } else {
-                stats.learntLocalFired++;
-            }
-        } else {
-            stats.conflFired++;
-        }
+	// SATIN BEGIN: update conflict statistics:
+	// System.out.println(name + " analyze: ");
+	// printTrail();
+	if (confl.learnt()) {
+	    if (confl.learntGlobal()) {
+		stats.learntGlobalFired++;
+	    } else {
+		stats.learntLocalFired++;
+	    }
+	} else {
+	    stats.conflFired++;
+	}
+	// SATIN END
 
         do {
             preason.clear();
             assert confl != null;
             confl.calcReason(p, preason);
-            if (confl.learnt()) {
+            if (confl.learnt())
                 claBumpActivity(confl);
-            }
-
             // Trace reason for p
             for (int j = 0; j < preason.size(); j++) {
                 int q = preason.get(j);
                 order.updateVar(q);
-
                 if (!seen[q >> 1]) {
                     // order.updateVar(q); // MINISAT
                     seen[q >> 1] = true;
                     if (voc.getLevel(q) == decisionLevel()) {
-                        counter++;
                         analyzer.onCurrentDecisionLevelLiteral(q);
-                        if (analyzeDebug) {
-                            System.out.print("" + q + " (d " + voc.getLevel(q)
-                                + ") ");
-                        }
-                        // } else if (voc.getLevel(q) > 0) {
-                        // Hack for parent/child satin splits:
-                    } else if (voc.getLevel(q) > 0
-                        || (satinWorkaround && voc.getLevel(q) >= 0)) {
+			// SATIN
+			if (decisionLevel() == splitLevel) {
+			    Constr reason = voc.getReason(q);
+			    if (reason != null && reason.size() == 1) {
+				// split decision literal
+				outLearnt.push(q ^ 1);
+			    }
+			}
+		    // } else if (voc.getLevel(q) > 0) {
+		    } else if (voc.getLevel(q) >= 0) { // SATIN needed?!
                         // ajoute les variables depuis le niveau de d?cision 0
                         outLearnt.push(q ^ 1);
                         outBtlevel = Math.max(outBtlevel, voc.getLevel(q));
-                        if (analyzeDebug) {
-                            System.out.print("" + q + " (i " + voc.getLevel(q)
-                                + ") ");
-                        }
-                    } else {
-                        if (analyzeDebug) {
-                            System.out.print("" + q + " (E " + voc.getLevel(q)
-                                + ") ");
-                        }
-                    }
-                } else {
-                    if (false /* analyzeDebug */) {
-                        System.out.print("" + q + " (s " + voc.getLevel(q)
-                            + ") ");
                     }
                 }
             }
@@ -544,63 +479,30 @@ public class Solver extends SatinObject implements ISolver,
                 // System.err.print((Clause.lastid()+1)+"
                 // "+((Clause)confl).getId()+" ");
                 confl = voc.getReason(p);
-                int plevel = voc.getLevel(p); // will be set to -1 by undoOne()
                 // System.err.println(((Clause)confl).getId());
                 // assert(confl != null) || counter == 1;
                 undoOne();
-
-                // HACK: skip over split decision variables in trail
-                // Better solution: introduce a special "split-decision"
-                // reason, with size 0.
-                if (satinWorkaround && seen[p >> 1] && confl == null
-                    && --counter > 0 && analyzer.clauseNonAssertive(confl)) {
-                    if (analyzeDebug) {
-                        System.out.println(this.name + ": skipping p " + p
-                            + " level " + plevel + " dl " + decisionLevel()
-                            + " counter " + counter);
-                        printTrail();
-                    }
-                } else if (analyzeDebug && confl == null
-                    && plevel != decisionLevel()) {
-                    System.out.println(this.name + ": reason null for p " + p
-                        + " level " + plevel + " dl " + decisionLevel()
-                        + " counter " + counter);
-                    printTrail();
-                }
-                // } while (!seen[p >> 1]);
-            } while (!seen[p >> 1]
-                || (satinWorkaround && (confl == null && counter > 0)));
-
-            if (satinWorkaround) {
-                if (confl == null && counter > 0) {
-                    System.out.println(this.name + ": confl null "
-                        + " counter " + counter + " p " + p);
-                    printTrail();
-                } else {
-                    --counter;
-                }
-            }
+            } while (!seen[p >> 1]);
             // seen[p.var] indique que p se trouve dans outLearnt ou dans
             // le dernier niveau de d?cision
         } while (analyzer.clauseNonAssertive(confl));
 
-        // Temp Hack for Satin cloning
-        if (simplifier != null) {
-            simplifier.simplify(outLearnt);
-        }
-
         outLearnt.set(0, p ^ 1);
-
-        if (analyzeDebug) {
-            System.out.print(" => ");
-            for (int i = 0; i < outLearnt.size(); i++) {
-                System.out.print(outLearnt.get(i) + " ");
-            }
-            System.out.println();
-        }
+	if (simplifier != null) { // SATIN
+	    simplifier.simplify(outLearnt);
+	}
 
         Constr c = dsfactory.createUnregisteredClause(outLearnt);
         slistener.learn(c);
+
+	// SATIN DEBUG:
+	if (false && c.size() <= satinMaxGlobalLearnSize) {
+	    System.out.print(name + ": learnt small ");
+	    for (int j = 0; j < c.size(); j++) {
+		System.out.print(" " + c.get(j));
+	    }
+	    System.out.println();
+	}
 
         outLearntRef.obj = c;
 
@@ -608,115 +510,173 @@ public class Solver extends SatinObject implements ISolver,
         return outBtlevel;
     }
 
-    // interface ISimplifier {
-    //    void simplify(IVecInt outLearnt);
-    // }
+    // SATIN TODO: simplification using local interface causes Solver
+    // garbage collection problems?
+    interface ISimplifier extends Serializable {
+        void simplify(IVecInt outLearnt);
+    }
 
-    public static final ISimplifier NO_SIMPLIFICATION = null;
+    public static final ISimplifier NO_SIMPLIFICATION = new ISimplifier() {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 1L;
 
-    // new ISimplifier() {
+        public void simplify(IVecInt outLearnt) {
+        }
+
+        @Override
+        public String toString() {
+            return "No reason simplification"; //$NON-NLS-1$
+        }
+    };
+
+    public final ISimplifier SIMPLE_SIMPLIFICATION = new ISimplifier() {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 1L;
+
+        public void simplify(IVecInt outLearnt) {
+            // simpleSimplification(outLearnt); // SATIN problem
+        }
+
+        @Override
+        public String toString() {
+            return "Simple reason simplification"; //$NON-NLS-1$
+        }
+    };
+
+    public final ISimplifier EXPENSIVE_SIMPLIFICATION = new ISimplifier() {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 1L;
+
+        public void simplify(IVecInt outLearnt) {
+            // expensiveSimplification(outLearnt); // SATIN problem
+        }
+
+        @Override
+        public String toString() {
+            return "Expensive reason simplification"; //$NON-NLS-1$
+        }
+    };
+
+    private ISimplifier simplifier = NO_SIMPLIFICATION;
+
     /**
+     * Setup the reason simplification strategy.
+     * By default, there is no reason simplification.
+     * NOTE THAT REASON SIMPLIFICATION IS ONLY ALLOWED FOR WL 
+     * CLAUSAL data structures. USING REASON SIMPLIFICATION
+     * ON CB CLAUSES, CARDINALITY CONSTRAINTS OR PB CONSTRAINTS
+     * MIGHT RESULT IN INCORRECT RESULTS. 
      * 
+     * @param simp the name of the simplifier (one of NO_SIMPLIFICATION, SIMPLE_SIMPLIFICATION, EXPENSIVE_SIMPLIFICATION).
      */
-    //    private static final long serialVersionUID = 1L;
-    //    public void simplify(IVecInt outLearnt) {
-    //    }
-    //    @Override
-    //    public String toString() {
-    //        return "No reason simplification";
-    //    }
-    // };
-    public final ISimplifier SIMPLE_SIMPLIFICATION = null;
+    public void setSimplifier(String simp) {
+        Field f;
+        try {
+            f = Solver.class.getDeclaredField(simp);
+            simplifier = (ISimplifier) f.get(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+            simplifier = NO_SIMPLIFICATION;
+        }
+    }
 
-    // new ISimplifier() {
     /**
+     * Setup the reason simplification strategy.
+     * By default, there is no reason simplification.
+     * NOTE THAT REASON SIMPLIFICATION IS ONLY ALLOWED FOR WL 
+     * CLAUSAL data structures. USING REASON SIMPLIFICATION
+     * ON CB CLAUSES, CARDINALITY CONSTRAINTS OR PB CONSTRAINTS
+     * MIGHT RESULT IN INCORRECT RESULTS. 
      * 
+     * @param simp
      */
-    // private static final long serialVersionUID = 1L;
-    // public void simplify(IVecInt outLearnt) {
-    // simpleSimplification(outLearnt);
-    // }
-    // @Override
-    // public String toString() {
-    //    return "Simple reason simplification";
-    // }
-    // };
-    // private ISimplifier simplifier = NO_SIMPLIFICATION;
-    protected ISimplifier simplifier = NO_SIMPLIFICATION;
-
     public void setSimplifier(ISimplifier simp) {
         simplifier = simp;
     }
 
-    // Simplify conflict clause (a little):
+    // Taken from MiniSAT 1.14: Simplify conflict clause (a little):
     private void simpleSimplification(IVecInt outLearnt) {
         int i, j;
-
+        final boolean[] seen = mseen;
         for (i = j = 1; i < outLearnt.size(); i++) {
             IConstr r = voc.getReason(outLearnt.get(i));
+            assert r instanceof WLClause;
             if (r == null) {
                 outLearnt.moveTo(j++, i);
             } else {
-                for (int k = 1; k < r.size(); k++) {
+                assert r.get(0) == neg(outLearnt.get(i));
+                for (int k = 1; k < r.size(); k++)
                     if (!seen[r.get(k) >> 1] && (voc.getLevel(r.get(k)) != 0)) {
                         outLearnt.moveTo(j++, i);
                         break;
                     }
-                }
             }
         }
         outLearnt.shrink(i - j);
         stats.reducedliterals += (i - j);
     }
 
-    // private void expensiveSimplification(IVecInt outLearn) {
-    // // Simplify conflict clause (a lot):
-    // //
-    // int min_level = 0;
-    // for (i = 1; i < outLearnt.size(); i++)
-    // min_level |= 1 << (level[var(out_learnt[i])] & 31); // (maintain an
-    // abstraction of levels involved in conflict)
-    //
-    // out_learnt.copyTo(analyze_toclear);
-    // for (i = j = 1; i < out_learnt.size(); i++)
-    // if (reason[var(out_learnt[i])] == GClause_NULL ||
-    // !analyze_removable(out_learnt[i], min_level))
-    // out_learnt[j++] = out_learnt[i];
-    // }
-    //    
-    // // Check if 'p' can be removed. 'min_level' is used to abort early if
+    private final IVecInt analyzetoclear = new VecInt();
+
+    private final IVecInt analyzestack = new VecInt();
+
+    // Taken from MiniSAT 1.14
+    private void expensiveSimplification(IVecInt outLearnt) {
+        // Simplify conflict clause (a lot):
+        //
+        int i, j;
+        // (maintain an abstraction of levels involved in conflict)
+        analyzetoclear.clear();
+        outLearnt.copyTo(analyzetoclear);
+        for (i = 1, j = 1; i < outLearnt.size(); i++)
+            if (voc.getReason(outLearnt.get(i)) == null
+                    || !analyzeRemovable(outLearnt.get(i)))
+                outLearnt.moveTo(j++, i);
+        outLearnt.shrink(i - j);
+        stats.reducedliterals += (i - j);
+    }
+
+    // Check if 'p' can be removed. 'min_level' is used to abort early if
     // visiting literals at a level that cannot be removed.
-    // //
-    // private boolean analyze_removable(int p, int min_level)
-    // {
-    // assert(reason[var(p)] != GClause_NULL);
-    // analyze_stack.clear(); analyze_stack.push(p);
-    // int top = analyze_toclear.size();
-    // while (analyze_stack.size() > 0){
-    // assert(reason[var(analyze_stack.last())] != GClause_NULL);
-    // GClause r = reason[var(analyze_stack.last())]; analyze_stack.pop();
-    // Clause& c = r.isLit() ? ((*analyze_tmpbin)[1] = r.lit(), *analyze_tmpbin)
-    // : *r.clause();
-    // for (int i = 1; i < c.size(); i++){
-    // Lit p = c[i];
-    // if (!analyze_seen[var(p)] && level[var(p)] != 0){
-    // if (reason[var(p)] != GClause_NULL && ((1 << (level[var(p)] & 31)) &
-    // min_level) != 0){
-    // analyze_seen[var(p)] = 1;
-    // analyze_stack.push(p);
-    // analyze_toclear.push(p);
-    // }else{
-    // for (int j = top; j < analyze_toclear.size(); j++)
-    // analyze_seen[var(analyze_toclear[j])] = 0;
-    // analyze_toclear.shrink(analyze_toclear.size() - top);
-    // return false;
-    // }
-    // }
-    // }
-    // }
     //
-    // return true;
-    // }
+    private boolean analyzeRemovable(int p) {
+        assert voc.getReason(p) != null;
+        analyzestack.clear();
+        analyzestack.push(p);
+        final boolean[] seen = mseen;
+        int top = analyzetoclear.size();
+        while (analyzestack.size() > 0) {
+            int q = analyzestack.last();
+            assert voc.getReason(q) != null;
+            Constr c = voc.getReason(q);
+            assert c instanceof WLClause;
+            analyzestack.pop();
+            assert c.get(0) == neg(q);
+            for (int i = 1; i < c.size(); i++) {
+                int l = c.get(i);
+                // if (!seen[var(l)] && voc.getLevel(l) != 0) {
+                if (!seen[var(l)] /* && voc.getLevel(l) != 0 */) { // SATIN?!
+                    if (voc.getReason(l) == null) {
+                        for (int j = top; j < analyzetoclear.size(); j++)
+                            seen[analyzetoclear.get(j) >> 1] = false;
+                        analyzetoclear.shrink(analyzetoclear.size() - top);
+                        return false;
+                    }
+                    seen[l >> 1] = true;
+                    analyzestack.push(l);
+                    analyzetoclear.push(l);
+                }
+            }
+        }
+
+        return true;
+    }
 
     /**
      * decode the internal representation of a literal into Dimacs format.
@@ -736,7 +696,7 @@ public class Solver extends SatinObject implements ISolver,
         // recupere le dernier litteral affecte
         int p = trail.last();
         assert p > 1;
-        assert voc.getLevel(p) > 0;
+        assert voc.getLevel(p) >= 0;
         int x = p >> 1;
         // desaffecte la variable
         voc.unassign(p);
@@ -759,16 +719,17 @@ public class Solver extends SatinObject implements ISolver,
 
     /**
      * Propagate activity to a constraint
-     * @param confl a constraint
+     * 
+     * @param confl
+     *            a constraint
      */
     public void claBumpActivity(Constr confl) {
         confl.incActivity(claInc);
-        if (confl.getActivity() > CLAUSE_RESCALE_BOUND) {
+        if (confl.getActivity() > CLAUSE_RESCALE_BOUND)
             claRescalActivity();
-            //        for (int i = 0; i < confl.size(); i++) {
-            //            varBumpActivity(confl.get(i));
-            //        }
-        }
+        // for (int i = 0; i < confl.size(); i++) {
+        // varBumpActivity(confl.get(i));
+        // }
     }
 
     public void varBumpActivity(int p) {
@@ -786,34 +747,20 @@ public class Solver extends SatinObject implements ISolver,
      * @return null if not conflict is found, else a conflicting constraint.
      */
     public Constr propagate() {
-        final boolean propagateDebug = satinGlobalDebug; // false;
-
         while (qhead < trail.size()) {
             stats.propagations++;
-            int p = trail.get(qhead++); // propQ.dequeue();
+            int p = trail.get(qhead++);
             slistener.propagating(decode2dimacs(p));
-            // p est maintenant le litt?ral a propager
+            // p is the literal to propagate
             // Moved original MiniSAT code to dsfactory to avoid
             // watches manipulation in counter Based clauses for instance.
             assert p > 1;
             IVec<Propagatable> constrs = dsfactory.getWatchesFor(p);
 
-            if (propagateDebug) {
-                System.out.println(this.name + ": watches for " + p + ": "
-                    + constrs.size());
-            }
-
-            for (int i = 0; i < constrs.size(); i++) {
+            final int size = constrs.size();
+            for (int i = 0; i < size; i++) {
                 stats.inspects++;
-                if (propagateDebug) {
-                    System.out.println(this.name + ": watch " + i + ": constr "
-                        + constrs.get(i));
-                }
                 if (!constrs.get(i).propagate(this, p)) {
-                    if (propagateDebug) {
-                        System.out.println(this.name + ": conflict");
-                    }
-
                     // Constraint is conflicting: copy remaining watches to
                     // watches[p]
                     // and return constraint
@@ -828,7 +775,6 @@ public class Solver extends SatinObject implements ISolver,
     }
 
     void record(Constr constr) {
-        constr.setLearnt();
         constr.assertConstraint(this);
         slistener.adding(decode2dimacs(constr.get(0)));
         if (constr.size() == 1) {
@@ -870,6 +816,7 @@ public class Solver extends SatinObject implements ISolver,
         for (int c = trail.size() - rootLevel; c > 0; c--) {
             undoOne();
         }
+        qhead = trail.size();
     }
 
     /**
@@ -886,1092 +833,889 @@ public class Solver extends SatinObject implements ISolver,
 
     private final Handle<Constr> learntConstraint = new Handle<Constr>();
 
-    protected String name = "rootSolver";
+    private boolean[] fullmodel;
 
-    private int serializedSize(Object obj) {
-        try {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            ObjectOutputStream oout = new ObjectOutputStream(out);
-            oout.writeObject(obj);
+    // SATIN BEGIN
+    final private static boolean satinGlobalDebug = false; // true;
+    final private static boolean analyzeDebug = satinGlobalDebug;
+    final private static boolean splitDebug = satinGlobalDebug;
 
-            return out.toByteArray().length;
-        } catch (Exception e) {
-            throw new RuntimeException("cannot clone class ["
-                + obj.getClass().getName() + "] via serialization: "
-                + e.toString());
+    private int splitLevel = -1;
+
+    // list of all initial constraints:
+    protected Vec<VecInt> allConstrs = new Vec<VecInt>();
+
+    // Temporary workarounds/experiments/..
+    private static final int DEFAULT_SATIN_FIXES = 0x38; // = 56
+    public int satinFixes = DEFAULT_SATIN_FIXES;
+    /* Current semantics of satinFixes:
+     * 0x01: <not used currently>
+     * 0x02: <not used currently>
+     * 0x04: <not used currently>
+     * 0x08: in external spawner: only clone solver state for one of the
+     *       children, and pass on the current one to the other child
+     * 0x10: incorporate variable selection statistics from children
+     *       (potentially useful during iterative restarts)
+     * 0x20: avoid a problem with split vars in analyze()  (default now)
+     * 0x40: pass reason vectors separately (and in fact additionally);
+     *       seems to trigger an assert in WLClause though, since var
+     *       order in reason might be changed from regular one?
+     */
+
+    protected String name = "/solver/";
+
+    private int serializedSize(Object obj)
+    {
+        try
+        {
+            ByteArrayOutputStream out = new ByteArrayOutputStream ();
+            ObjectOutputStream oout = new ObjectOutputStream (out);
+            oout.writeObject (obj);
+            
+	    return out.toByteArray().length;
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException ("cannot clone class [" +
+                obj.getClass ().getName () + "] via serialization: " +
+                e.toString ());
         }
     }
 
-    private Solver serialClone(Solver obj) {
-        try {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            ObjectOutputStream oout = new ObjectOutputStream(out);
-            oout.writeObject(obj);
-
-            ObjectInputStream in = new ObjectInputStream(
-                new ByteArrayInputStream(out.toByteArray()));
-            return (Solver) in.readObject();
-        } catch (Exception e) {
-            throw new RuntimeException("cannot clone class ["
-                + obj.getClass().getName() + "] via serialization: "
-                + e.toString());
+    private Solver serialClone(Solver obj)
+    {
+        try
+        {
+            ByteArrayOutputStream out = new ByteArrayOutputStream ();
+            ObjectOutputStream oout = new ObjectOutputStream (out);
+            oout.writeObject (obj);
+            
+            ObjectInputStream in = new ObjectInputStream (
+                new ByteArrayInputStream (out.toByteArray ()));
+            return (Solver) in.readObject ();
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException ("cannot clone class [" +
+                obj.getClass ().getName () + "] via serialization: " +
+                e.toString ());
         }
     }
 
-    private Solver serialIbisClone(Solver solver) {
-        return (Solver) ibis.util.DeepCopy.deepCopy(solver);
+    private Solver serialIbisClone (Solver solver)
+    {
+	return (Solver) ibis.util.DeepCopy.deepCopy(solver);
     }
 
     static final boolean reasonDebug = false;
 
-    private VecInt constraintToVecInt(Constr c) {
-        VecInt cVec;
+    private VecInt constraintToVecInt(Constr c)
+    {
+	VecInt cVec;
 
-        cVec = new VecInt();
-        for (int i = 0; i < c.size(); i++) {
-            cVec.push(c.get(i));
-        }
-        return cVec;
+	cVec = new VecInt();
+	for (int i = 0; i < c.size(); i++) {
+	    cVec.push(c.get(i));
+	}
+	return cVec;
     }
 
-    public Vec<VecInt> reasonVec() {
-        Vec<VecInt> reasons = new Vec<VecInt>();
+    public Vec<VecInt> reasonVec()
+    {
+	Vec<VecInt> reasons = new Vec<VecInt>();
 
-        if ((satinFixes & 0x40) == 0) {
-            // still experimental stuff, don't do by default
-            return reasons;
-        }
+	if ((satinFixes & 0x40) == 0) {
+	    // still experimental stuff, don't do by default
+	    return reasons;
+	}
 
-        reasons.push(null);
-        for (int i = 1; i <= voc.nVars(); i++) {
-            int lit = i << 1;
-            VecInt rVec;
+	reasons.push(null);
+	for (int i = 1; i <= voc.nVars(); i++) {
+	    int lit = i << 1;
+	    VecInt rVec;
 
-            Constr reason = voc.getReason(lit);
-            if (reason != null) {
-                // Include full reasons, since constraint IDs are only
-                // implemented for WLClause, and IDs cannot be trusted
-                // for the shared clauses version.  Sigh..
-                if (reason instanceof WLClause) {
-                    rVec = constraintToVecInt(reason);
-                    if (reasonDebug) {
-                        System.out.println(name + ": " + lit + " has reason "
-                            + reason + ": " + rVec);
-                    }
-                } else {
-                    if (reasonDebug) {
-                        System.out.println(name + ": " + lit
-                            + " has non-WL reason " + reason);
-                    }
-                    rVec = null;
-                }
-            } else {
-                rVec = null;
-            }
-            reasons.push(rVec);
-        }
+	    Constr reason = voc.getReason(lit);
+	    if (reason != null) {
+		// Include full reasons, since constraint IDs are only
+		// implemented for WLClause, and IDs cannot be trusted
+		// for the shared clauses version.  Sigh..
+		if (reason instanceof WLClause) {
+		    rVec = constraintToVecInt(reason);
+		    if (reasonDebug) {
+			System.out.println(name + ": " + lit +
+					   " has reason " + reason +
+					   ": " + rVec);
+		    }
+		} else {
+		    if (reasonDebug) {
+			System.out.println(name + ": " + lit +
+					   " has non-WL reason " + reason);
+		    }
+		    rVec = null;
+		}
+	    } else {
+		rVec = null;
+	    }
+	    reasons.push(rVec);
+	}
 
-        return reasons;
+	return reasons;
     }
 
-    private void setReasons(Vec<VecInt> reasons) {
-        if ((satinFixes & 0x40) == 0) {
-            // still experimental stuff, don't do by default
-            return;
-        }
+    private void setReasons(Vec<VecInt> reasons)
+    {
+	if ((satinFixes & 0x40) == 0) {
+	    // still experimental stuff, don't do by default
+	    return;
+	}
 
-        // Put the reasons, indexed by variable number, in a hashtable
-        // ignoring the order of the literals (UnorderedVec).
-        Hashtable<UnorderedVec, Integer> reasonHash = new Hashtable<UnorderedVec, Integer>();
+	// Put the reasons, indexed by variable number, in a hashtable
+	// ignoring the order of the literals (UnorderedVec).
+	Hashtable reasonHash = new Hashtable();
 
-        for (int i = 0; i < reasons.size(); i++) {
-            VecInt rVec = reasons.get(i);
+	for (int i = 0; i < reasons.size(); i++) {
+	    VecInt rVec = reasons.get(i);
 
-            if (rVec != null) {
-                UnorderedVec uv = new UnorderedVec(rVec);
-                reasonHash.put(uv, (Integer) i);
-            }
-        }
+	    if (rVec != null) {
+		UnorderedVec uv = new UnorderedVec(rVec);
+		reasonHash.put(uv, (Integer) i);
+	    }
+	}
 
-        // Scan over the constraints to find matches with the reasons
-        // and reconstruct
-        for (int i = 0; i < constrs.size(); i++) {
-            Constr c = constrs.get(i);
-            UnorderedVec uv = new UnorderedVec(constraintToVecInt(c));
-            Integer var;
+	// Scan over the constraints to find matches with the reasons
+	// and reconstruct
+	for (int i = 0; i < constrs.size(); i++) {
+	    Constr c = constrs.get(i);
+	    UnorderedVec uv = new UnorderedVec(constraintToVecInt(c));
+	    Integer var;
 
-            if ((var = (Integer) reasonHash.get(uv)) != null) {
-                int lit = ((int) var) << 1;
+	    if ((var = (Integer) reasonHash.get(uv)) != null) {
+		int lit = ((int) var) << 1;
 
-                voc.setReason(lit, c);
-                if (reasonDebug) {
-                    System.out.println(name + ": lit " + lit + " had reason "
-                        + c);
-                }
-            }
-        }
+		voc.setReason(lit, c);
+		if (reasonDebug) {
+		    System.out.println(name + ": lit " + lit +
+				       " had reason " + c);
+		}
+	    }
+	}
 
-        // Same for the learnts
-        for (int i = 0; i < learnts.size(); i++) {
-            Constr c = learnts.get(i);
-            UnorderedVec uv = new UnorderedVec(constraintToVecInt(c));
-            Integer var;
+	// Same for the learnts
+	for (int i = 0; i < learnts.size(); i++) {
+	    Constr c = learnts.get(i);
+	    UnorderedVec uv = new UnorderedVec(constraintToVecInt(c));
+	    Integer var;
 
-            if ((var = (Integer) reasonHash.get(uv)) != null) {
-                int lit = ((int) var) << 1;
+	    if ((var = (Integer) reasonHash.get(uv)) != null) {
+		int lit = ((int) var) << 1;
 
-                voc.setReason(lit, c);
-                if (reasonDebug) {
-                    System.out.println(name + ": lit " + lit
-                        + " had learnt reason " + c);
-                }
-            }
-        }
-
-        if (reasonDebug) {
-            // Temp debug stuff
-            for (int i = 0; i < constrs.size(); i++) {
-                System.out.println(name + " constr " + i + ": "
-                    + constrs.get(i));
-            }
-
-            for (int i = 2; i < 2 * (voc.nVars() + 1); i++) {
-                IVec<Propagatable> watched = voc.watches(i);
-
-                // System.out.println(name + " watches " + i + ": " +
-                //		   watched.size());
-
-                // TEMP HACK: for reproducible results (irrespective of use
-                // of cloning or sun/ibis serialization) we sort the watches
-                // based on constraint id. This is not smart in itself!! 
-                // NOTE: only implemented for WLClause representation.
-                if (watched.size() > 0 && watched.get(0) instanceof WLClause) {
-                    for (int j = 0; j < watched.size(); j++) {
-                        int min = j;
-                        int watch_min = ((WLClause) watched.get(j)).getId();
-
-                        for (int k = j + 1; k < watched.size(); k++) {
-                            int watch_k = ((WLClause) watched.get(k)).getId();
-                            if (watch_k < watch_min) {
-                                min = k;
-                                watch_min = watch_k;
-                            }
-                        }
-                        if (min != j) {
-                            Propagatable temp = watched.get(j);
-                            watched.set(j, watched.get(min));
-                            watched.set(min, temp);
-                        }
-                    }
-                }
-
-                for (int j = 0; j < watched.size(); j++) {
-                    System.out.println(name + ": watch " + j + ": "
-                        + watched.get(j));
-                }
-            }
-        }
+		voc.setReason(lit, c);
+		if (reasonDebug) {
+		    System.out.println(name + ": lit " + lit +
+				       " had learnt reason " + c);
+		}
+	    }
+	}
     }
 
-    public Object clone() {
-        Solver clone;
-        boolean showClone = false; // true;
+    private static final String DEFAULT_CLONE_TYPE = "ibis";
+    private String satinCloneType = DEFAULT_CLONE_TYPE;
 
-        try {
-            clone = (Solver) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new InternalError(e.toString());
-        }
+    public void fixupAfterClone()
+    {
+	// In childs, learnts are fresh:
+	startNewLearnts = 0;
 
-        if (showClone) {
-            System.out.println(name + ": clone begin " + serializedSize(clone));
-        }
-
-        // Hack: need to update simplifier manually, or we keep 
-        // a reference back to the old solver :-(
-        clone.setSimplifier(null);
-
-        clone.stats = (SolverStats) this.stats.clone();
-        if (showClone) {
-            System.out.println(name + ": clone stats " + serializedSize(clone));
-        }
-
-        clone.trail = (IVecInt) this.trail.clone();
-        if (showClone) {
-            System.out.println(name + ": clone trail " + serializedSize(clone));
-        }
-
-        clone.trailLim = (IVecInt) this.trailLim.clone();
-        if (this.model != null) {
-            clone.model = (int[]) this.model.clone();
-        }
-        if (showClone) {
-            System.out.println(name + ": clone trailLim "
-                + serializedSize(clone));
-        }
-
-        clone.seen = (boolean[]) this.seen.clone();
-        if (showClone) {
-            System.out.println(name + ": clone seen " + serializedSize(clone));
-        }
-
-        clone.preason = (IVecInt) this.preason.clone();
-        if (showClone) {
-            System.out.println(name + ": clone preason "
-                + serializedSize(clone));
-        }
-
-        clone.outLearnt = (IVecInt) this.outLearnt.clone();
-        if (showClone) {
-            System.out.println(name + ": clone outLearnt "
-                + serializedSize(clone));
-        }
-
-        clone.__dimacs_out = (IVecInt) this.__dimacs_out.clone();
-        if (showClone) {
-            System.out.println(name + ": clone __dimacs_out "
-                + serializedSize(clone));
-        }
-
-        clone.learner = (LearningStrategy) this.learner.clone();
-        if (showClone) {
-            System.out.println(name + ": clone learner "
-                + serializedSize(clone));
-        }
-
-        // Extra tweaks to restore concistency of the datastructures:
-        clone.dsfactory = (DataStructureFactory) clone.dsfactory.clone();
-        clone.dsfactory.setUnitPropagationListener(clone);
-        clone.dsfactory.setLearner(clone);
-
-        if (showClone) {
-            System.out.println(name + ": clone dsfactory "
-                + serializedSize(clone));
-        }
-
-        // Let learner module link back to the clone;
-        // the method for this is learner dependent
-        if (clone.learner instanceof LimitedLearning) {
-            LimitedLearning l = (LimitedLearning) clone.learner;
-            l.setSolver(clone);
-        } else if (clone.learner instanceof MiniSATLearning) {
-            MiniSATLearning l = (MiniSATLearning) clone.learner;
-            l.setDataStructureFactory(clone.dsfactory);
-        }
-        clone.learner.setVarActivityListener(clone);
-
-        if (showClone) {
-            System.out.println(name + ": clone learner "
-                + serializedSize(clone));
-        }
-
-        clone.order = (IOrder) this.order.clone();
-        if (showClone) {
-            System.out.println(name + ": clone order " + serializedSize(clone));
-        }
-
-        clone.voc = clone.dsfactory.getVocabulary();
-        if (false) {
-            System.out.println("Solver: voc orig: " + dsfactory.getVocabulary()
-                + " in clone: " + clone.voc);
-        }
-        clone.order.setLits(clone.voc);
-        if (showClone) {
-            System.out.println(name + ": clone voc " + serializedSize(clone));
-        }
-
-        if (satinUseSharedClauses) {
-            // Constrs are reconstructed in the child satin thread
-            clone.constrs = null;
-        } else {
-            clone.constrs = (IVec<Constr>) this.constrs.clone();
-            for (int i = 0; i < clone.constrs.size(); i++) {
-                Constr c = clone.constrs.get(i);
-
-                c.setVoc(clone.voc);
-                // Need to reconstruct watches since clause has been cloned
-                c.register();
-            }
-        }
-
-        if (showClone) {
-            System.out.println(name + ": clone constrs "
-                + serializedSize(clone));
-        }
-
-        clone.learnts = (IVec<Constr>) this.learnts.clone();
-        for (int i = 0; i < clone.learnts.size(); i++) {
-            Constr c = clone.learnts.get(i);
-            Constr old = learnts.get(i);
-
-            c.setVoc(clone.voc);
-            // Need to reconstruct watches since the clause has been cloned
-            if (true) {
-                // HACK: register() does additional things for learned clauses
-                // which somehow doesn't work while cloning.. (TODO)
-                clone.voc.watch(c.get(0) ^ 1, c);
-                clone.voc.watch(c.get(1) ^ 1, c);
-            } else {
-                c.register();
-            }
-
-            if (false) { // Done elsewhere now
-                if (old.locked()) {
-                    if (analyzeDebug) {
-                        System.out.print("learnt " + i + " reason locked: ");
-                        for (int j = 0; j < c.size(); j++) {
-                            System.out.print(" " + c.get(j));
-                        }
-                        System.out.println();
-                    }
-
-                    clone.voc.setReason(c.get(0), c);
-                }
-            }
-        }
-
-        if (showClone) {
-            System.out.println(name + ": clone learnts "
-                + serializedSize(clone));
-        }
-
-        // Temp HACK, only for debugging cloned solver state:
-        if (false && showClone && this.name.equals("rootSolver")) {
-            Solver yetanotherclone1 = serialIbisClone(this);
-            Solver yetanotherclone2 = serialIbisClone(clone);
-        }
-
-        return clone;
+	// Reset statistics; the new stats are added back at the end of
+	// the job by the parent.
+	// stats.reset();
+	stats = new SolverStats();
     }
 
-    private String satinCloneType = "cloning"; // "ibis";
+    public Solver clone_for_satin()
+    {
+	Solver clone;
 
-    private int satinMaxDepth = 0;
+	long begintime = System.currentTimeMillis();
 
-    public void fixupAfterClone() {
-        // In childs, learnts are fresh:
-        startNewLearnts = 0;
+	if (satinUseSharedClauses) {
+	    // Clone all except the constraints
+	    // They will be rebuilt based on the shared clauses
+	    // For the moment it is done by first including it in
+	    // the clone and then deleting it manually, since the
+	    // hooks to do this in one step currently don't exist,
+	    // and could lead to old cruft still hanging around
+	    // in the cloned Solver object; see below.
+	}
 
-        // Reset statistics; the new stats are added back at the end of
-        // the job by the parent.
-        // stats.reset();
-        stats = new SolverStats();
+	
+	if (satinCloneType.equals("sun")) {
+	    clone = serialClone(this);
+	    // System.out.println("Cloned " + clone.name +
+	    //		       " by Sun serialization");
+	} else {
+	    clone = serialIbisClone(this);
+	    // System.out.println("Cloned " + clone.name +
+	    //		       " by Ibis serialization");
+	}
+
+	if (satinUseSharedClauses) {
+	    if (satinCloneType.equals("sun") ||
+		satinCloneType.equals("ibis"))
+	    {
+		if (false) {
+		    System.out.println(name + ": before clause removal: " +
+				       serializedSize(clone));
+		}
+
+		// Now delete the constraints and data structures pointing
+		// to them: the watched literal implementation:
+		for (int i = 0; i < clone.constrs.size(); i++) {
+		    Constr c = clone.constrs.get(i);
+		    c.remove();
+		}
+		clone.constrs = null;
+	    }
+	    // In the clone() the watched literals are only pointing
+	    // to the cloned learned clauses, which is fine.
+	}
+
+	// Avoid backtraking beyond current level:
+	// clone.rootLevel = decisionLevel();
+	// Now done in the children themselves, AFTER the assumption!
+
+	clone.fixupAfterClone();
+
+	if (false) {
+	    System.out.println(name + ": size " + serializedSize(this) +
+			       " clone size " + serializedSize(clone));
+	}
+
+	stats.cloneOverhead +=
+	    (System.currentTimeMillis() - begintime) / 1000.0;
+
+	return clone;
     }
 
-    public Solver clone_for_satin() {
-        Solver clone;
-
-        long begintime = System.currentTimeMillis();
-
-        if (satinUseSharedClauses) {
-            // Clone all except the constraints
-            // They will be rebuilt based on the shared clauses
-            // For the moment it is done by first including it in
-            // the clone and then deleting it manually, since the
-            // hooks to do this in one step currently don't exist,
-            // and could lead to old cruft still hanging around
-            // in the cloned Solver object; see below.
-        }
-
-        if (satinCloneType.equals("sun")) {
-            clone = serialClone(this);
-            // System.out.println("Cloned " + clone.name +
-            //		       " by Sun serialization");
-        } else if (satinCloneType.equals("ibis")) {
-            clone = serialIbisClone(this);
-            // System.out.println("Cloned " + clone.name +
-            //		       " by Ibis serialization");
-        } else {
-            clone = (Solver) this.clone();
-            // System.out.println("Cloned " + clone.name + " by clone()");
-        }
-
-        if (satinUseSharedClauses) {
-            if (satinCloneType.equals("sun") || satinCloneType.equals("ibis")) {
-                if (false) {
-                    System.out.println(name + ": before clause removal: "
-                        + serializedSize(clone));
-                }
-
-                // Now delete the constraints and data structures pointing
-                // to them: the watched literal implementation:
-                for (int i = 0; i < clone.constrs.size(); i++) {
-                    Constr c = clone.constrs.get(i);
-                    c.remove();
-                }
-                clone.constrs = null;
-            }
-            // In the clone() the watched literals are only pointing
-            // to the cloned learned clauses, which is fine.
-        }
-
-        // Avoid backtraking beyond current level:
-        // clone.rootLevel = decisionLevel();
-        // Now done in the children themselves, AFTER the assumption!
-
-        clone.fixupAfterClone();
-
-        if (false) {
-            System.out.println(name + ": size " + serializedSize(this)
-                + " clone size " + serializedSize(clone));
-        }
-
-        stats.cloneOverhead += (System.currentTimeMillis() - begintime) / 1000.0;
-
-        return clone;
-    }
-
-    private int satinMaxGlobalLearnSize = 0;
+    private static int DEFAULT_MAX_GLOBAL_LEARN_SIZE = 0;
+    private int satinMaxGlobalLearnSize = DEFAULT_MAX_GLOBAL_LEARN_SIZE;
 
     // To limit spawning big problems deeper and deeper until memory runs out:
-    private int satinMaxSpawnDepth = 100;
+    private static final int DEFAULT_MAX_SPAWN_DEPTH = 100;
+    private int satinMaxSpawnDepth = DEFAULT_MAX_SPAWN_DEPTH;
 
-    // Maybe it makes sense to take the current decision depth into account
-    // for when to split up a problem (not done right now):
-    private int satinMaxDecisionDepth = 400;
+    private static final int DEFAULT_MAX_ITER = 25000;
+    private int satinMaxLocalIter = DEFAULT_MAX_ITER; // TODO: need heuristics
 
-    private int satinMaxLocalIter = Integer.MAX_VALUE;
+    class UnorderedVec
+    {
+	VecInt theVec;
 
-    class UnorderedVec {
-        VecInt theVec;
+	UnorderedVec(VecInt vec)
+	{
+	    theVec = vec;
+	}
 
-        UnorderedVec(VecInt vec) {
-            theVec = vec;
-        }
+	
+	@Override
+	public boolean equals(Object other)
+	{
+	    VecInt otherVec = ((UnorderedVec) other).theVec;
 
-        @Override
-        public boolean equals(Object other) {
-            VecInt otherVec = ((UnorderedVec) other).theVec;
+	    if (false) {
+		System.out.print("compare: ");
+		for (int i = 0; i < theVec.size(); i++) {
+		    System.out.print(" " + theVec.get(i));
+		}
+		System.out.print("and: ");
+		for (int i = 0; i < otherVec.size(); i++) {
+		    System.out.print(" " + otherVec.get(i));
+		}
+		System.out.println();
+	    }
 
-            if (false) {
-                System.out.print("compare: ");
-                for (int i = 0; i < theVec.size(); i++) {
-                    System.out.print(" " + theVec.get(i));
-                }
-                System.out.print("and: ");
-                for (int i = 0; i < otherVec.size(); i++) {
-                    System.out.print(" " + otherVec.get(i));
-                }
-                System.out.println();
-            }
+	    for (int i = 0; i < theVec.size(); i++) {
+		int find = theVec.get(i);
+		boolean found = false;
+		for (int j = 0; j < otherVec.size(); j++) {
+		    if (otherVec.get(j) == find) {
+			found = true;
+			break;
+		    }
+		}
+		if (! found) {
+		    // System.out.println(" other missing " + find);
+		    return false;
+		}
+	    }
 
-            for (int i = 0; i < theVec.size(); i++) {
-                int find = theVec.get(i);
-                boolean found = false;
-                for (int j = 0; j < otherVec.size(); j++) {
-                    if (otherVec.get(j) == find) {
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    // System.out.println(" other missing " + find);
-                    return false;
-                }
-            }
+	    for (int i = 0; i < otherVec.size(); i++) {
+		int find = otherVec.get(i);
+		boolean found = false;
+		for (int j = 0; j < theVec.size(); j++) {
+		    if (theVec.get(j) == find) {
+			found = true;
+			break;
+		    }
+		}
+		if (! found) {
+		    // System.out.println(" this missing " + find);
+		    return false;
+		}
+	    }
 
-            for (int i = 0; i < otherVec.size(); i++) {
-                int find = otherVec.get(i);
-                boolean found = false;
-                for (int j = 0; j < theVec.size(); j++) {
-                    if (theVec.get(j) == find) {
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    // System.out.println(" this missing " + find);
-                    return false;
-                }
-            }
+	    // System.out.println(" equal! size " + theVec.size());
+	    return true;
+	}
 
-            // System.out.println(" equal! size " + theVec.size());
-            return true;
-        }
+	@Override
+	public int hashCode()
+	{
+	    int sum = 0x0;
 
-        @Override
-        public int hashCode() {
-            int sum = 0x0;
+	    for (int i = 0; i < theVec.size(); i++) {
+		sum ^= theVec.get(i);
+	    }
 
-            for (int i = 0; i < theVec.size(); i++) {
-                sum ^= theVec.get(i);
-            }
-
-            // System.out.print(" hash " + sum + " ");
-            return sum;
-        }
+	    // System.out.print(" hash " + sum + " ");
+	    return sum;
+	}
     }
 
     private long nofLearnts;
 
     private int startNewLearnts = 0;
-
     private Vec<String> learntFrom;
 
-    boolean satinUseIntArrays = false; // temp HACK
-
-    private static final boolean learntDebug = false; // true;
-
+    private static final boolean learntDebug = false;
     private static final boolean satinDebug = satinGlobalDebug; // false;
 
     public boolean satinUseSharedObjects = true;
-
+    // SATIN TODO:
     private boolean satinUseSharedClauses = false; // for now
-
     public int satinSearchIter = 0;
 
-    private void processGlobalLearnts(SolverState globalState, int iter) {
-        Hashtable<UnorderedVec, String> myLearnedHash = new Hashtable<UnorderedVec, String>();
+    private void
+    processGlobalLearnts(SolverState globalState, int iter)
+    {
+	Hashtable myLearnedHash = new Hashtable();
 
-        // Too much overhead:
-        if (false) {
-            // Initialize the hash with the ones we already know:
-            for (int i = 0; i < learnts.size(); i++) {
-                Constr l;
+	// Too much overhead:
+	if (false) {
+	    // Initialize the hash with the ones we already know:
+	    for (int i = 0; i < learnts.size(); i++) {
+		Constr l;
 
-                l = learnts.get(i);
-                VecInt cl = new VecInt();
-                for (int j = 0; j < l.size(); j++) {
-                    cl.push(l.get(j));
-                }
+		l = learnts.get(i);
+		VecInt cl = new VecInt();
+		for (int j = 0; j < l.size(); j++) {
+		    cl.push(l.get(j));
+		}
 
-                if (learntDebug) {
-                    System.out.print(this.name + ": already learnt " + i + ":");
-                    for (int j = 0; j < l.size(); j++) {
-                        System.out.print(" " + cl.get(j));
-                    }
-                    System.out.println();
-                }
+		if (learntDebug) {
+		    System.out.print(name + ": already learnt " + i + ":");
+		    for (int j = 0; j < l.size(); j++) {
+			System.out.print(" " + cl.get(j));
+		    }
+		    System.out.println();
+		}
 
-                UnorderedVec uv = new UnorderedVec(cl);
-                if (myLearnedHash.get(uv) == null) {
-                    myLearnedHash.put(uv, this.name);
-                } else {
-                    if (learntDebug) {
-                        System.out.println("duplicate?!");
-                    }
-                }
-            }
-        }
+		UnorderedVec uv = new UnorderedVec(cl);
+		if (myLearnedHash.get(uv) == null) {
+		    myLearnedHash.put(uv, name);
+		} else {
+		    if (learntDebug) {
+			System.out.println("duplicate?!");
+		    }
+		}
+	    }
+	}
 
-        int took = 0;
-        int avail = 0;
-        int jobs = 0;
+	int took = 0;
+	int avail = 0;
+	int jobs = 0;
+	int numKeys = 0;
 
-        if (startNewLearnts == 0) {
-            startNewLearnts = learnts.size();
-        }
-        learntFrom = new Vec<String>();
+	if (startNewLearnts == 0) {
+	    startNewLearnts = learnts.size();
+	}
+	learntFrom = new Vec<String>();
 
-        Enumeration<String> keys = globalState.learnedHash.keys();
-        while (keys.hasMoreElements()) {
-            String key = (String) keys.nextElement();
-            // Vec<Constr> learn = null;
-            Vec<VecInt> newLearnt = null;
-            int[][] newLearntarr = null;
-            int nlearnt;
+	Enumeration keys = globalState.learnedHash.keys();
+	while (keys.hasMoreElements()) {
+	    numKeys = 0;
+	    String key = (String) keys.nextElement();
+	    // Vec<Constr> learn = null;
+	    Vec<VecInt> newLearnt = null;
+	    int [][] newLearntarr = null;
+	    int nlearnt;
 
-            learntFrom.push(key);
-            if (satinUseIntArrays) {
-                newLearntarr = (int[][]) globalState.learnedHash.get(key);
-                if (newLearntarr == null) {
-                    continue;
-                }
-                nlearnt = newLearntarr.length;
-            } else {
-                newLearnt = (Vec<VecInt>) globalState.learnedHash.get(key);
-                if (newLearnt == null) {
-                    continue;
-                }
-                nlearnt = newLearnt.size();
-            }
+	    learntFrom.push(key);
+	    newLearnt = (Vec<VecInt>) globalState.learnedHash.get(key);
+	    if (newLearnt == null) {
+		continue;
+	    }
+	    nlearnt = newLearnt.size();
+	    if (learntDebug) {
+		System.out.println("solver " + name +
+				   " learnt " + newLearnt.size() +
+				   " from " + key);
+	    }
 
-            if (learntDebug && !satinUseIntArrays) {
-                System.out.println("solver " + name + " learnt "
-                    + newLearnt.size() + " from " + key);
-            }
+	    if (name.equals(key)) {
+		// this is true for the reiterating rootSolver
+		if (learntDebug) {
+		    System.out.println("solver " + name +
+				       " cannot learn from itself");
+		}
+		continue;
+	    }
 
-            if (name.equals(key)) {
-                // this is true for the reiterating rootSolver
-                if (learntDebug) {
-                    System.out.println("solver " + name
-                        + " cannot learn from itself");
-                }
-                continue;
-            }
+	    jobs++;
+	    avail += nlearnt;
 
-            jobs++;
-            avail += nlearnt;
+	    for (int i = 0; i < nlearnt; i++) {
+		VecInt cl;
 
-            for (int i = 0; i < nlearnt; i++) {
-                VecInt cl;
+		cl = newLearnt.get(i);
+		if (cl == null || cl.size() == 0) {
+		    // Hack: this can happen when global learnts are
+		    // removed by one of the other threads..
+		    if (learntDebug) {
+			System.out.println(name + ": no learnt from "
+					   + key + " at " +  i + "!");
+		    }
+		    break;
+		}
 
-                if (satinUseIntArrays) {
-                    cl = new VecInt();
-                    int[] l = newLearntarr[i];
-                    for (int j = 0; j < l.length; j++) {
-                        cl.push(l[j]);
-                    }
-                } else {
-                    cl = newLearnt.get(i);
-                    if (cl == null || cl.size() == 0) {
-                        // Hack: this can happen when global learnts are
-                        // removed by one of the other threads..
-                        if (learntDebug) {
-                            System.out.println(this.name + ": no learnt from "
-                                + key + " at " + i + "!");
-                        }
-                        break;
-                    }
-                }
+		if (learntDebug) {
+		    System.out.print(name + ": learnt " + i +
+				     " from " + key + ":");
+		    for (int j = 0; j < cl.size(); j++) {
+			System.out.print(" " + cl.get(j));
+		    }
+		    System.out.println();
+		}
 
-                if (learntDebug) {
-                    System.out.print(this.name + ": learnt " + i + " from "
-                        + key + ":");
-                    for (int j = 0; j < cl.size(); j++) {
-                        System.out.print(" " + cl.get(j));
-                    }
-                    System.out.println();
-                }
+		UnorderedVec uv = new UnorderedVec(cl);
+		if (myLearnedHash.get(uv) == null) {
+		    // System.out.println(": new!");
+		    myLearnedHash.put(uv, key);
+		    took++;
+		    
+		    // Note: use newConstr instead of createUnregisteredClause
+		    // directly, since we need to watch two UNassigned
+		    // literals in the clause if possible, and the other
+		    // primitive doesn't take care of that.
+		    Constr c = newConstr(cl);
+		    if (c != null) { // SATIN TODO
+			// Subset of functionality of record(c):
+			c.setLearnt();
+			// Also set a flag to note it was globally learned
+			c.setLearntGlobal();
+			// NOT: constr.assertConstraint(this);
+			slistener.adding(decode2dimacs(c.get(0)));
+			if (c.size() == 1) {
+			    // NOT: stats.learnedliterals++;
+			} else {
+			    // Note: next call will also increment locally
+			    // learned variable statistics; so overall they
+			    // will be added multiple times. Other than that,
+			    // no problem.
+			    learner.learns(c);
+			}
+		    }
+		}
+	    }
 
-                UnorderedVec uv = new UnorderedVec(cl);
-                if (myLearnedHash.get(uv) == null) {
-                    // System.out.println(": new!");
-                    myLearnedHash.put(uv, key);
-                    took++;
+	    if (learnts.size() > nofLearnts) {
+		// Reduce the set of learnt clauses
+		reduceDB();
+	    }
+	}
 
-                    // Note: use newConstr instead of createUnregisteredClause
-                    // directly, since we need to watch two UNassigned
-                    // literals in the clause if possible, and the other
-                    // primitve doesn't take care of that.
-                    Constr c = newConstr(cl);
-                    if (c != null) {
-                        // Subset of functionality of record(c):
-                        c.setLearnt();
-                        // set a flag to note it is a globally learned one:
-                        c.setStatus(1L);
-                        // NOT: constr.assertConstraint(this);
-                        slistener.adding(decode2dimacs(c.get(0)));
-                        if (c.size() == 1) {
-                            // NOT: stats.learnedliterals++;
-                        } else {
-                            // Note: next call will also increment locally
-                            // learned variable statistics; so overall they
-                            // will be added multiple times. Other than that,
-                            // no problem.
-                            learner.learns(c);
-                        }
-                    }
-                }
-            }
+	if (took > 0) {
+	    stats.learnedglobaljobs++;
+	    stats.learnedglobalclauses += took;
 
-            if (learnts.size() > nofLearnts) {
-                // Reduce the set of learnt clauses
-                reduceDB();
-            }
-        }
-
-        if (took > 0) {
-            stats.learnedglobaljobs++;
-            stats.learnedglobalclauses += took;
-
-            if (verbose) {
-                System.out.println(this.name + " iter " + iter + " took "
-                    + took + " of " + avail + " from " + jobs + " jobs;"
-                    + " now " + learnts.size());
-            }
-        }
+	    if (verbose) {
+		System.out.println(name + " iter " + iter +
+				   " took " + took + " of " +  avail +
+				   " from " + jobs + " jobs;" +
+				   " now " + learnts.size());
+	    }
+	}
     }
 
-    private void publishLearnts(SolverState globalState, long conflicts) {
-        // Vec<Constr> sendLearnts = null;
-        Vec<VecInt> sendLearnts = null;
-        Vec<int[]> sendLearntsVec = null;
+    private void
+    publishLearnts(SolverState globalState, long conflicts)
+    {
+	Vec<VecInt> sendLearnts = null;
+	Vec<int[]> sendLearntsVec = null;
 
-        if (satinUseIntArrays) {
-            sendLearntsVec = new Vec<int[]>(learnts.size());
-        } else {
-            // sendLearnts = new Vec<Constr>(learnts.size());
-            sendLearnts = new Vec<VecInt>(learnts.size());
-        }
+	sendLearnts = new Vec<VecInt>(learnts.size());
 
-        // Only send newly learnt constraints starting at startNewLearnts
-        for (int i = startNewLearnts; i < learnts.size(); i++) {
-            Constr l;
+	// Only send newly learnt constraints starting at startNewLearnts
+	for (int i = startNewLearnts; i < learnts.size(); i++) {
+	    Constr l;
 
-            l = learnts.get(i);
-            if (l.size() <= satinMaxGlobalLearnSize) {
-                if (learntDebug) {
-                    System.out.print(this.name + ": publish ");
-                    for (int j = 0; j < l.size(); j++) {
-                        System.out.print(" " + l.get(j));
-                    }
-                    System.out.println();
-                }
+	    l = learnts.get(i);
+	    if (l.size() <= satinMaxGlobalLearnSize) {
+		if (learntDebug) {
+		    System.out.print(name + ": publish ");
+		    for (int j = 0; j < l.size(); j++) {
+			System.out.print(" " + l.get(j));
+		    }
+		    System.out.println();
+		}
 
-                if (satinUseIntArrays) {
-                    int[] lArr = new int[l.size()];
+		VecInt lVec = new VecInt(l.size());
+		for (int j = 0; j < l.size(); j++) {
+		    lVec.push(l.get(j));
+		}
+		sendLearnts.push(lVec);
+	    }
+	}
 
-                    for (int j = 0; j < l.size(); j++) {
-                        lArr[j] = l.get(j);
-                    }
-                    sendLearntsVec.push(lArr);
-                } else {
-                    // sendLearnts.push(l);
-                    VecInt lVec = new VecInt(l.size());
+	if (sendLearnts.size() > 0) {
+	    globalState.addLearnts(name, sendLearnts, conflicts);
+	    stats.publishglobalclauses += sendLearnts.size();
+	    stats.publishglobaljobs++;
+	} else {
+	    globalState.addConflicts(conflicts);
+	}
 
-                    for (int j = 0; j < l.size(); j++) {
-                        lVec.push(l.get(j));
-                    }
-                    sendLearnts.push(lVec);
-                }
-            }
-        }
-
-        if (satinUseIntArrays) {
-            if (sendLearntsVec.size() > 0) {
-                int[][] sendLearntsArr = new int[sendLearntsVec.size()][];
-
-                for (int i = 0; i < sendLearntsVec.size(); i++) {
-                    sendLearntsArr[i] = sendLearntsVec.get(i);
-                }
-                globalState.addLearntsIntVecs(name, sendLearntsArr, conflicts);
-                stats.publishglobalclauses += sendLearntsVec.size();
-                stats.publishglobaljobs++;
-            } else {
-                globalState.addConflicts(conflicts);
-            }
-        } else {
-            if (sendLearnts.size() > 0) {
-                globalState.addLearnts(name, sendLearnts, conflicts);
-                stats.publishglobalclauses += sendLearnts.size();
-                stats.publishglobaljobs++;
-            } else {
-                globalState.addConflicts(conflicts);
-            }
-        }
-
-        // Avoid processing duplicate info in subsequent jobs:
-        if (learntFrom != null) {
-            for (int i = 0; i < learntFrom.size(); i++) {
-                if (verbose) {
-                    System.out.println(this.name + ": remove learnt from "
-                        + learntFrom.get(i));
-                }
-                globalState.removeLearnts(learntFrom.get(i));
-                stats.removedglobaljobs++;
-            }
-        }
+	// Avoid processing duplicate info in subsequent jobs:
+	if (learntFrom != null) {
+	    for (int i = 0; i < learntFrom.size(); i++) {
+		if (verbose) {
+		    System.out.println(name + ": remove learnt from " +
+				       learntFrom.get(i));
+		}
+		globalState.removeLearnts(learntFrom.get(i));
+		stats.removedglobaljobs++;
+	    }
+	}
     }
 
-    public SolverResult searchResult(Lbool result) {
-        return new SolverResult(result, this.model, this.stats, this.voc,
-            this.order);
+    public SolverResult
+    searchResult(Lbool result)
+    {
+	return new SolverResult(result, model, stats, voc, order);
     }
 
-    private Constr newConstr(VecInt theLits) {
-        // Note: need the clone() since createClause
-        // really grabs (and modifies) the lits array.
-        VecInt vlits = (VecInt) theLits.clone();
+    private Constr newConstr(VecInt theLits)
+    {
+	// Note: need the clone() since createClause
+	// really grabs (and modifies) the lits array.
+	// ORIG: VecInt vlits = (VecInt) theLits.clone();
+	// NEW: copy instead of clone:
+	VecInt vlits = new VecInt();
+	for (int i = 0; i < theLits.size(); i++) {
+	    vlits.push(theLits.get(i));
+	}
 
-        // NOTE: Put the variable with the highest level on place 1
-        // (see WLClause), so that after UNassignments, which happen
-        // in reverse, we keep watching the right literals.
-        int maxi = 1;
-        int maxlevel = voc.getLevel(vlits.get(1));
-        for (int i = 2; i < vlits.size(); i++) {
-            int level = voc.getLevel(vlits.get(i));
-            if (level > maxlevel) {
-                maxi = i;
-                maxlevel = level;
-            }
-        }
-        int l = vlits.get(1);
-        vlits.set(1, vlits.get(maxi));
-        vlits.set(maxi, l);
+	// NOTE: Put the variable with the highest level on place 1
+	// (see WLClause), so that after UNassignments, which happen
+	// in reverse, we keep watching the right literals.
+	int maxi = 1;
+	int maxlevel = voc.getLevel(vlits.get(1));
+	for (int i = 2; i < vlits.size(); i++) {
+	    int level = voc.getLevel(vlits.get(i));
+	    if (level > maxlevel) {
+		maxi = i;
+		maxlevel = level;
+	    }
+	}
+	int l = vlits.get(1);
+	vlits.set(1, vlits.get(maxi));
+	vlits.set(maxi, l);
 
-        // Also make sure the first (watched) literals can still be made true,
-        // else swap them with other unassigned ones.
-        // TODO: is this really still necessary, given the precautions above?!
-        for (int k = 1; k >= 0; k--) {
-            if (voc.isFalsified(vlits.get(k))) {
-                if (satinGlobalDebug) {
-                    System.out.println(this.name + " constr " + vlits
-                        + " falsified " + k + ": " + vlits.get(k));
-                }
-                // search a free var to be used instead:
-                int j;
-                for (j = 2; j < vlits.size(); j++) {
-                    if (voc.isUnassigned(vlits.get(j))) {
-                        int lit = vlits.get(j);
-                        vlits.set(j, vlits.get(k));
-                        vlits.set(k, lit);
-                        if (satinGlobalDebug) {
-                            System.out.println("swap " + vlits.get(j) + ", "
-                                + lit);
-                        }
-                        break;
-                    }
-                }
-                if (satinGlobalDebug) {
-                    if (j >= vlits.size()) {
-                        System.out.println("*** no free var for " + k + "!");
-                    }
-                }
-            }
-        }
+	// Also make sure the first (watched) literals can still be made true,
+	// else swap them with other unassigned ones.
+	// TODO: is this really still necessary, given the precautions above?!
+	for (int k = 1; k >= 0; k--) {
+	    if (voc.isFalsified(vlits.get(k))) {
+		if (satinGlobalDebug) {
+		    System.out.println(name + " constr " +
+				       vlits + " falsified " +  k + ": " +
+				       vlits.get(k));
+		}
+		// search a free var to be used instead:
+		int j;
+		for (j = 2; j < vlits.size(); j++) {
+		    if (voc.isUnassigned(vlits.get(j))) {
+			int lit = vlits.get(j);
+			vlits.set(j, vlits.get(k));
+			vlits.set(k, lit);
+			if (satinGlobalDebug) {
+			    System.out.println("swap " + vlits.get(j) +
+					       ", " + lit);
+			}
+			break;
+		    }
+		}
+		if (satinGlobalDebug) {
+		    if (j >= vlits.size()) {
+			System.out.println("*** no free var for " + k + "!");
+		    }
+		}
+	    }
+	}
 
-        // Note: we cannot create a registered clause, since
-        // the primitive for that *also* throws out literals
-        // based on the current (possibly tentative)
-        // variable assignments.
-        return dsfactory.createUnregisteredClause(vlits);
+	// Note: we cannot create a registered clause, since
+	// the primitive for that *also* throws out literals
+	// based on the current (possibly tentative)
+	// variable assignments.
+	return dsfactory.createUnregisteredClause(vlits);
     }
 
-    public SolverResult satinDoRecSearch(long nofConflicts, int satinDepth,
-        SolverState globalState, Vec<VecInt> reasons) {
-        long begintime = System.currentTimeMillis();
+    public SolverResult
+    satinDoRecSearch(long nofConflicts, int satinDepth,
+		     SolverState globalState, Vec<VecInt> reasons)
+    {
+	long begintime = System.currentTimeMillis();
 
-        try {
-            // If solution found elsewhere, stop as quickly as possible
-            if (satinUseSharedObjects && globalState.updated(satinSearchIter)) {
-                // System.out.println("satinDoRecSearch: solver iter " +
-                //		   this.satinSearchIter +
-                // 		   " globalState iter " + globalState.iter);
-                System.out.println(this.name + ": pruned");
-                return searchResult(Lbool.UNDEFINED); // was FALSE
-            }
+	try
+        {
+	    // If solution found elsewhere, stop as quickly as possible
+	    if (satinUseSharedObjects && globalState.updated(satinSearchIter)){
+		if (verbose) {
+		    System.out.println(name + ": pruned");
+		}
+		return searchResult(Lbool.UNDEFINED); // other branch knows
+	    }
 
-            if (satinUseSharedClauses) {
-                // Reconstruct current constraints from initial
-                // global constraints
-                constrs = new Vec<Constr>();
-                // System.out.println(name +
-                //		      ": Read all constraints: " +
-                //		      globalState.allConstrs);
-                // System.out.println(name +
-                //		      ": Number of constraints: " +
-                //		      globalState.allConstrs.size());
-                int nconstr = 0;
-                for (int i = 0; i < globalState.allConstrs.size(); i++) {
-                    // System.out.println("creating constraint for " +
-                    //		       globalState.allConstrs.get(i));
-                    Constr c = newConstr(globalState.allConstrs.get(i));
-                    if (c != null) {
-                        c.setVoc(voc);
-                        c.register();
-                        if (satinGlobalDebug) {
-                            System.out.println("New constr " + i + ": " + c);
-                        }
-                        nconstr++;
-                        addConstr(c);
-                    }
-                }
-                if (satinGlobalDebug) {
-                    System.out.println(name + ": Number of live constraints: "
-                        + nconstr);
-                }
-            }
+	    if (satinUseSharedClauses) {
+		// Reconstruct current constraints from initial
+		// global constraints
+		constrs  = new Vec<Constr>();
+		// System.out.println(name + ": Read all constraints: " +
+		//		      globalState.allConstrs + "; number " +
+		//		      globalState.allConstrs.size());
+		int nconstr = 0;
+		for (int i = 0; i < globalState.allConstrs.size(); i++) {
+		    // System.out.println("creating constraint for " +
+		    //		       globalState.allConstrs.get(i));
+		    Constr c = newConstr(globalState.allConstrs.get(i));
+		    if (c != null) {
+			// Previously we did a c.setVoc() but that was only
+			// for the native cloning support that is dropped
+			c.register();
+			if (satinGlobalDebug) {
+			    System.out.println("New constr " + i + ": " + c);
+			}
+			nconstr++;
+			addConstr(c);
+		    }
+		}
+		if (satinGlobalDebug) {
+		    System.out.println(name +
+				       ": Number of live constraints: " +
+				       nconstr);
+		}
+	    }
 
-            // Apply reasons for assigned variables
-            if (reasons != null) {
-                setReasons(reasons);
-            }
+	    // Apply reasons for assigned variables
+	    if (reasons != null) {
+		setReasons(reasons);
+	    }
 
-            if (splitDebug) {
-                System.out.println(name + ": satinDoRecSearch:");
-                printTrail();
-            }
+	    if (false && splitDebug) {
+	        System.out.println(name + ": satinDoRecSearch:");
+		printTrail();
+	    }
 
-            if (satinDebug) {
-                System.out.println(name + ": spawn level " + satinDepth
-                    + " root level " + rootLevel + " decision level "
-                    + decisionLevel());
-            }
+	    if (satinDebug) {
+		System.out.println(name + ": spawn level " + satinDepth +
+		    " root level " + rootLevel +
+		    " decision level " + decisionLevel());
+	    }
 
-            SolverResult res = satinRecSearch(nofConflicts, satinDepth,
-                globalState);
-            double secs = (System.currentTimeMillis() - begintime) / 1000.0;
-            if (satinDepth < 6 || secs > 10.0) {
-                // System.out.println(name + ": " + res.satin_res);
-                System.out.println(name
-                    + (res.seqTimeOut ? " time " : " took ") + secs + " sec");
-            }
-            return res;
-        } catch (Throwable e) {
-            System.err.println("Got exception: " + e);
-            e.printStackTrace();
-            return new SolverResult(Lbool.FALSE, null, stats, this.voc,
-                this.order);
-        }
+	    SolverResult res =
+		satinRecSearch(nofConflicts, satinDepth, globalState);
+	    double secs = (System.currentTimeMillis() - begintime) / 1000.0;
+	    if (satinDepth < 6 || secs > 10.0) {
+		// System.out.println(name + ": " + res.satin_res);
+		System.out.println("c " + name + 
+				   (res.seqTimeOut ? " time " : " took ") +
+				   secs + " sec");
+	    }
+	    return res;
+	}
+	catch(Throwable e) {
+	    System.err.println("Got exception: " + e);
+	    e.printStackTrace();
+	    return new SolverResult(Lbool.FALSE, null, stats, voc, order);
+	} 
     }
 
-    public boolean guard_spawn_satinRecSearch(Solver solver, long nofConflicts,
-        int satinDepth, SolverState globalState, Vec<VecInt> reasons) {
-        return (globalState.iter == solver.satinSearchIter);
+    private void printTrail()
+    {
+	int prevLevel = -1;
+
+	System.out.print("trail " +
+			 " root level " + rootLevel +
+			 " decision level " + decisionLevel() +
+			 " size " + trail.size() +
+			 // " lim last " + ((trailLim.size() > 0) ?
+			 //		 trailLim.last() : -1) +
+			 " lim size " + trailLim.size() +
+			 ": ");
+	for (int i = 0; i < trailLim.size(); i++) {
+	    System.out.print(" " + i + "=" + trailLim.get(i));
+	}
+
+	for (int i = 0; i < trail.size(); i++) {
+	    int p = trail.get(i);
+	    int level = voc.getLevel(p);
+	    if (level != prevLevel) {
+		System.out.println();
+		System.out.print("" + level + ": ");
+	    }
+	    System.out.print(" " + p);
+	    Constr reason = voc.getReason(p);
+	    if (reason == null) {
+		if (level == prevLevel) {
+	            System.out.print("@");
+		} else {
+	            System.out.print("#");
+		}
+	    }
+	    prevLevel = level;
+	}
+	System.out.println();
     }
 
-    public SolverResult spawn_satinRecSearch(Solver solver, long nofConflicts,
-        int satinDepth, SolverState globalState, Vec<VecInt> reasons) {
-        return solver.satinDoRecSearch(nofConflicts, satinDepth, globalState,
-            reasons);
-    }
+    public int splitParent()
+    {
+	int ret = -1;
+	int thisRootLevel = (rootLevel == 0) ? 1 : rootLevel;
 
-    private void printTrail() {
-        int prevLevel = -1;
+	if (false && splitDebug) {
+	    System.out.println(name + ": parent trail before split:");
+	    printTrail();
+	}
 
-        System.out.print("trail " + " root level " + rootLevel
-            + " decision level " + decisionLevel() + " size " + trail.size() +
-            // " lim last " + ((trailLim.size() > 0) ?
-            //		 trailLim.last() : -1) +
-            " lim size " + trailLim.size() + ": ");
-        for (int i = 0; i < trailLim.size(); i++) {
-            System.out.print(" " + i + "=" + trailLim.get(i));
-        }
+ 	// GridSAT
+	int rootVarIndex = trailLim.get(thisRootLevel);
 
-        for (int i = 0; i < trail.size(); i++) {
-            int p = trail.get(i);
-            int level = voc.getLevel(p);
-            if (level != prevLevel) {
-                System.out.println();
-                System.out.print("" + level + ": ");
-            }
-            System.out.print(" " + p);
-            Constr reason = voc.getReason(p);
-            if (reason == null) {
-                if (level == prevLevel) {
-                    System.out.print("@");
-                } else {
-                    System.out.print("#");
-                }
-            }
-            prevLevel = level;
-        }
-        System.out.println();
-    }
+	// Modify decision levels of variables above root level
+	for (int i = rootVarIndex; i < trail.size(); i++) {
+	    int p = trail.get(i);
+	    if (i == rootVarIndex) {
+		ret = p;
+		if (voc.getReason(p) == null) {
+		    // analyze() by default assumes every assignment at the
+		    // same decision level has a proper reason clause that
+		    // led to its conclusion.
+		    // To honor this, we create a fake reason for our chosen
+		    // "split" variable (which is done without a reason in
+		    // the formal sense).
+		    // The alternative is to recognize this particular case
+		    // in analyze() itself, but it seems more messy.
+		    VecInt vlits = new VecInt();
+		    vlits.push(p);
+		    Constr cl = dsfactory.createUnregisteredClause(vlits);
+		    voc.setReason(p, cl);
+		} else {
+		    System.out.println(name + ": *** split lit " + p +
+				       " already has a reason?!");
+		}
+	    }
+	    // Don't move level 1 vars to level 0: that has the special
+	    // meaning of assumptions made before search was started
+	    // (e.g., analyze() does not include them when constructing
+	    // conflict clauses)
+	    if (voc.getLevel(p) > 1) {
+		voc.setLevel(p, voc.getLevel(p) - 1);
+	    }
+	}
+	for (int i = thisRootLevel; i < trailLim.size() - 1; i++) {
+	    trailLim.set(i, trailLim.get(i + 1));
+	}
+	trailLim.pop();
 
-    public int splitParent() {
-        int ret = -1;
-        int thisRootLevel = (rootLevel == 0) ? 1 : rootLevel;
+	if (splitDebug) {
+	    System.out.println("parent trail: split var " + ret);
+	    System.out.print("new trailLim: ");
+	    for (int i = 0; i < trailLim.size(); i++) {
+		System.out.print(" " + i + "=" + trailLim.get(i));
+	    }
+	    System.out.println();
+	    printTrail();
+	}
 
-        if (splitDebug) {
-            System.out.println(this.name + ": parent trail before split:");
-            printTrail();
-        }
+	splitLevel = 1;
 
-        // GridSAT
-        int rootVarIndex = trailLim.get(thisRootLevel);
-
-        // Modify decision levels of variables above root level
-        for (int i = rootVarIndex; i < trail.size(); i++) {
-            int p = trail.get(i);
-            if (i == rootVarIndex) {
-                ret = p;
-                if ((satinFixes & 0x20) != 0) {
-                    if (voc.getReason(p) == null) {
-                        // analyze() by default assumes every assignment at
-                        // the same decision level has a proper reason
-                        // clause that led to its conclusion.
-                        // To honor this, we create a fake reason for our
-                        // chosen "split" variable (which is done without
-                        // a reason in the formal sense).
-                        // The alternative is to recognize this particular
-                        // situation in analyze() itself, but it seems
-                        // more messy.
-                        VecInt vlits = new VecInt();
-                        vlits.push(p);
-                        Constr cl = dsfactory.createUnregisteredClause(vlits);
-                        voc.setReason(p, cl);
-                    } else {
-                        System.out.println(this.name + ": *** split lit " + p
-                            + " already has a reason?!");
-                    }
-                }
-            }
-            // Don't move level 1 vars to level 0: that has the special
-            // meaning of assumptions made before search was started
-            // (e.g., analyze() does not include them when constructing
-            // conflict clauses)
-            if (voc.getLevel(p) > 1) {
-                voc.setLevel(p, voc.getLevel(p) - 1);
-            }
-        }
-        for (int i = thisRootLevel; i < trailLim.size() - 1; i++) {
-            trailLim.set(i, trailLim.get(i + 1));
-        }
-        trailLim.pop();
-
-        if (splitDebug) {
-            System.out.println("parent trail: split var " + ret);
-            System.out.print("new trailLim: ");
-            for (int i = 0; i < trailLim.size(); i++) {
-                System.out.print(" " + i + "=" + trailLim.get(i));
-            }
-            System.out.println();
-            printTrail();
-        }
-
-        return ret;
+	return ret;
     }
 
     private boolean inconsistentPropagation = false;
 
-    public void splitChild(int lit) {
-        int thisRootLevel = (rootLevel == 0) ? 1 : rootLevel;
+    public void splitChild()
+    {
+	int thisRootLevel = (rootLevel == 0) ? 1 : rootLevel;
+	int rootVarIndex = trailLim.get(thisRootLevel);
+	int lit = trail.get(rootVarIndex);
 
-        if (false /* splitDebug */) {
-            System.out.println(this.name + ": child trail before split:");
-            printTrail();
-        }
+	if (splitDebug) {
+	    System.out.println(name + ": child trail before split:");
+	    printTrail();
+	}
 
-        // cancel back to rootLevel; the split child then negates the
-        // assumption of the chosen literal after the previous root
-        // For details, see the GridSAT paper.
-        cancelUntil(thisRootLevel);
+	// cancel back to rootLevel; the split child then negates the
+	// assumption of the chosen literal after the previous root
+	// For details, see the GridSAT paper.
+	cancelUntil(thisRootLevel);
 
-        VecInt vlits = new VecInt();
-        int neglit = (lit ^ 1);
-        vlits.push(neglit);
-        Constr cl = dsfactory.createUnregisteredClause(vlits);
-        enqueue(neglit, cl);
+	splitLevel = 1;
+
+	VecInt vlits = new VecInt();
+	int neglit = (lit ^ 1);
+	vlits.push(neglit);
+	Constr cl = dsfactory.createUnregisteredClause(vlits);
+	enqueue(neglit, cl);
         Constr confl = propagate();
-        if (confl != null) {
-            // System.out.println("*** splitChild conflict: " + neglit);
-            inconsistentPropagation = true;
-        }
+	if (confl != null) {
+	    // System.out.println("*** splitChild conflict: " + neglit);
+	    inconsistentPropagation = true;
+	}
 
-        if (trailLim.size() > thisRootLevel) {
+	if (trailLim.size() > thisRootLevel) {
             trailLim.set(thisRootLevel, trailLim.get(thisRootLevel) + 1);
-        }
+	}
 
-        if (splitDebug) {
-            System.out.println("child trail after split:");
-            printTrail();
+	if (splitDebug) {
+	    System.out.println("child trail after split:");
+	    printTrail();
 
-            if (false) {
-                if (voc.isFalsified(lit)) {
-                    System.out.println("*** Firstvar falsified: " + lit);
-                }
-                if (voc.isFalsified(neglit)) {
-                    System.out.println("*** -Firstvar falsified:  " + neglit);
-                }
-            }
-        }
+	    if (false) {
+	        if (voc.isFalsified(lit)) {
+	  	    System.out.println("*** Firstvar falsified: " + lit);
+	        }
+	        if (voc.isFalsified(neglit)) {
+		    System.out.println("*** -Firstvar falsified:  " + neglit);
+	        }
+	    }
+	}
     }
 
     private static final boolean verbose = satinGlobalDebug; // false;
-
     private static final boolean jobStats = false;
 
-    public void updateTimingStats(SolverState globalState, long begintime,
-        int iters) {
-        if (jobStats) {
-            long curtime = System.currentTimeMillis();
-            TimeInfo timeinfo = new TimeInfo(this.name, curtime, curtime
-                - begintime, iters);
-            globalState.updateTime(timeinfo);
-        }
+    public void updateTimingStats(SolverState globalState,
+				  long begintime, int iters)
+    {
+	if (jobStats) {
+	    long curtime = System.currentTimeMillis();
+	    TimeInfo timeinfo = new TimeInfo(name, curtime,
+					     curtime - begintime, iters);
+	    globalState.updateTime(timeinfo);
+	}
     }
+
+    private long initialFreeMem;
 
     // TODO: need auto-inferring of what constitutes a "big" problem
     // that could improve load balancing by forking off earlier
@@ -1979,120 +1723,127 @@ public class Solver extends SatinObject implements ISolver,
     private static final boolean bigProblem = false;
 
     // Added for spawner:
-    public int lastSelectedLit = 0; // Not needed anymore?
-
     public int lastConflicts;
 
-    public SolverResult satinRecSearch(long nofConflicts, int satinDepth,
-        SolverState globalState) {
-        int conflictC = 0;
-        int loop = 0;
-        long gloConflicts;
-        long begintime = System.currentTimeMillis();
-        int maxIter;
+    public SolverResult
+    satinRecSearch(long nofConflicts, int satinDepth, SolverState globalState)
+    {
+	int conflictC = 0;
+	int conflictCsav = 0;
+	int loop = 0;
+	int loop2 = 0;
+	long gloConflicts;
+ 	// increase job length for deap searches with high nofConflicts
+	long minLocalConflicts = (satinDepth > 3) ? (nofConflicts / 256) : 0;
+	long begintime = System.currentTimeMillis();
+	int maxIter;
 
-        if (inconsistentPropagation) {
-            // Just after the problem was split, the childs may find out
-            // that in fact assertion of the chosen split literal led
-            // to an inconsistency.  Situation is dealt with here.
-            // System.out.println(this.name + ": splitChild found conflict");
-            return searchResult(Lbool.FALSE);
-        }
+        final long bound1 = (initialFreeMem / 3);
+        final long bound2 = 32 * 1024 * 1024;
+        final long memorybound = (bound1 < bound2) ? bound2 : bound1;
 
-        if (satinUseSharedObjects) {
-            // Now done in satinDoRecSearch
-            if (false && globalState.updated(satinSearchIter)) {
-                if (verbose) {
-                    System.out.println(this.name + ": pruned");
-                }
-                return searchResult(Lbool.FALSE);
-            }
-            gloConflicts = globalState.globalConflicts;
-            // TODO: only learn at slaves?
-            processGlobalLearnts(globalState, 0);
-        } else {
-            gloConflicts = 0; // Don't know; got reduced nofConflicts instead
-        }
+	if (inconsistentPropagation) {
+	    // Just after the problem was split, the childs may find out
+	    // that in fact assertion of the chosen split literal led
+	    // to an inconsistency.  Situation is dealt with here.
+	    // System.out.println(name + ": splitChild found conflict");
+	    return searchResult(Lbool.FALSE);
+	}
 
-        maxIter = satinMaxLocalIter;
-        if (bigProblem) {
-            // Speed up spawns in the beginning to get all nodes busy:
-            if (satinDepth <= 6) {
-                maxIter >>= 1;
-                if (satinDepth <= 4) {
-                    maxIter >>= 1;
-                    if (satinDepth <= 2) {
-                        maxIter >>= 1;
-                    }
-                }
-            }
-        }
+	if (satinUseSharedObjects) {
+	    // Now done in satinDoRecSearch
+	    if (false && globalState.updated(satinSearchIter)) {
+	    	if (verbose) {
+		    System.out.println("c " + name + ": pruned");
+		}
+		return searchResult(Lbool.FALSE);
+	    }
+	    gloConflicts = globalState.globalConflicts;
+	    // TODO: only learn at slaves?
+	    processGlobalLearnts(globalState, 0);
+	} else {
+	    gloConflicts = 0; // Don't know; got reduced nofConflicts instead
+	}
 
-        if (satinDepth > 0) {
-            // Start with new variable decision (not done in caller as before)
+	maxIter = satinMaxLocalIter;
+	if (bigProblem) {
+	    // Speed up spawns in the beginning to get all nodes busy:
+	    if (satinDepth <= 6) {
+		maxIter >>= 1;
+		if (satinDepth <= 4) {
+		    maxIter >>= 1;
+		    if (satinDepth <= 2) {
+			maxIter >>= 1;
+		    }
+		}
+	    }
+	}
+
+	if (satinDepth > 0) {
+            // Start with new literal decision
             stats.decisions++;
             int p = order.select();
-            if (p <= 1) {
-                System.out.println(this.name + ": init");
-                printTrail();
-            }
             assert p > 1;
-            if (voc.isFalsified(p ^ 1)) {
-                System.out.println(this.name + ": *** implied lit " + p
-                    + " selected?!");
-            }
 
-            slistener.assuming(decode2dimacs(p));
-            boolean ret = assume(p);
-            if (!ret) {
-                System.err.println(this.name + "Solver err assuming " + p);
-            }
-            assert ret;
+	    slistener.assuming(decode2dimacs(p));
+	    boolean ret = assume(p);
+	    assert ret;
 
-            if (analyzeDebug) {
-                System.out.println(this.name + ": first assumption:");
-                printTrail();
-            }
-        }
+	    if (analyzeDebug) {
+	        System.out.println("c " + name + ": first assumption:");
+	        printTrail();
+	    }
+
+	    if (satinDepth > stats.maxSpawnDepth) {
+		stats.maxSpawnDepth = satinDepth;
+	    }
+
+	    System.out.println("c " + name + " "
+			       + (int) (100.0 *
+					Runtime.getRuntime().freeMemory() /
+					(double) initialFreeMem)
+			       + "% memory free");
+	}
 
         do {
             slistener.beginLoop();
-            loop++;
+	    loop++;
 
-            if (verbose) {
-                System.out.print(this.name + ": trail size " + trail.size()
-                    + ": ");
-                for (int i = 0; i < trail.size(); i++) {
-                    System.out.print(" " + trail.get(i));
-                }
-                System.out.println();
-            }
+	    if (verbose) {
+		System.out.print("c " + name + ": trail size " +
+				 trail.size() + ": ");
+		for (int i = 0; i < trail.size(); i++) {
+		    System.out.print(" " + trail.get(i));
+		}
+		System.out.println();
+	    }
 
             // propage les clauses unitaires
             Constr confl = propagate();
             assert trail.size() == qhead;
 
-            if (analyzeDebug && loop < 2) {
-                System.out.println(this.name + ": loop " + loop);
-                printTrail();
-            }
+	    if (analyzeDebug && loop < 2) {
+		System.out.println("c " + name + ": loop " + loop);
+		printTrail();
+	    }
 
             if (confl != null) {
                 // un conflit apparait
                 stats.conflicts++;
                 conflictC++;
                 slistener.conflictFound();
+                freeMem.newConflict();
                 if (decisionLevel() == rootLevel) {
                     // on est a la racine, la formule est inconsistante
-                    if (satinDebug) {
-                        System.out.println(this.name + ": UNSAT after " + loop
-                            + " iterations");
-                    }
-                    // System.out.println(this.name + ": " + confl.toString());
-                    if (satinUseSharedObjects) {
-                        updateTimingStats(globalState, begintime, loop);
-                        publishLearnts(globalState, conflictC);
-                    }
+		    if (satinDebug) {
+			System.out.println("c " + name + ": UNSAT after " +
+					   loop + " iterations");
+		    }
+		    // System.out.println(name + ": " + confl.toString());
+		    if (satinUseSharedObjects) {
+			updateTimingStats(globalState, begintime, loop);
+			publishLearnts(globalState, conflictC);
+		    }
                     return searchResult(Lbool.FALSE);
                 }
 
@@ -2100,23 +1851,23 @@ public class Solver extends SatinObject implements ISolver,
                 assert confl != null;
                 int backtrackLevel = analyze(confl, learntConstraint);
                 assert backtrackLevel < decisionLevel();
-                // System.err.println(this.name +
-                // 		   ": backtrack to " + backtrackLevel +
-                //		   ", decisionLevel " + decisionLevel() +
-                //		   " root " + rootLevel);
+		// System.err.println(name +
+		// 		   ": backtrack to " + backtrackLevel +
+		//		   ", decisionLevel " + decisionLevel() +
+		//		   " root " + rootLevel);
                 cancelUntil(Math.max(backtrackLevel, rootLevel));
                 assert (decisionLevel() >= rootLevel)
-                    && (decisionLevel() >= backtrackLevel);
+                        && (decisionLevel() >= backtrackLevel);
                 if (learntConstraint.obj == null) {
-                    if (satinDebug) {
-                        System.out.println(this.name
-                            + ": no learntConstr: UNSAT");
-                    }
+		    if (satinDebug) {
+			System.out.println("c " + name +
+					   ": no learntConstr: UNSAT");
+		    }
 
-                    if (satinUseSharedObjects) {
-                        updateTimingStats(globalState, begintime, loop);
-                        publishLearnts(globalState, conflictC);
-                    }
+		    if (satinUseSharedObjects) {
+			updateTimingStats(globalState, begintime, loop);
+			publishLearnts(globalState, conflictC);
+		    }
                     return searchResult(Lbool.FALSE);
                 }
                 record(learntConstraint.obj);
@@ -2124,32 +1875,30 @@ public class Solver extends SatinObject implements ISolver,
                 decayActivities();
             } else {
                 // No conflict found
+		/* regular SAT4J code now also uncomments this
                 if (decisionLevel() == 0 && (satinFixes & 0x2) == 0) {
                     // Simplify the set of problem clause
                     // iff rootLevel==0
 
-                    // Experimental: it appears simplifyDB conflicts with
-                    // assignment stack splitting.  Still need to figure
-                    // out why exactly..
+	    	    // Experimental: it appears simplifyDB conflicts with
+		    // assignment stack splitting.  Still need to figure
+		    // out why exactly..
                     stats.rootSimplifications++;
                     boolean ret = simplifyDB();
                     assert ret;
                 }
+		*/
                 // was learnts.size() - nAssigns() > nofLearnts
-                if (nofLearnts >= 0 && learnts.size() > nofLearnts) {
-                    // Reduce the set of learnt clauses
-                    reduceDB();
-                }
                 assert nAssigns() <= voc.realnVars();
                 if (nAssigns() == voc.realnVars()) {
-                    modelFound();
                     slistener.solutionFound();
-                    System.out.println(this.name + ": SAT after " + loop
-                        + " iterations");
-                    if (satinUseSharedObjects) {
-                        updateTimingStats(globalState, begintime, loop);
-                        globalState.setFinished(Lbool.TRUE);
-                    }
+                    modelFound();
+		    System.out.println("c " + name + ": SAT after " +
+				       loop + " iterations");
+		    if (satinUseSharedObjects) {
+			updateTimingStats(globalState, begintime, loop);
+			globalState.setFinished(Lbool.TRUE);
+		    }
                     return searchResult(Lbool.TRUE);
                 }
                 // if (conflictC >= nofConflicts) {
@@ -2157,90 +1906,98 @@ public class Solver extends SatinObject implements ISolver,
                     // Reached bound on number of conflicts
                     // Force a restart
                     cancelUntil(rootLevel);
-                    if (satinUseSharedObjects) {
-                        // for non-shared objects, this would be printed
-                        // MANY times
-                        System.out.println(this.name
-                            + ": conflict bound reached: UNDEF");
-
-                        // Publishing learnts is useful in case of restarts:
-                        publishLearnts(globalState, conflictC);
-                        updateTimingStats(globalState, begintime, loop);
-                        globalState.setFinished(Lbool.UNDEFINED);
-                    }
+		    if (satinUseSharedObjects) {
+			// for non-shared objects, this would be printed
+			// MANY times
+			System.out.println("c " + name +
+					   ": conflict bound reached: UNDEF");
+			
+			// Publishing learnts is useful in case of restarts:
+			publishLearnts(globalState, conflictC);
+			updateTimingStats(globalState, begintime, loop);
+			globalState.setFinished(Lbool.UNDEFINED);
+		    }
 
                     return searchResult(Lbool.UNDEFINED);
                 }
-
-                if (satinUseSharedObjects && ((loop & 0x3ff) == 0x3ff)) {
-                    // Heuristic: occasionally check global state to prevent
-                    // getting stuck in deep fruitless subtrees
-                    sync(); // poll for updates
-                    if (globalState.updated(satinSearchIter)) {
-                        if (verbose) {
-                            System.out.println(this.name + ": pruned running");
-                        }
-                        // Root solver may still want to use our learnts:
-                        updateTimingStats(globalState, begintime, loop);
-                        publishLearnts(globalState, conflictC);
-                        return searchResult(Lbool.FALSE);
-                    }
-                    if ((loop & 0xfff) == 0xfff) {
-                        // Occasionally publish additional learnts
-                        publishLearnts(globalState, conflictC);
-                        conflictC = 0;
-                        // Occasionally also check additional learnts
-                        processGlobalLearnts(globalState, loop);
-                    }
-                    gloConflicts = globalState.globalConflicts;
+		/* SATIN TODO: new sat4j:
+                if (needToReduceDB) {
+                    reduceDB();
+                    needToReduceDB = false;
+                    // Runtime.getRuntime().gc();
+                }
+		*/
+                if (nofLearnts >= 0 && learnts.size() > nofLearnts) {
+                    // Reduce the set of learnt clauses
+                    reduceDB();
                 }
 
-                if (loop > maxIter
-                    // && decisionLevel() < satinMaxDecisionDepth // TODO
-                    && satinDepth < satinMaxSpawnDepth
-                    && ((satinFixes & 0x20) == 0 || decisionLevel() > 3)) {
-                    stats.maxSpawnDepth = satinDepth;
-                    stats.maxIter = loop;
+		if (satinUseSharedObjects && (loop2++ & 0x3ff) == 0x3ff) {
+		    // Heuristic: occasionally check global state to prevent
+		    // getting stuck in deep fruitless subtrees
+		    sync(); // poll for updates
+		    if (globalState.updated(satinSearchIter)) {
+			if (verbose) {
+			    System.out.println("c " + name +
+					       ": pruned running");
+			}
+			// Root solver may still want to use our learnts:
+			updateTimingStats(globalState, begintime, loop);
+			publishLearnts(globalState, conflictC);
+			return searchResult(Lbool.FALSE);
+		    }
+		    if ((loop2 & 0xfff) == 0xfff) {
+			// Occasionally publish additional learnts
+			publishLearnts(globalState, conflictC);
+			conflictCsav += conflictC;
+			conflictC = 0;
+			// Occasionally also check additional learnts
+			processGlobalLearnts(globalState, loop);
+		    }
+		    gloConflicts = globalState.globalConflicts;
+		}
 
-                    // Don't spawn ourselves, but let caller decide
-                    SolverResult res = new SolverResult(Lbool.UNDEFINED, null,
-                        stats, this.voc, this.order);
-                    res.seqTimeOut = true;
-                    return res;
-                }
+		if ((loop > maxIter)
+		    && (conflictC + conflictCsav > minLocalConflicts)
+		    && (satinDepth < satinMaxSpawnDepth)
+		    && (decisionLevel() > rootLevel + 1) // SATIN TODO!!
+		    // also need enough memory left for spawner:
+		    && (Runtime.getRuntime().freeMemory() > memorybound)
+		    )
+		{
+		    if (loop > stats.maxIter) {
+			stats.maxIter = loop;
+		    }
 
-                // New variable decision
-                // The assumption will be done later in this loop,
-                // or if spawning below, in both children.
-                stats.decisions++;
-                int p = order.select();
-                if (p <= 1) {
-                    System.out.println(this.name + ": loop " + loop);
-                    printTrail();
-                }
-                assert p > 1;
-                if (voc.isFalsified(p ^ 1)) {
-                    System.out.println(this.name + ": *** implied lit " + p
-                        + " selected?!");
-                }
+		    // Don't spawn ourselves, but let caller decide
+		    SolverResult res = new SolverResult(Lbool.UNDEFINED,
+							null, stats,
+							voc, order);
+		    lastConflicts = conflictC; // feedback for spawner
+		    res.seqTimeOut = true;
+		    return res;
+		}
 
-                slistener.assuming(decode2dimacs(p));
-                boolean ret = assume(p);
-                if (!ret) {
-                    System.err.println(this.name + "Solver err assuming " + p);
-                }
-                assert ret;
+		// New literal decision
+		stats.decisions++;
+		int p = order.select();
+		assert p > 1;
+
+		slistener.assuming(decode2dimacs(p));
+		boolean ret = assume(p);
+		assert ret;
             }
         } while (undertimeout);
 
-        System.out.println(this.name + ": timeout: UNDEFINED");
-        if (satinUseSharedObjects) {
-            globalState.setFinished(Lbool.UNDEFINED);
-        }
+	System.out.println("c " + name + ": timeout: UNDEFINED");
+	if (satinUseSharedObjects) {
+	    globalState.setFinished(Lbool.UNDEFINED);
+	}
         return searchResult(Lbool.UNDEFINED); // timeout occured
     }
 
-    Lbool satinSearch(long nofConflicts, SolverState globalState) {
+    Lbool satinSearch(long nofConflicts, SolverState globalState)
+    {
         assert rootLevel == decisionLevel();
         stats.starts++;
 
@@ -2248,67 +2005,125 @@ public class Solver extends SatinObject implements ISolver,
         order.setVarDecay(1 / params.getVarDecay());
         claDecay = 1 / params.getClaDecay();
 
-        SolverResult res;
-        // Use external spawner:
-        SolverSpawner spawner = new SolverSpawner();
-        res = spawner.recSearch(this, nofConflicts, 0 /* depth */,
-            globalState, null);
-        if (res.model != null) {
-            model = res.model;
-        }
+	SolverResult res;
+	// Use external spawner:
+	SolverSpawner spawner = new SolverSpawner();
+	res = spawner.recSearch(this, nofConflicts,
+				0 /* depth */, globalState, null);
+	if (res.model != null) {
+	    model = res.model;
+	}
 
-        if ((satinFixes & 0x10) != 0) {
-            // For possibly better variable selecten in the next round,
-            // take combined statistics from children into account:
-            for (int i = 1; i < res.activities.length; i++) {
-                int lit = i << 1;
+	if ((satinFixes & 0x10) != 0 && res.stats.maxSpawnDepth > 0) {
+	    // For better variable selection in the next round,
+	    // take combined activities from children into account.
+	    // Note that the original activities at the parent are
+	    // also the starting activities at the children, so total
+	    // activities are higher than the sequential version
+	    // would report.  However, it is relative activities that
+	    // matter, and these will be updated like we want them.
+	    for (int i = 1; i < res.activities.length; i++) {
+		int lit = i << 1;
 
-                // System.out.println("increase activity " + i +
-                //		   " from " + order.varActivity(lit) +
-                //		   " to " + res.activities[i]);
-                order.setActivity(lit, res.activities[i]);
-            }
-        }
+		// System.out.println(name + " add to activity " + i +
+		// 		   " = " + order.varActivity(lit) +
+		// 		   " : " +  res.activities[i]);
+		order.addActivity(lit, res.activities[i]);
+	    }
+	}
 
-        System.out.println("Global conflicts: " + globalState.globalConflicts
-            + " max " + nofConflicts);
-        // Print job stats
-        Enumeration<TimeInfo> jobs = globalState.timeVec.elements();
-        long firsttime = -1;
-        long maxtime = 0;
-        TimeInfo tiMax = null;
-        long totjobs = 0;
-        while (jobs.hasMoreElements()) {
-            TimeInfo ti = (TimeInfo) jobs.nextElement();
-            if (firsttime == -1) {
-                firsttime = ti.endtime;
-            }
+	System.out.println("c global conflicts: " +
+			   globalState.globalConflicts +
+			   " max " + nofConflicts);
 
-            totjobs++;
-            if (ti.seqtime > maxtime && ti.iters > 0) {
-                tiMax = ti;
-            }
-            if (false) {
-                System.out.println("job " + ti.solver + " at "
-                    + ((ti.endtime - firsttime) / 1000.0) + ": "
-                    + (ti.seqtime / 1000.0) + " s" + " iters " + ti.iters);
-            }
-        }
+	PrintWriter out1 = new PrintWriter(System.out, true);
+	stats.printStat(out1, "c ");
 
-        if (tiMax != null) {
-            System.out.println("maxtime " + (tiMax.seqtime / 1000.0)
-                + " for job " + tiMax.solver + " of " + totjobs + " at "
-                + ((tiMax.endtime - firsttime) / 1000.0) + " iters "
-                + tiMax.iters);
-        }
+	// Print job stats
+	Enumeration jobs = globalState.timeVec.elements();
+	long firsttime = -1;
+	long maxtime = 0;
+	TimeInfo tiMax = null;
+	long totjobs = 0;
+	while (jobs.hasMoreElements()) {
+	    TimeInfo ti = (TimeInfo) jobs.nextElement();
+	    if (firsttime == -1) {
+		firsttime = ti.endtime;
+	    }
 
-        if (res.satin_res == Lbool.UNDEFINED) {
-            // Retaining learned clauses only useful in case we are restarted:
-            processGlobalLearnts(globalState, 0);
-        }
+	    totjobs++;
+	    if (ti.seqtime > maxtime && ti.iters > 0) {
+		tiMax = ti;
+	    }
+	    if (false) {
+		System.out.println("job " + ti.solver +
+			       " at " + ((ti.endtime - firsttime) / 1000.0) +
+			       ": " + (ti.seqtime / 1000.0) + " s" +
+			       " iters " + ti.iters);
+	    }
+	}
+	
+	if (tiMax != null) {
+	    System.out.println(
+		"maxtime " + (tiMax.seqtime / 1000.0) +
+		" for job " + tiMax.solver +
+		" of " + totjobs +
+		" at " + ((tiMax.endtime - firsttime) / 1000.0) +
+		" iters " + tiMax.iters);
+	}
 
-        return res.satin_res;
+	if (res.satin_res == Lbool.UNDEFINED) {
+	    // Retaining learned clauses only useful in case we are restarted:
+	    processGlobalLearnts(globalState, 0);
+	}
+
+	return res.satin_res;
     }
+
+    public void satinSolverInit() {
+	Properties props = new Properties(System.getProperties());
+
+	satinCloneType = props.getProperty("clone", DEFAULT_CLONE_TYPE);
+	System.out.println("Using clone: " + satinCloneType);
+
+	satinFixes =
+	    Integer.parseInt(props.getProperty("fixes",
+					       "" + DEFAULT_SATIN_FIXES));
+	System.out.println("Using fixes: " + satinFixes);
+
+	satinMaxSpawnDepth =
+	    Integer.parseInt(props.getProperty("maxspawndepth",
+					       "" + DEFAULT_MAX_SPAWN_DEPTH));
+	System.out.println("Using maxSpawnDepth: " + satinMaxSpawnDepth);
+
+	satinMaxGlobalLearnSize =
+	    Integer.parseInt(props.getProperty("maxlearnsize",
+					  "" + DEFAULT_MAX_GLOBAL_LEARN_SIZE));
+	System.out.println("Using maxGlobalLearnSize: " +
+			   satinMaxGlobalLearnSize);
+
+	int doUseSharedObjects =
+	    Integer.parseInt(props.getProperty("sharedobjects", "1"));
+	System.out.println("Using sharedobjects: " + doUseSharedObjects);
+	satinUseSharedObjects = (doUseSharedObjects != 0);
+
+	if (satinUseSharedObjects) {
+	    int doUseSharedClauses =
+		Integer.parseInt(props.getProperty("sharedclauses", "0"));
+	    System.out.println("Using sharedclauses: " + doUseSharedClauses);
+	    satinUseSharedClauses = (doUseSharedClauses != 0);
+	}
+
+	satinMaxLocalIter =
+	    Integer.parseInt(props.getProperty("maxiter",
+					       "" + DEFAULT_MAX_ITER));
+	System.out.println("Using maxLocalIter: " + satinMaxLocalIter);
+
+	// Get estimate of remaining free memory after proper startup
+	Runtime.getRuntime().gc();
+	initialFreeMem = Runtime.getRuntime().freeMemory();
+    }
+    // SATIN END
 
     Lbool search(long nofConflicts) {
         assert rootLevel == decisionLevel();
@@ -2325,47 +2140,23 @@ public class Solver extends SatinObject implements ISolver,
             Constr confl = propagate();
             assert trail.size() == qhead;
 
-            if (confl != null) {
-                // un conflit apparait
-                stats.conflicts++;
-                conflictC++;
-                slistener.conflictFound();
-                if (decisionLevel() == rootLevel) {
-                    // on est a la racine, la formule est inconsistante
-                    return Lbool.FALSE;
-                }
-
-                // analyse la cause du conflit
-                assert confl != null;
-                int backtrackLevel = analyze(confl, learntConstraint);
-                assert backtrackLevel < decisionLevel();
-                cancelUntil(Math.max(backtrackLevel, rootLevel));
-                assert (decisionLevel() >= rootLevel)
-                    && (decisionLevel() >= backtrackLevel);
-                if (learntConstraint.obj == null) {
-                    return Lbool.FALSE;
-                }
-                record(learntConstraint.obj);
-                learntConstraint.obj = null;
-                decayActivities();
-            } else {
+            if (confl == null) {
                 // No conflict found
-                if (decisionLevel() == 0) {
-                    // Simplify the set of problem clause
-                    // iff rootLevel==0
-                    stats.rootSimplifications++;
-                    boolean ret = simplifyDB();
-                    assert ret;
-                }
+                // simpliFYDB() prevents a correct use of
+                // constraints removal.
+                // if (decisionLevel() == 0) {
+                // // Simplify the set of problem clause
+                // // iff rootLevel==0
+                // stats.rootSimplifications++;
+                // boolean ret = simplifyDB();
+                // assert ret;
+                // }
                 // was learnts.size() - nAssigns() > nofLearnts
-                if (nofLearnts >= 0 && learnts.size() > nofLearnts) {
-                    // Reduce the set of learnt clauses
-                    reduceDB();
-                }
+                // if (nofLearnts.obj >= 0 && learnts.size() > nofLearnts.obj) {
                 assert nAssigns() <= voc.realnVars();
                 if (nAssigns() == voc.realnVars()) {
-                    modelFound();
                     slistener.solutionFound();
+                    modelFound();
                     return Lbool.TRUE;
                 }
                 if (conflictC >= nofConflicts) {
@@ -2374,6 +2165,11 @@ public class Solver extends SatinObject implements ISolver,
                     cancelUntil(rootLevel);
                     return Lbool.UNDEFINED;
                 }
+                if (needToReduceDB) {
+                    reduceDB();
+                    needToReduceDB = false;
+                    // Runtime.getRuntime().gc();
+                }
                 // New variable decision
                 stats.decisions++;
                 int p = order.select();
@@ -2381,6 +2177,29 @@ public class Solver extends SatinObject implements ISolver,
                 slistener.assuming(decode2dimacs(p));
                 boolean ret = assume(p);
                 assert ret;
+            } else {
+                // un conflit apparait
+                stats.conflicts++;
+                conflictC++;
+                slistener.conflictFound();
+                freeMem.newConflict();
+                if (decisionLevel() == rootLevel) {
+                    // on est a la racine, la formule est inconsistante
+                    return Lbool.FALSE;
+                }
+                // analyse la cause du conflit
+                assert confl != null;
+                int backtrackLevel = analyze(confl, learntConstraint);
+                assert backtrackLevel < decisionLevel();
+                cancelUntil(Math.max(backtrackLevel, rootLevel));
+                assert (decisionLevel() >= rootLevel)
+                        && (decisionLevel() >= backtrackLevel);
+                if (learntConstraint.obj == null) {
+                    return Lbool.FALSE;
+                }
+                record(learntConstraint.obj);
+                learntConstraint.obj = null;
+                decayActivities();
             }
         } while (undertimeout);
         return Lbool.UNDEFINED; // timeout occured
@@ -2390,55 +2209,76 @@ public class Solver extends SatinObject implements ISolver,
      * 
      */
     void modelFound() {
-        // Model found
         model = new int[trail.size()];
+        fullmodel = new boolean[nVars()];
         int index = 0;
         for (int i = 1; i <= voc.nVars(); i++) {
-            if (voc.belongsToPool(i) && !voc.isUnassigned(i)) {
-                model[index++] = voc.isSatisfied(voc.getFromPool(i)) ? i : -i;
+            if (voc.belongsToPool(i)) {
+                int p = voc.getFromPool(i);
+                if (!voc.isUnassigned(p)) {
+                    model[index++] = voc.isSatisfied(p) ? i : -i;
+                    fullmodel[i - 1] = voc.isSatisfied(p);
+                }
             }
         }
+        assert index == model.length;
 
-        // Added sanity checks: all vars assigned and constraints indeed
-        // satisfied.
-        // E.g., useful protection against problems in watched-literals
-        // implementation, cloning, etc
+	// SATIN BEGIN
+	// Added sanity checks: all vars assigned and constraints indeed
+	// satisfied.
+	// E.g., useful protection against problems in watched-literals
+	// implementation, cloning, etc
         if (index != model.length) {
-            System.out.println("*** modelFound but only " + index + " of "
-                + voc.nVars() + " vars assigned! ***");
-        } else {
-            for (int i = 0; i < constrs.size(); i++) {
-                Constr c = constrs.get(i);
+	    System.out.println("*** modelFound but only " + 
+			       index + " of " + voc.nVars() +
+			       " vars assigned! ***");
+	} else {
+	    for (int i = 0; i < constrs.size(); i++) {
+		Constr c = constrs.get(i);
+		VecInt cVec = new VecInt(c.size());
 
-                int res = 0;
-                for (int j = 0; j < c.size(); j++) {
-                    int lit = c.get(j);
-                    boolean sign = ((lit % 2) == 1);
-                    int var = lit / 2;
-                    if (voc.isSatisfied(voc.getFromPool(var)) != sign) {
-                        res++;
-                    }
-                }
+		int res = 0;
+		for (int j = 0; j < c.size(); j++) {
+		    int lit = c.get(j);
+		    boolean sign = ((lit % 2) == 1);
+		    int var = lit / 2;
+		    if (voc.isSatisfied(voc.getFromPool(var)) != sign) {
+			res++;
+		    }
+		}
 
-                if (res == 0) {
-                    System.out.print("*** constraint " + i + "(" + c + ")"
-                        + " NOT satisfied: ");
-                    for (int j = 0; j < c.size(); j++) {
-                        System.out.print(" " + c.get(j));
-                    }
-                    System.out.println();
-                } else if (false) {
-                    System.out.print("constr " + i + " satisfied: " + res);
-                    System.out.print(" (");
-                    for (int j = 0; j < c.size(); j++) {
-                        System.out.print(" " + c.get(j));
-                    }
-                    System.out.println(")");
-                }
-            }
-        }
+		if (res == 0) {
+		    System.out.print("*** constraint " + i + "(" + c + ")" +
+				     " NOT satisfied: ");
+		    for (int j = 0; j < c.size(); j++) {
+			System.out.print(" " + c.get(j));
+		    }
+		    System.out.println();
+		} else if (false) {
+		    System.out.print("constr " + i + " satisfied: " + res);
+		    System.out.print(" (");
+		    for (int j = 0; j < c.size(); j++) {
+			System.out.print(" " + c.get(j));
+		    }
+		    System.out.println(")");
+		}
+	    }
+	}
+	// SATIN END
 
         cancelUntil(rootLevel);
+    }
+
+    public boolean model(int var) {
+        if (var <= 0 || var > nVars()) {
+            throw new IllegalArgumentException(
+                    "Use a valid Dimacs var id as argument!"); //$NON-NLS-1$
+        }
+        if (fullmodel == null) {
+            throw new UnsupportedOperationException(
+                    "Call the solve method first!!!"); //$NON-NLS-1$
+        }
+        return fullmodel[var - 1];
     }
 
     /**
@@ -2448,42 +2288,41 @@ public class Solver extends SatinObject implements ISolver,
         reduceDB(claInc / learnts.size());
     }
 
-    protected void clearLearntClauses() {
-        reduceDB(Double.MAX_VALUE);
+    public void clearLearntClauses() {
+        for (Constr c : learnts)
+            c.remove();
+        learnts.clear();
     }
 
     protected void reduceDB(double lim) {
         int i, j;
-        int oldsize = learnts.size();
-
         sortOnActivity();
         stats.reduceddb++;
         for (i = j = 0; i < learnts.size() / 2; i++) {
             Constr c = learnts.get(i);
-            if (!c.locked()) {
-                c.remove();
-            } else {
+            if (c.locked()) {
                 learnts.set(j++, learnts.get(i));
+            } else {
+                c.remove();
             }
         }
         for (; i < learnts.size(); i++) {
-            Constr c = learnts.get(i);
-            if (!c.locked() && (c.getActivity() < lim)) {
-                c.remove();
-            } else {
-                learnts.set(j++, learnts.get(i));
-            }
+            // Constr c = learnts.get(i);
+            // if (!c.locked() && (c.getActivity() < lim)) {
+            // c.remove();
+            // } else {
+            learnts.set(j++, learnts.get(i));
+            // }
         }
+        // System.out.println("c cleaning " + (learnts.size() - j) //$NON-NLS-1$
+        //        + " clauses out of " + learnts.size() + " for limit " + lim); //$NON-NLS-1$ //$NON-NLS-2$
+
+        System.out.println("c " + name + " cleaning " + (learnts.size() - j) //$NON-NLS-1$
+                + " clauses out of " + learnts.size() + ", "
+		+ (int) (100.0 * (double) Runtime.getRuntime().freeMemory() /
+			 (double) initialFreeMem)
+		+ "% free mem"); //$NON-NLS-1$ //$NON-NLS-2$
         learnts.shrinkTo(j);
-
-        if (false) {
-            System.out.println(this.name + ": ReduceDB: limit " + lim
-                + " old: " + oldsize + " new: " + learnts.size());
-        }
-
-        // Too much has changed: publish all learnts to avoid losing
-        // valuable info?
-        startNewLearnts = 0;
     }
 
     /**
@@ -2517,28 +2356,48 @@ public class Solver extends SatinObject implements ISolver,
 
     private double timebegin = 0;
 
-    private boolean isReallySatisfiable(IVecInt assumps)
-        throws TimeoutException {
+    private boolean needToReduceDB;
+
+    private ConflictTimer freeMem;
+
+    public boolean isSatisfiable(IVecInt assumps) throws TimeoutException {
         Lbool status = Lbool.UNDEFINED;
-        double nofConflicts = params.initConflictBound;
-        double scaledNofLearnts = nConstraints()
-            * params.initLearntBoundConstraintFactor;
-
-        // order.init();
-        // learner.init();
+        double nofConflicts = params.getInitConflictBound();
+        // nofLearnts = Math.min(nofLearnts,10000);
+        order.init();
+        learner.init();
         timebegin = System.currentTimeMillis();
-
+        slistener.start();
         model = null; // forget about previous model
+        fullmodel = null;
+
+	// SATIN BEGIN
+	satinSolverInit();
+	double scaledNofLearnts = nConstraints()
+	    * params.getInitLearntBoundConstraintFactor();
+	SolverState globalState = new SolverState();
+	if (satinUseSharedClauses) {
+	    // export allConstrs as part of the shared object
+	    globalState.setAllConstraints(allConstrs);
+	}
+	if (satinUseSharedObjects) {
+	    globalState.exportObject();
+	}
+	// but don't pass it on as part of the dynamic Solver state:
+	allConstrs = null;
+	// SATIN END
 
         // propagate constraints
         if (propagate() != null) {
+            slistener.end(Lbool.FALSE);
             cancelUntil(0);
             return false;
         }
 
         // push incremental assumptions
-        for (int l : assumps) {
-            if (!assume(voc.getFromPool(l)) || (propagate() != null)) {
+        for (int q : assumps) {
+            if (!assume(voc.getFromPool(q)) || (propagate() != null)) {
+                slistener.end(Lbool.FALSE);
                 cancelUntil(0);
                 return false;
             }
@@ -2562,125 +2421,62 @@ public class Solver extends SatinObject implements ISolver,
         };
         undertimeout = true;
         Timer timer = new Timer(true);
-        timer.schedule(stopMe, timeout * 1000L);
+        timer.schedule(stopMe, timeout);
+        needToReduceDB = false;
 
-        SolverState globalState = new SolverState();
-        if (satinUseSharedClauses) {
-            // export allConstrs as part of the shared object
-            globalState.setAllConstraints(allConstrs);
-        }
-        if (satinUseSharedObjects) {
-            globalState.exportObject();
-        }
-        // but don't pass it on as part of the dynamic Solver state:
-        allConstrs = null;
-
+        // final long memorybound = Runtime.getRuntime().freeMemory() / 10;
+        final long bound1 = Runtime.getRuntime().freeMemory() / 10;
+        final long bound2 = 4 * 1024 * 1024; // at least 4 MB
+        final long memorybound = (bound1 < bound2) ? bound2 : bound1;
+        freeMem = new ConflictTimer(500) {
+                    void run() {
+                        long freemem = Runtime.getRuntime().freeMemory();
+                        // System.out.println("c Free memory "+freemem);
+                        // System.out.println("c Free memory "+freemem +
+			//		   " bound " + memorybound);
+                        if (freemem < memorybound) {
+                            // Reduce the set of learnt clauses
+                            needToReduceDB = true;
+                        }
+                    }
+                };
         // Solve
         while ((status == Lbool.UNDEFINED) && undertimeout) {
-            this.nofLearnts = Math.round(scaledNofLearnts);
-            if (satinMaxDepth == -1) {
-                status = search(Math.round(nofConflicts));
-            } else {
-                satinSearchIter++;
-                status = satinSearch(Math.round(nofConflicts), globalState);
-                if (status == Lbool.UNDEFINED) {
-                    // Need to explicitly cancel back everything because
-                    // - some implementations modify the root solver now
-                    // - may want to start with whole new path based on latest
-                    //   statistics anyway
-                    cancelUntil(0); // TODO
-                }
+	    if (satinMaxSpawnDepth < 0) { // Original, non-SATIN
+		status = search(Math.round(nofConflicts));
+		nofConflicts *= params.getConflictBoundIncFactor();
+		// order.mirror(stats.starts);
+	    } else {
+		// SATIN BEGIN
+		nofLearnts = Math.round(scaledNofLearnts);
+		satinSearchIter++;
+		status = satinSearch(Math.round(nofConflicts), globalState);
+		if (status == Lbool.UNDEFINED) {
+		    // Need to explicitly cancel back everything because
+		    // - some implementations modify the root solver now
+		    // - may want to start with whole new path based on latest
+		    //   statistics anyway
+		    cancelUntil(0);
+		}
 
-                globalState.reinit(false);
-            }
-            System.out.println("search status " + status);
-            nofConflicts *= params.conflictBoundIncFactor;
-            scaledNofLearnts *= params.learntBoundIncFactor;
-            // order.mirror(stats.starts);
+		globalState.reinit(false);
+
+		System.out.println("c search status " + status);
+		nofConflicts *= params.getConflictBoundIncFactor();
+		scaledNofLearnts *= params.getLearntBoundIncFactor();
+		// order.mirror(stats.starts);
+		Runtime.getRuntime().gc(); // TODO: useful?
+		// SATIN END
+	    }
         }
 
         cancelUntil(0);
         timer.cancel();
+        slistener.end(status);
         if (!undertimeout) {
-            throw new TimeoutException(" Timeout (" + timeout + "s) exceeded");
+            throw new TimeoutException(" Timeout (" + timeout + "s) exceeded"); //$NON-NLS-1$//$NON-NLS-2$
         }
         return status == Lbool.TRUE;
-    }
-
-    public boolean isSatisfiable(IVecInt assumps) throws TimeoutException {
-        // Satin wrapper for the original isSatisfiable()
-        Properties props = new Properties(System.getProperties());
-        Solver solver;
-
-        satinCloneType = props.getProperty("clone", "cloning");
-        System.out.println("Using clone: " + satinCloneType);
-
-        satinMaxDepth = Integer.parseInt(props.getProperty("maxdepth", "0"));
-        System.out.println("Using maxDepth: " + satinMaxDepth);
-
-        satinFixes = Integer.parseInt(props.getProperty("fixes", "3"));
-        System.out.println("Using fixes: " + satinFixes);
-
-        // temp hack to test assertions:
-        // assert false;
-
-        satinMaxSpawnDepth = Integer.parseInt(props.getProperty(
-            "maxspawndepth", "100"));
-        System.out.println("Using maxSpawnDepth: " + satinMaxSpawnDepth);
-
-        satinMaxDecisionDepth = Integer.parseInt(props.getProperty(
-            "maxdecisiondepth", "400"));
-        System.out.println("Using maxDecisionDepth: " + satinMaxDecisionDepth);
-
-        satinMaxGlobalLearnSize = Integer.parseInt(props.getProperty(
-            "maxlearnsize", "0"));
-        System.out.println("Using maxGlobalLearnSize: "
-            + satinMaxGlobalLearnSize);
-
-        int doUseSharedObjects = Integer.parseInt(props.getProperty(
-            "sharedobjects", "1"));
-        System.out.println("Using sharedobjects: " + doUseSharedObjects);
-        satinUseSharedObjects = (doUseSharedObjects != 0);
-
-        if (satinUseSharedObjects) {
-            int doUseSharedClauses = Integer.parseInt(props.getProperty(
-                "sharedclauses", "0"));
-            System.out.println("Using sharedclauses: " + doUseSharedClauses);
-            satinUseSharedClauses = (doUseSharedClauses != 0);
-        }
-
-        satinMaxLocalIter = Integer.parseInt(props.getProperty("maxiter", ""
-            + Integer.MAX_VALUE));
-        System.out.println("Using maxLocalIter: " + satinMaxLocalIter);
-
-        int useArrays = Integer.parseInt(props.getProperty("usearrays", "0"));
-        satinUseIntArrays = (useArrays != 0);
-        System.out.println("Using useIntArrays: " + satinUseIntArrays);
-
-        // has to be done before clone()
-        order.init();
-        learner.init();
-
-        // Experiment: see how a clone behaves at root level:
-        String rootClone = props.getProperty("rootclone", "none");
-        if (rootClone.equals("cloning")) {
-            solver = (Solver) this.clone();
-        } else if (rootClone.equals("default")) {
-            solver = this.clone_for_satin();
-        } else { // none
-            solver = this;
-        }
-
-        boolean res = solver.isReallySatisfiable(assumps);
-
-        if (solver != this) {
-            // Update results in this solver since we were using a clone:
-            this.stats = solver.stats;
-            this.order = solver.order;
-            this.model = solver.model;
-        }
-
-        return res;
     }
 
     public SolverStats getStats() {
@@ -2718,7 +2514,7 @@ public class Solver extends SatinObject implements ISolver,
      *            a constraint implementing the Constr interface.
      * @return a reference to the constraint for external use.
      */
-    IConstr addConstr(Constr constr) {
+    protected IConstr addConstr(Constr constr) {
         if (constr != null) {
             constrs.push(constr);
         }
@@ -2751,10 +2547,14 @@ public class Solver extends SatinObject implements ISolver,
      *      java.lang.String)
      */
     public void printStat(PrintStream out, String prefix) {
+        printStat(new PrintWriter(out), prefix);
+    }
+
+    public void printStat(PrintWriter out, String prefix) {
         stats.printStat(out, prefix);
         double cputime = (System.currentTimeMillis() - timebegin) / 1000;
-        out.println(prefix + "speed (decisions/second)\t: " + stats.decisions
-            / cputime);
+        out.println(prefix + "speed (decisions/second)\t: " + stats.decisions //$NON-NLS-1$
+                / cputime);
         order.printStat(out, prefix);
     }
 
@@ -2765,19 +2565,19 @@ public class Solver extends SatinObject implements ISolver,
      */
     public String toString(String prefix) {
         StringBuilder stb = new StringBuilder();
-        Object[] objs = { analyzer, dsfactory, learner, params, order
-        // , simplifier // Temp hack
-        };
-        stb.append(prefix);
-        stb.append("--- Begin Solver configuration ---");
-        stb.append("\n");
+        Object[] objs = { analyzer, dsfactory, learner, params, order,
+			  simplifier
+	};
+        // stb.append(prefix);
+        stb.append("--- Begin Solver configuration ---"); //$NON-NLS-1$
+        stb.append("\n"); //$NON-NLS-1$
         for (Object o : objs) {
             stb.append(prefix);
             stb.append(o.toString());
-            stb.append("\n");
+            stb.append("\n"); //$NON-NLS-1$
         }
         stb.append(prefix);
-        stb.append("--- End Solver configuration ---");
+        stb.append("--- End Solver configuration ---"); //$NON-NLS-1$
         return stb.toString();
     }
 
@@ -2788,10 +2588,33 @@ public class Solver extends SatinObject implements ISolver,
      */
     @Override
     public String toString() {
-        return toString("");
+        return toString(""); //$NON-NLS-1$
     }
 
     public int getTimeout() {
-        return timeout;
+        return (int)(timeout/1000);
     }
+
+    public void setExpectedNumberOfClauses(int nb) {
+        constrs.ensure(nb);
+    }
+
+    public Map<String, Number> getStat() {
+        return stats.toMap();
+    }
+
+    public int[] findModel() throws TimeoutException {
+        if (isSatisfiable()) {
+            return model();
+        }
+        return null;
+    }
+
+    public int[] findModel(IVecInt assumps) throws TimeoutException {
+        if (isSatisfiable(assumps)) {
+            return model();
+        }
+        return null;
+    }
+
 }

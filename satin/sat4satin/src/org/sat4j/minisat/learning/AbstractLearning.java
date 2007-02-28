@@ -1,27 +1,43 @@
+/*
+ * SAT4J: a SATisfiability library for Java Copyright (C) 2004-2006 Daniel Le Berre
+ * 
+ * Based on the original minisat specification from:
+ * 
+ * An extensible SAT solver. Niklas E?n and Niklas S?rensson. Proceedings of the
+ * Sixth International Conference on Theory and Applications of Satisfiability
+ * Testing, LNCS 2919, pp 502-518, 2003.
+ * 
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
+ */
 package org.sat4j.minisat.learning;
-
-import java.io.Serializable;
 
 import org.sat4j.minisat.core.Constr;
 import org.sat4j.minisat.core.LearningStrategy;
+import org.sat4j.minisat.core.Solver;
 import org.sat4j.minisat.core.VarActivityListener;
 
-abstract class AbstractLearning implements LearningStrategy, Serializable,
-        Cloneable {
+abstract class AbstractLearning implements LearningStrategy {
 
     private VarActivityListener val;
 
-    public void init() {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void learns(Constr constr) {
-        // TODO Auto-generated method stub
-
-    }
-
     public void setVarActivityListener(VarActivityListener s) {
+        this.val = s;
+    }
+
+    public void setSolver(Solver s) {
         this.val = s;
     }
 
@@ -33,12 +49,7 @@ abstract class AbstractLearning implements LearningStrategy, Serializable,
         }
     }
 
-    @Override
-    public Object clone() {
-        try {
-            return super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new InternalError(e.toString());
-        }
+    public void init() {
     }
+
 }

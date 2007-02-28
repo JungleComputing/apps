@@ -1,17 +1,35 @@
+/*
+ * SAT4J: a SATisfiability library for Java Copyright (C) 2004-2006 Daniel Le Berre
+ * 
+ * Based on the original minisat specification from:
+ * 
+ * An extensible SAT solver. Niklas E?n and Niklas S?rensson. Proceedings of the
+ * Sixth International Conference on Theory and Applications of Satisfiability
+ * Testing, LNCS 2919, pp 502-518, 2003.
+ * 
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
+ */
 package org.sat4j.reader;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.LineNumberReader;
+import java.io.PrintWriter;
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.zip.GZIPInputStream;
 
 import org.sat4j.core.Vec;
 import org.sat4j.core.VecInt;
@@ -28,26 +46,22 @@ import org.sat4j.specs.IVecInt;
  * @author or
  * @author mederic baron
  */
-public class OPBReader2005 implements Reader, Serializable {
+public class OPBReader2005 extends Reader implements Serializable {
 
     /**
      * Comment for <code>serialVersionUID</code>
      */
     private static final long serialVersionUID = 1L;
 
-    private ISolver solver;
+    private final ISolver solver;
 
-    private final IVec<String> decode = new Vec<String>();
+    private final IVecInt lits;
 
-    private IVecInt lits;
-
-    private IVec<BigInteger> coeffs;
+    private final IVec<BigInteger> coeffs;
 
     private BigInteger d;
 
     private String operator;
-
-    private final Map<String, Integer> map = new HashMap<String, Integer>();
 
     private final IVecInt objectiveVars = new VecInt();
 
@@ -55,6 +69,9 @@ public class OPBReader2005 implements Reader, Serializable {
 
     // does the instance have an objective function?
     private boolean hasObjFunc = false;
+
+    private int nbVars, nbConstr; // MetaData: #Variables and #Constraints in
+                                    // file.
 
     /**
      * callback called when we get the number of variables and the expected
@@ -80,12 +97,6 @@ public class OPBReader2005 implements Reader, Serializable {
      */
     protected void endObjective() {
         assert lits.size() == coeffs.size();
-        // try {
-        // solver.addPseudoBoolean(lits, coeffs, false, Integer.MAX_VALUE);
-        // } catch (ContradictionException e) {
-        // e.printStackTrace();
-        // }
-
         assert lits.size() == coeffs.size();
         for (int i = 0; i < lits.size(); i++) {
             objectiveVars.push(lits.get(i));
@@ -115,12 +126,10 @@ public class OPBReader2005 implements Reader, Serializable {
         assert !(coeffs.size() == 0);
         assert lits.size() == coeffs.size();
 
-        if (operator.equals("<=") || operator.equals("=")) {
+        if ("<=".equals(operator) || "=".equals(operator))
             solver.addPseudoBoolean(lits, coeffs, false, d);
-        }
-        if (operator.equals(">=") || operator.equals("=")) {
+        if (">=".equals(operator) || "=".equals(operator))
             solver.addPseudoBoolean(lits, coeffs, true, d);
-        }
     }
 
     /**
@@ -133,16 +142,8 @@ public class OPBReader2005 implements Reader, Serializable {
      */
     protected void constraintTerm(BigInteger coeff, String var) {
         coeffs.push(coeff);
-        Integer id = map.get(var);
-        if (id == null) {
-            assert map.size() < solver.nVars();
-            map.put(var, id = map.size() + 1);
-            assert id > 0;
-            assert id <= solver.nVars();
-            decode.push(var);
-            assert decode.size() == id;
-        }
-        int lid = ((savedChar == '-') ? -1 : 1) * id.intValue();
+        int id = Integer.parseInt(var.substring(1));
+        int lid = ((savedChar == '-') ? -1 : 1) * id;
         lits.push(lid);
     }
 
@@ -189,9 +190,8 @@ public class OPBReader2005 implements Reader, Serializable {
         }
 
         c = in.read();
-        if (c == -1) {
+        if (c == -1)
             eofReached = true;
-        }
 
         return (char) c;
     }
@@ -224,12 +224,11 @@ public class OPBReader2005 implements Reader, Serializable {
      * 
      * @throws IOException
      */
-    private void skipSpaces() throws IOException {
+    protected void skipSpaces() throws IOException {
         char c;
 
-        while (Character.isWhitespace(c = get())) {
+        while (Character.isWhitespace(c = get()))
             ;
-        }
 
         putback(c);
     }
@@ -246,9 +245,8 @@ public class OPBReader2005 implements Reader, Serializable {
 
         skipSpaces();
 
-        while (!Character.isWhitespace(c = get()) && !eof()) {
+        while (!Character.isWhitespace(c = get()) && !eof())
             s.append(c);
-        }
 
         return s.toString();
     }
@@ -267,14 +265,12 @@ public class OPBReader2005 implements Reader, Serializable {
         s.setLength(0);
 
         c = get();
-        if (c == '-' || Character.isDigit(c)) {
+        if (c == '-' || Character.isDigit(c))
             s.append(c);
-            // note: BigInteger don't like a '+' before the number, we just skip it
-        }
+        // note: BigInteger don't like a '+' before the number, we just skip it
 
-        while (Character.isDigit(c = get()) && !eof()) {
+        while (Character.isDigit(c = get()) && !eof())
             s.append(c);
-        }
 
         putback(c);
     }
@@ -284,8 +280,10 @@ public class OPBReader2005 implements Reader, Serializable {
      * 
      * @return the identifier we read or null
      * @throws IOException
+     * @throws ParseFormatException
      */
-    private boolean readIdentifier(StringBuffer s) throws IOException {
+    protected boolean readIdentifier(StringBuffer s) throws IOException,
+            ParseFormatException {
         char c;
 
         s.setLength(0);
@@ -294,9 +292,8 @@ public class OPBReader2005 implements Reader, Serializable {
 
         // first char (must be a letter or underscore)
         c = get();
-        if (eof()) {
+        if (eof())
             return false;
-        }
 
         if (!Character.isLetter(c) && c != '_') {
             putback(c);
@@ -308,18 +305,23 @@ public class OPBReader2005 implements Reader, Serializable {
         // next chars (must be a letter, a digit or an underscore)
         while (true) {
             c = get();
-            if (eof()) {
+            if (eof())
                 break;
-            }
 
-            if (Character.isLetter(c) || Character.isDigit(c) || c == '_') {
+            if (Character.isLetter(c) || Character.isDigit(c) || c == '_')
                 s.append(c);
-            } else {
+            else {
                 putback(c);
                 break;
             }
         }
 
+        // Small check on the coefficient ID to make sure everything is ok
+        int varID = Integer.parseInt(s.substring(1));
+        if (varID > nbVars) {
+            throw new ParseFormatException(
+                    "Variable identifier larger than #variables in metadata.");
+        }
         return true;
     }
 
@@ -335,17 +337,14 @@ public class OPBReader2005 implements Reader, Serializable {
         skipSpaces();
 
         c = get();
-        if (eof()) {
+        if (eof())
             return null;
-        }
 
-        if (c == '=') {
+        if (c == '=')
             return "=";
-        }
 
-        if (c == '>' && get() == '=') {
+        if (c == '>' && get() == '=')
             return ">=";
-        }
 
         return null;
     }
@@ -360,28 +359,24 @@ public class OPBReader2005 implements Reader, Serializable {
     private void readMetaData() throws IOException, ParseFormatException {
         char c;
         String s;
-        int nbVars, nbConstr;
 
         // get the number of variables and constraints
         c = get();
-        if (c != '*') {
+        if (c != '*')
             throw new ParseFormatException(
-                "First line of input file should be a comment");
-        }
+                    "First line of input file should be a comment");
 
         s = readWord();
-        if (eof() || !s.equals("#variable=")) {
+        if (eof() || !"#variable=".equals(s))
             throw new ParseFormatException(
-                "First line should contain #variable= as first keyword");
-        }
+                    "First line should contain #variable= as first keyword");
 
         nbVars = Integer.parseInt(readWord());
 
         s = readWord();
-        if (eof() || !s.equals("#constraint=")) {
+        if (eof() || !"#constraint=".equals(s))
             throw new ParseFormatException(
-                "First line should contain #constraint= as second keyword");
-        }
+                    "First line should contain #constraint= as second keyword");
 
         nbConstr = Integer.parseInt(readWord());
 
@@ -419,22 +414,20 @@ public class OPBReader2005 implements Reader, Serializable {
      * @throws IOException
      * @throws ParseException
      */
-    private void readTerm(StringBuffer coeff, StringBuffer var)
-        throws IOException, ParseFormatException {
+    protected void readTerm(StringBuffer coeff, StringBuffer var)
+            throws IOException, ParseFormatException {
         char c;
 
         readInteger(coeff);
 
         skipSpaces();
         c = get();
-        if (c != '*') {
+        if (c != '*')
             throw new ParseFormatException(
-                "'*' expected between a coefficient and a variable");
-        }
+                    "'*' expected between a coefficient and a variable");
 
-        if (!readIdentifier(var)) {
+        if (!readIdentifier(var))
             throw new ParseFormatException("identifier expected");
-        }
     }
 
     /**
@@ -469,21 +462,20 @@ public class OPBReader2005 implements Reader, Serializable {
 
                 skipSpaces();
                 c = get();
-                if (c == ';') {
+                if (c == ';')
                     break; // end of objective
-                } else if (c == '-' || c == '+' || Character.isDigit(c)) {
+
+                else if (c == '-' || c == '+' || Character.isDigit(c))
                     putback(c);
-                } else {
+                else
                     throw new ParseFormatException(
-                        "unexpected character in objective function");
-                }
+                            "unexpected character in objective function");
             }
 
             endObjective();
-        } else {
+        } else
             throw new ParseFormatException(
-                "input format error: 'min:' expected");
-        }
+                    "input format error: 'min:' expected");
     }
 
     /**
@@ -494,7 +486,7 @@ public class OPBReader2005 implements Reader, Serializable {
      * @throws ContradictionException
      */
     private void readConstraint() throws IOException, ParseFormatException,
-        ContradictionException {
+            ContradictionException {
         StringBuffer var = new StringBuffer();
         StringBuffer coeff = new StringBuffer();
         char c;
@@ -511,36 +503,33 @@ public class OPBReader2005 implements Reader, Serializable {
                 // relational operator found
                 putback(c);
                 break;
-            } else if (c == '-' || c == '+' || Character.isDigit(c)) {
+            } else if (c == '-' || c == '+' || Character.isDigit(c))
                 putback(c);
-            } else {
+            else {
                 throw new ParseFormatException(
-                    "unexpected character in constraint");
+                        "unexpected character in constraint");
             }
         }
 
-        if (eof()) {
+        if (eof())
             throw new ParseFormatException(
-                "unexpected EOF before end of constraint");
-        }
+                    "unexpected EOF before end of constraint");
 
         String relop;
-        if ((relop = readRelOp()) != null) {
-            constraintRelOp(relop);
-        } else {
+        if ((relop = readRelOp()) == null) {
             throw new ParseFormatException(
-                "unexpected relational operator in constraint");
-        }
+                    "unexpected relational operator in constraint");
 
+        }
+        constraintRelOp(relop);
         readInteger(coeff);
         constraintRightTerm(new BigInteger(coeff.toString()));
 
         skipSpaces();
         c = get();
-        if (eof() || c != ';') {
+        if (eof() || c != ';')
             throw new ParseFormatException(
-                "semicolon expected at end of constraint");
-        }
+                    "semicolon expected at end of constraint");
 
         endConstraint();
     }
@@ -560,7 +549,7 @@ public class OPBReader2005 implements Reader, Serializable {
      * @throws ContradictionException
      */
     public void parse() throws IOException, ParseFormatException,
-        ContradictionException {
+            ContradictionException {
         readMetaData();
 
         skipComments();
@@ -568,61 +557,83 @@ public class OPBReader2005 implements Reader, Serializable {
         readObjective();
 
         // read constraints
+        int nbConstraintsRead = 0;
+        char c;
         while (!eof()) {
             skipSpaces();
-            if (eof()) {
+            if (eof())
                 break;
-            }
+
+            c = get();
+            putback(c);
+            if (c == '*')
+                skipComments();
+
+            if (eof())
+                break;
 
             readConstraint();
+            nbConstraintsRead++;
+        }
+        // Small check on the number of constraints
+        if (nbConstraintsRead != nbConstr) {
+            throw new ParseFormatException(
+                    "Number of constraints read is different from metadata.");
         }
     }
 
-    public IProblem parseInstance(String filename)
-        throws FileNotFoundException, ParseFormatException, IOException,
-        ContradictionException {
-
-        if (filename.endsWith(".gz")) {
-            parseInstance(new LineNumberReader(new InputStreamReader(
-                new GZIPInputStream(new FileInputStream(filename)))));
-        } else {
-            parseInstance(new LineNumberReader(new FileReader(filename)));
-        }
-
-        return solver;
+    @Override
+    public final IProblem parseInstance(final java.io.Reader in)
+            throws ParseFormatException, ContradictionException {
+        return parseInstance(new LineNumberReader(in));
     }
 
-    public void parseInstance(LineNumberReader in) throws ParseFormatException,
-        ContradictionException {
+    private IProblem parseInstance(LineNumberReader in)
+            throws ParseFormatException, ContradictionException {
         solver.reset();
         this.in = in;
         try {
             parse();
+            return solver;
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new ParseFormatException(e);
         }
     }
 
+    @Override
     public String decode(int[] model) {
         StringBuffer stb = new StringBuffer();
 
         for (int i = 0; i < model.length; i++) {
             if (model[i] < 0) {
-                stb.append("-");
-                stb.append(decode.get(-model[i] - 1));
+                stb.append("-x");
+                stb.append(-model[i]);
             } else {
-                stb.append(decode.get(model[i] - 1));
+                stb.append("x");
+                stb.append(model[i]);
             }
             stb.append(" ");
         }
         return stb.toString();
     }
 
-    public ObjectiveFunction getObjectiveFunction() {
-        if (hasObjFunc) {
-            return new ObjectiveFunction(getVars(), getCoeffs());
+    @Override
+    public void decode(int[] model, PrintWriter out) {
+        for (int i = 0; i < model.length; i++) {
+            if (model[i] < 0) {
+                out.print("-x");
+                out.print(-model[i]);
+            } else {
+                out.print("x");
+                out.print(model[i]);
+            }
+            out.print(" ");
         }
+    }
+
+    public ObjectiveFunction getObjectiveFunction() {
+        if (hasObjFunc)
+            return new ObjectiveFunction(getVars(), getCoeffs());
         return null;
     }
 

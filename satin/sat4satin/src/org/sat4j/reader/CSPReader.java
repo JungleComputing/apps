@@ -1,76 +1,154 @@
+/*
+ * SAT4J: a SATisfiability library for Java Copyright (C) 2004-2006 Daniel Le Berre
+ * 
+ * Based on the original minisat specification from:
+ * 
+ * An extensible SAT solver. Niklas E?n and Niklas S?rensson. Proceedings of the
+ * Sixth International Conference on Theory and Applications of Satisfiability
+ * Testing, LNCS 2919, pp 502-518, 2003.
+ * 
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
+ */
 package org.sat4j.reader;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.LineNumberReader;
+import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.zip.GZIPInputStream;
 
-import org.sat4j.core.VecInt;
+import org.sat4j.core.Vec;
+import org.sat4j.reader.csp.AllDiff;
+import org.sat4j.reader.csp.Clausifiable;
+import org.sat4j.reader.csp.Constant;
+import org.sat4j.reader.csp.Domain;
+import org.sat4j.reader.csp.EnumeratedDomain;
+import org.sat4j.reader.csp.Evaluable;
+import org.sat4j.reader.csp.Nogoods;
+import org.sat4j.reader.csp.Predicate;
+import org.sat4j.reader.csp.RangeDomain;
+import org.sat4j.reader.csp.Relation;
+import org.sat4j.reader.csp.Var;
+import org.sat4j.reader.csp.WalshSupports;
 import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IProblem;
 import org.sat4j.specs.ISolver;
-import org.sat4j.specs.IVecInt;
+import org.sat4j.specs.IVec;
 
 /**
- * This class is a CSP to SAT translator that is able to read
- * a CSP problem using the First CSP solver competition input 
- * format and that translates it into clausal and cardinality 
- * (equality) constraints.
+ * This class is a CSP to SAT translator that is able to read a CSP problem
+ * using the First CSP solver competition input format and that translates it
+ * into clausal and cardinality (equality) constraints.
  * 
- * That code has not been tested very thoroughtly yet and was 
- * written very quickly to meet the competition deadline :=))
- * There is plenty of room for improvement.
+ * That code has not been tested very thoroughtly yet and was written very
+ * quickly to meet the competition deadline :=)) There is plenty of room for
+ * improvement.
  * 
  * @author leberre
  * 
  */
-public class CSPReader implements Reader {
+public class CSPReader extends Reader implements org.sat4j.csp.xml.ICSPCallback {
 
     private final ISolver solver;
 
-    private int[][] domains;
-
-    private Var[] vars;
+    // private Var[] vars;
 
     protected Relation[] relations;
 
+    private int valueindex;
+
+    // private int varindex;
+
+    private int relindex;
+
+    private int[] currentdomain;
+
+    private Domain rangedomain;
+
+    private String currentdomainid;
+
+    private int currentdomainsize;
+
+    private final Map<String, Domain> domainmapping = new HashMap<String, Domain>();
+
+    private final Map<String, Var> varmapping = new LinkedHashMap<String, Var>();
+
+    private final Map<String, Integer> relmapping = new HashMap<String, Integer>();
+
+    private final Map<String, Clausifiable> predmapping = new HashMap<String, Clausifiable>();
+
+    private int nbvarstocreate;
+
+    private int tupleindex;
+
+    private Clausifiable currentclausifiable;
+
+    private Predicate currentpredicate;
+
+    private final IVec<Evaluable> variables = new Vec<Evaluable>();
+
+    private final IVec<Var> scope = new Vec<Var>();
+
+    private int nbvars;
+
+    private int nbconstraints;
+
+    private int currentconstraint;
+
     public CSPReader(ISolver solver) {
         this.solver = solver;
+        predmapping.put("global:allDifferent", new AllDiff());
     }
 
-    public IProblem parseInstance(String filename)
-        throws FileNotFoundException, ParseFormatException, IOException,
-        ContradictionException {
-        if (filename.endsWith(".gz")) {
-            parseInstance(new LineNumberReader(new InputStreamReader(
-                new GZIPInputStream(new FileInputStream(filename)))));
-        } else {
-            parseInstance(new LineNumberReader(new FileReader(filename)));
-        }
-        return solver;
+    @Override
+    public final IProblem parseInstance(final java.io.Reader in)
+            throws ParseFormatException, ContradictionException, IOException {
+        return parseInstance(new LineNumberReader(in));
+
     }
 
-    public void parseInstance(LineNumberReader in) throws ParseFormatException,
-        ContradictionException {
+    private IProblem parseInstance(LineNumberReader in)
+            throws ParseFormatException, ContradictionException {
         solver.reset();
         try {
             readProblem(in);
+            return solver;
         } catch (NumberFormatException e) {
             throw new ParseFormatException("integer value expected on line "
-                + in.getLineNumber(), e);
+                    + in.getLineNumber(), e);
         }
     }
 
+    @Override
+    public void decode(int[] model, PrintWriter out) {
+        // verifier que les variables sont bien dans le bon ordre !!!!
+        for (Var v : varmapping.values()) {
+            out.print(v.findValue(model));
+            out.print(" ");
+        }
+    }
+
+    @Override
     public String decode(int[] model) {
         StringBuilder stb = new StringBuilder();
-        for (int i = 0; i < vars.length; i++) {
-            stb.append(vars[i].findValue(model));
+        // verifier que les variables sont bien dans le bon ordre !!!!
+        for (Var v : varmapping.values()) {
+            stb.append(v.findValue(model));
             stb.append(" ");
         }
         return stb.toString();
@@ -79,84 +157,91 @@ public class CSPReader implements Reader {
     private void readProblem(LineNumberReader in) throws ContradictionException {
         Scanner input = new Scanner(in);
         // discard problem name
-        System.out.println("c reading problem " + input.nextLine());
+        beginInstance(input.nextLine());
+
         // read number of domain
-        System.out.println("c reading domains");
         int nbdomain = input.nextInt();
-        domains = new int[nbdomain][];
+        beginDomainsSection(nbdomain);
+
         for (int i = 0; i < nbdomain; i++) {
             // read domain number
             int dnum = input.nextInt();
             assert dnum == i;
-
             // read domain
-            domains[dnum] = readArrayOfInt(input);
+            int[] domain = readArrayOfInt(input);
+            beginDomain("" + dnum, domain.length);
+            for (int j = 0; j < domain.length; j++) {
+                addDomainValue(domain[j]);
+            }
+            endDomain();
         }
-        System.out.println("c reading variables");
+        endDomainsSection();
         int nbvar = input.nextInt();
-        vars = new Var[nbvar];
-        int nbvarstocreate = 0;
+        beginVariablesSection(nbvar);
         for (int i = 0; i < nbvar; i++) {
             // read var number
             int varnum = input.nextInt();
             assert varnum == i;
             // read var domain
             int vardom = input.nextInt();
-            vars[varnum] = new Var(domains[vardom], nbvarstocreate);
-            nbvarstocreate += domains[vardom].length;
+            addVariable("" + varnum, "" + vardom);
         }
-        solver.newVar(nbvarstocreate);
-        for (int i = 0; i < nbvar; i++) {
-            vars[i].toClause(solver);
-        }
-        System.out.println("c reading relations");
+        endVariablesSection();
+
         // relation definition
         // read number of relations
         int nbrel = input.nextInt();
-        relations = new Relation[nbrel];
+        beginRelationsSection(nbrel);
         for (int i = 0; i < nbrel; i++) {
+
             // read relation number
             int relnum = input.nextInt();
             assert relnum == i;
 
             boolean forbidden = input.nextInt() == 1 ? false : true;
-            int[] domains = readArrayOfInt(input);
+            int[] rdomains = readArrayOfInt(input);
 
             int nbtuples = input.nextInt();
-            if (forbidden) {
-                relations[relnum] = new ForbiddenRelation(domains, nbtuples);
-            } else {
-                manageAllowedTuples(relnum, domains, nbtuples);
-            }
-            // allowed/forbidden tuples
+
+            beginRelation("" + relnum, rdomains.length, nbtuples, !forbidden);
+
             for (int j = 0; j < nbtuples; j++) {
                 int[] tuple = readArrayOfInt(input, relations[relnum].arity());
                 // do something with tuple
-                relations[relnum].addTuple(j, tuple);
+                addRelationTuple(tuple);
             }
+
+            endRelation();
         }
-        System.out.println("c reading constraints");
-        // constraint definition
+        endRelationsSection();
         int nbconstr = input.nextInt();
+        beginConstraintsSection(nbconstr);
+        // constraint definition
         for (int i = 0; i < nbconstr; i++) {
             int[] variables = readArrayOfInt(input);
+            beginConstraint("" + i, variables.length);
             int relnum = input.nextInt();
             // manage constraint
-            relations[relnum].toClause(solver, intToVar(variables));
+            constraintReference("" + relnum);
+            for (int v : variables) {
+                addEffectiveParameter("" + v);
+            }
+            endConstraint();
         }
+        endConstraintsSection();
+        endInstance();
     }
 
-    protected void manageAllowedTuples(int relnum, int[] domains, int nbtuples) {
-        relations[relnum] = new AllowedRelation(domains, nbtuples);
+    protected void manageAllowedTuples(int relnum, int arity, int nbtuples) {
+        relations[relnum] = new WalshSupports(arity, nbtuples);
     }
 
-    private Var[] intToVar(int[] variables) {
-        Var[] nvars = new Var[variables.length];
-        for (int i = 0; i < variables.length; i++) {
-            nvars[i] = vars[variables[i]];
-        }
-        return nvars;
-    }
+    // private Var[] intToVar(int[] variables) {
+    // Var[] nvars = new Var[variables.length];
+    // for (int i = 0; i < variables.length; i++)
+    // nvars[i] = vars[variables[i]];
+    // return nvars;
+    // }
 
     private int[] readArrayOfInt(Scanner input) {
         int size = input.nextInt();
@@ -165,164 +250,239 @@ public class CSPReader implements Reader {
 
     private int[] readArrayOfInt(Scanner input, int size) {
         int[] tab = new int[size];
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < size; i++)
             tab[i] = input.nextInt();
-        }
         return tab;
     }
-}
 
-class Var {
+    public void beginInstance(String arg0) {
+        System.out.println("c reading problem named " + arg0);
+    }
 
-    Map<Integer, Integer> mapping = new HashMap<Integer, Integer>();
+    public void beginDomainsSection(int nbdomain) {
+        System.out.print("c reading domains");
+    }
 
-    private final int[] domain;
+    public void beginDomain(String id, int size) {
+        currentdomainsize = size;
+        currentdomain = null;
+        valueindex = -1;
+        currentdomainid = id;
+        rangedomain = null;
+    }
 
-    Var(int[] domain, int startid) {
-        this.domain = domain;
-        for (int i = 0; i < domain.length; i++) {
-            mapping.put(domain[i], ++startid);
+    public void addDomainValue(int arg0) {
+        if (currentdomain == null) {
+            currentdomain = new int[currentdomainsize];
         }
-    }
-
-    int[] domain() {
-        return domain;
-    }
-
-    int translate(int key) {
-        return mapping.get(key);
-    }
-
-    void toClause(ISolver solver) throws ContradictionException {
-        IVecInt clause = new VecInt();
-        for (int key : mapping.keySet()) {
-            clause.push(mapping.get(key));
+        if (rangedomain != null) {
+            for (int i = 0; i < rangedomain.size(); i++)
+                currentdomain[++valueindex] = rangedomain.get(i);
+            rangedomain = null;
         }
-        // System.err.println("Adding clause: # " + clause + " = 1 ");
-        solver.addClause(clause);
-        solver.addAtMost(clause, 1);
+        currentdomain[++valueindex] = arg0;
     }
 
-    int findValue(int[] model) {
-        for (Map.Entry<Integer, Integer> entry : mapping.entrySet()) {
-            if (model[entry.getValue() - 1] == entry.getValue()) {
-                return entry.getKey();
+    public void addDomainValue(int begin, int end) {
+        if (currentdomainsize == end - begin + 1)
+            rangedomain = new RangeDomain(begin, end);
+        else {
+            if (currentdomain == null) {
+                currentdomain = new int[currentdomainsize];
             }
+            for (int v = begin; v <= end; v++)
+                currentdomain[++valueindex] = v;
         }
-        throw new RuntimeException("BIG PROBLEM: no value for a var!");
-    }
-}
-
-interface Relation {
-    void addTuple(int index, int[] tuple);
-
-    public void toClause(ISolver solver, Var[] vars)
-        throws ContradictionException;
-
-    int arity();
-}
-
-class AllowedRelation implements Relation {
-
-    protected final int[] domains;
-
-    protected int[][] tuples;
-
-    private IVecInt clause;
-
-    AllowedRelation(int[] domains, int nbtuples) {
-        this.domains = domains;
-        tuples = new int[nbtuples][];
     }
 
-    public void addTuple(int index, int[] tuple) {
-        tuples[index] = tuple;
+    public void endDomain() {
+        assert rangedomain != null || valueindex == currentdomain.length - 1;
+        if (rangedomain == null)
+            domainmapping.put(currentdomainid, new EnumeratedDomain(
+                    currentdomain));
+        else
+            domainmapping.put(currentdomainid, rangedomain);
     }
 
-    public void toClause(ISolver solver, Var[] vars)
-        throws ContradictionException {
-        // need to find all the tuples that are not expressed here.
-        clause = new VecInt();
-        int[] tuple = new int[vars.length];
-        find(tuple, 0, vars, solver);
+    public void endDomainsSection() {
+        System.out.println(" done.");
     }
 
-    private void find(int[] tuple, int n, Var[] vars, ISolver solver)
-        throws ContradictionException {
-        if (n == vars.length) {
-            if (notPresent(tuple)) {
-                clause.clear();
-                for (int j = 0; j < vars.length; j++) {
-                    clause.push(-vars[j].translate(tuple[j]));
-                }
-                // System.err.println("Adding clause:" + clause);
-                solver.addClause(clause);
+    public void beginVariablesSection(int nbvars) {
+        System.out.print("c reading variables");
+        nbvarstocreate = 0;
+        this.nbvars = nbvars;
+    }
+
+    public void addVariable(String idvar, String iddomain) {
+        Domain vardom = domainmapping.get(iddomain);
+        varmapping.put(idvar, new Var(idvar, vardom, nbvarstocreate));
+        nbvarstocreate += vardom.size();
+        if (isVerbose())
+            System.out.print("\rc reading variables " + varmapping.size() + "/"
+                    + nbvars);
+
+    }
+
+    public void endVariablesSection() {
+        System.out.println("\rc reading variables (" + nbvars + ") done.");
+        solver.newVar(nbvarstocreate);
+        try {
+            for (Evaluable v : varmapping.values()) {
+                v.toClause(solver);
             }
+        } catch (ContradictionException ce) {
+            assert false;
+        }
+
+    }
+
+    public void beginRelationsSection(int nbrel) {
+        System.out.print("c reading relations");
+        relations = new Relation[nbrel];
+        relindex = -1;
+    }
+
+    public void beginRelation(String name, int arity, int nbTuples,
+            boolean isSupport) {
+        relmapping.put(name, ++relindex);
+        if (isVerbose())
+            System.out.print("\rc reading relations " + relindex + "/"
+                    + relations.length);
+        if (isSupport) {
+            manageAllowedTuples(relindex, arity, nbTuples);
         } else {
-            int[] domain = vars[n].domain();
-            for (int i = 0; i < domain.length; i++) {
-                tuple[n] = domain[i];
-                find(tuple, n + 1, vars, solver);
-            }
-
+            relations[relindex] = new Nogoods(arity, nbTuples);
         }
+        tupleindex = -1;
+    }
+
+    public void addRelationTuple(int[] tuple) {
+        relations[relindex].addTuple(++tupleindex, tuple);
+    }
+
+    public void endRelation() {
+    }
+
+    public void endRelationsSection() {
+        System.out.println("\rc reading relations (" + relations.length
+                + ") done.");
+    }
+
+    public void beginPredicatesSection(int arg0) {
+        System.out.print("c reading predicates ");
+    }
+
+    public void beginPredicate(String name) {
+        currentpredicate = new Predicate();
+        predmapping.put(name, currentpredicate);
+        if (isVerbose())
+            System.out.print("\rc reading predicate " + predmapping.size());
+    }
+
+    public void addFormalParameter(String name, String type) {
+        currentpredicate.addVariable(name);
 
     }
 
-    private boolean notPresent(int[] tuple) {
-        // System.out.println("Checking:" + Arrays.asList(tuple));
-        // find the first tuple begining with the same
-        // initial number
-        int i = 0;
-        int j = 0;
-        while (i < tuples.length && j < tuple.length) {
-            if (tuples[i][j] < tuple[j]) {
-                i++;
-                j = 0;
-                continue;
-            }
-            if (tuples[i][j] > tuple[j]) {
-                return true;
-            }
-            j++;
+    public void predicateExpression(String expr) {
+        currentpredicate.setExpression(expr);
+    }
+
+    public void endPredicate() {
+        // TODO Auto-generated method stub
+    }
+
+    public void endPredicatesSection() {
+        System.out.println("\rc reading relations (" + predmapping.size()
+                + ") done.");
+    }
+
+    public void beginConstraintsSection(int arg0) {
+        System.out.print("c reading constraints");
+        nbconstraints = arg0;
+        currentconstraint = 0;
+    }
+
+    public void beginConstraint(String name, int arity) {
+        variables.clear();
+        variables.ensure(arity);
+        scope.clear();
+        scope.ensure(arity);
+        if (isVerbose())
+            System.out.print("\rc grounding constraint " + name + "("
+                    + (++currentconstraint * 100 / nbconstraints) + "%)");
+    }
+
+    public void constraintReference(String ref) {
+        Integer id = relmapping.get(ref);
+        if (id == null) {
+            currentclausifiable = predmapping.get(ref);
+        } else {
+            currentclausifiable = relations[id];
         }
-        return (j != tuple.length);
     }
 
-    public int arity() {
-        return domains.length;
-    }
-}
-
-class ForbiddenRelation implements Relation {
-
-    private final int[] domains;
-
-    private int[][] tuples;
-
-    ForbiddenRelation(int[] domains, int nbtuples) {
-        this.domains = domains;
-        tuples = new int[nbtuples][];
+    public void addVariableToConstraint(String arg0) {
+        scope.push(varmapping.get(arg0));
     }
 
-    public void addTuple(int index, int[] tuple) {
-        tuples[index] = tuple;
+    public void addEffectiveParameter(String arg0) {
+        variables.push(varmapping.get(arg0));
     }
 
-    public void toClause(ISolver solver, Var[] vars)
-        throws ContradictionException {
-        IVecInt clause = new VecInt();
-        for (int i = 0; i < tuples.length; i++) {
-            clause.clear();
-            for (int j = 0; j < domains.length; j++) {
-                clause.push(-vars[j].translate(tuples[i][j]));
-            }
-            // System.err.println("Adding clause (EZ) :" + clause);
-            solver.addClause(clause);
+    public void addEffectiveParameter(int arg0) {
+        variables.push(new Constant(arg0));
+    }
+
+    public void beginParameterList() {
+        throw new UnsupportedOperationException(
+                "I do not handle parameter list yet!");
+
+    }
+
+    public void addIntegerItem(int arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void addVariableItem(String arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void endParamaterList() {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void addConstantParameter(String arg0, int arg1) {
+        throw new UnsupportedOperationException(
+                "I do not handle constant parameter yet!");
+    }
+
+    public void constraintExpression(String arg0) {
+        throw new UnsupportedOperationException(
+                "I do not handle constraint expression yet!");
+    }
+
+    public void endConstraint() {
+        try {
+            currentclausifiable.toClause(solver, scope, variables);
+        } catch (ContradictionException e) {
+            System.err.println("c INSTANCE TRIVIALLY UNSAT");
         }
     }
 
-    public int arity() {
-        return domains.length;
+    public void endConstraintsSection() {
+        System.out.println("\rc reading constraints done.");
+    }
+
+    public void endInstance() {
+        // TODO Auto-generated method stub
+    }
+
+    IProblem getProblem() {
+        return solver;
     }
 }

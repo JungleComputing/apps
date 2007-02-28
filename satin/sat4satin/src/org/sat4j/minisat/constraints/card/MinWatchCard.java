@@ -1,6 +1,5 @@
 /*
- * MiniSAT in Java, a Java based-SAT framework Copyright (C) 2004 Daniel Le
- * Berre
+ * SAT4J: a SATisfiability library for Java Copyright (C) 2004-2006 Daniel Le Berre
  * 
  * Based on the original minisat specification from:
  * 
@@ -21,12 +20,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- *  
+ * 
  */
+
 package org.sat4j.minisat.constraints.card;
 
 import java.io.Serializable;
 
+import org.sat4j.minisat.constraints.cnf.Lits;
 import org.sat4j.minisat.core.Constr;
 import org.sat4j.minisat.core.ILits;
 import org.sat4j.minisat.core.Undoable;
@@ -40,46 +41,47 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
 
     public static final boolean ATLEAST = true;
 
-    /**
-     * Degr? de la contrainte de cardinalit?
-     */
-    private int degree;
+    public static final boolean ATMOST = false;
 
     /**
-     * Liste des litt?raux de la contrainte
+     * degree of the cardinality constraint
+     */
+    protected int degree;
+
+    /**
+     * literals involved in the constraint
      */
     private int[] lits;
 
     /**
-     * D?termine si c'est une in?galit? sup?rieure ou ?gale
+     * contains the sign of the constraint : ATLEAT or ATMOST
      */
     private boolean moreThan;
 
     /**
-     * Somme des coefficients des litt?raux observ?s
+     * contains the sum of the coefficients of the watched literals
      */
-    private int watchCumul;
+    protected int watchCumul;
 
     /**
-     * Vocabulaire de la contrainte
+     * Vocabulary of the constraint
      */
-    private ILits voc;
-
-    private long status = 0L;
+    private final ILits voc;
 
     /**
-     * Constructeur de clause accessible par minWatchCard
+     * Constructs and normalizes a cardinality constraint. used by
+     * minWatchCardNew in the non-normalized case.
      * 
      * @param voc
-     *            vocabulaire employ? par la contrainte
+     *            vocabulary used by the constraint
      * @param ps
-     *            vecteur contenant la liste des litt?raux de la contrainte
+     *            literals involved in the constraint
      * @param moreThan
-     *            true si la contrainte est sup?rieure ou ?gale
+     *            should be ATLEAST or ATMOST;
      * @param degree
-     *            le degr? de la contrainte
+     *            degree of the constraint
      */
-    private MinWatchCard(ILits voc, IVecInt ps, boolean moreThan, int degree) {
+    public MinWatchCard(ILits voc, IVecInt ps, boolean moreThan, int degree) {
         // On met en place les valeurs
         this.voc = voc;
         this.degree = degree;
@@ -87,15 +89,14 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
 
         // On simplifie ps
         int[] index = new int[voc.nVars() * 2 + 2];
-        for (int i = 0; i < index.length; i++) {
+        for (int i = 0; i < index.length; i++)
             index[i] = 0;
-        }
         // On repertorie les litt?raux utiles
         for (int i = 0; i < ps.size(); i++) {
-            if (index[ps.get(i) ^ 1] != 0) {
-                index[ps.get(i) ^ 1]--;
-            } else {
+            if (index[ps.get(i) ^ 1] == 0) {
                 index[ps.get(i)]++;
+            } else {
+                index[ps.get(i) ^ 1]--;
             }
         }
         // On supprime les litt?raux inutiles
@@ -105,9 +106,9 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
                 index[ps.get(ind)]--;
                 ind++;
             } else {
-                if ((ps.get(ind) & 1) != 0) {
+                // ??
+                if ((ps.get(ind) & 1) != 0)
                     this.degree--;
-                }
                 ps.set(ind, ps.last());
                 ps.pop();
             }
@@ -123,12 +124,39 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
     }
 
     /**
-     * Calcule la cause de l'affection d'un litt?ral
+     * Constructs and normalizes a cardinality constraint. used by
+     * MinWatchCardPB.normalizedMinWatchCardNew() in the normalized case. <br />
+     * <strong>Should not be used if parameters are not already normalized</strong><br />
+     * This constraint is always an ATLEAST constraint.
+     * 
+     * @param voc
+     *            vocabulary used by the constraint
+     * @param ps
+     *            literals involved in the constraint
+     * @param moreThan
+     *            true si la contrainte est sup?rieure ou ?gale
+     * @param degree
+     *            degree of the constraint
+     */
+    protected MinWatchCard(ILits voc, IVecInt ps, int degree) {
+        // On met en place les valeurs
+        this.voc = voc;
+        this.degree = degree;
+        this.moreThan = ATLEAST;
+
+        // On copie les litt?raux de la contrainte
+        lits = new int[ps.size()];
+        ps.moveTo(lits);
+
+    }
+
+    /**
+     * computes the reason for a literal
      * 
      * @param p
-     *            un litt?ral falsifi? (ou Lit.UNDEFINED)
+     *            falsified literal (or Lit.UNDEFINED)
      * @param outReason
-     *            vecteur de litt?raux ? remplir
+     *            the reason to be computed. Vector of literals.
      * @see Constr#calcReason(int p, IVecInt outReason)
      */
     public void calcReason(int p, IVecInt outReason) {
@@ -144,9 +172,9 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
     }
 
     /**
-     * Obtenir la valeur de l'activit? de la contrainte
+     * Returns the activity of the constraint
      * 
-     * @return la valeur de l'activit? de la contrainte
+     * @return activity value of the constraint
      * @see Constr#getActivity()
      */
     public double getActivity() {
@@ -155,10 +183,10 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
     }
 
     /**
-     * Incr?mente la valeur de l'activit? de la contrainte
+     * Increments activity of the constraint
      * 
      * @param claInc
-     *            incr?ment de l'activit? de la contrainte
+     *            value to be added to the activity of the constraint
      * @see Constr#incActivity(double claInc)
      */
     public void incActivity(double claInc) {
@@ -166,32 +194,34 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
     }
 
     /**
-     * D?termine si la contrainte est apprise
+     * Returns wether the constraint is learnt or not.
      * 
-     * @return true si la contrainte est apprise, false sinon
+     * @return false : a MinWatchCard cannot be learnt.
      * @see Constr#learnt()
      */
     public boolean learnt() {
-        // TODO learnt
         return false;
     }
 
     /**
-     * Met ? jour les affectations
+     * Simplifies the constraint w.r.t. the assignments of the literals
      * 
      * @param voc
-     *            vocabulaire employ?
+     *            vocabulary used
      * @param ps
-     *            liste des litt?raux concern?s
-     * @return influence des changements sur le degr?
+     *            literals involved
+     * @return value to be added to the degree. This value is less than or equal
+     *         to 0.
      */
-    private static int linearisation(ILits voc, IVecInt ps) {
+    protected static int linearisation(ILits voc, IVecInt ps) {
         // Stockage de l'influence des modifications
         int modif = 0;
 
         for (int i = 0; i < ps.size();) {
             // on verifie si le litteral est affecte
-            if (!voc.isUnassigned(ps.get(i))) {
+            if (voc.isUnassigned(ps.get(i))) {
+                i++;
+            } else {
                 // Si le litteral est satisfait,
                 // ?a revient ? baisser le degr?
                 if (voc.isSatisfied(ps.get(i))) {
@@ -201,22 +231,20 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
                 // on enleve le ieme litteral
                 ps.set(i, ps.last());
                 ps.pop();
-            } else {
-                // on passe au litt?ral suivant
-                i++;
             }
         }
 
         // DLB: inutile?
         // ps.shrinkTo(nbElement);
+        assert modif <= 0;
 
         return modif;
     }
 
     /**
-     * La contrainte est la cause d'une propagation unitaire
+     * Returns if the constraint is the reason for a unit propagation.
      * 
-     * @return true si c'est le cas, false sinon
+     * @return true
      * @see Constr#locked()
      */
     public boolean locked() {
@@ -225,87 +253,56 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
     }
 
     /**
-     * Permet la cr?ation de contrainte de cardinalit? ? observation minimale
+     * Constructs a cardinality constraint with a minimal set of watched
+     * literals Permet la cr?ation de contrainte de cardinalit? ? observation
+     * minimale
      * 
      * @param s
-     *            outil pour la propagation des litt?raux
+     *            tool for propagation
      * @param voc
-     *            vocabulaire utilis? par la contrainte
+     *            vocalulary used by the constraint
      * @param ps
-     *            liste des litt?raux de la nouvelle contrainte
+     *            literals involved in the constraint
      * @param moreThan
-     *            d?termine si c'est une sup?rieure ou ?gal ? l'origine
+     *            sign of the constraint. Should be ATLEAST or ATMOST.
      * @param degree
-     *            fournit le degr? de la contrainte
-     * @return une nouvelle clause si tout va bien, null sinon
+     *            degree of the constraint
+     * @return a new cardinality constraint, null if it is a tautology
      * @throws ContradictionException
      */
     public static MinWatchCard minWatchCardNew(UnitPropagationListener s,
-        ILits voc, IVecInt ps, boolean moreThan, int degree)
-        throws ContradictionException {
+            ILits voc, IVecInt ps, boolean moreThan, int degree)
+            throws ContradictionException {
 
-        degree += linearisation(voc, ps);
+        int mydegree = degree + linearisation(voc, ps);
 
-        if (ps.size() == 0) {
-            throw new ContradictionException("Cr?ation d'une clause vide");
-        } else if (ps.size() == degree) {
-            for (int i = 0; i < ps.size(); i++) {
+        if (ps.size() == 0 && mydegree > 0) {
+            throw new ContradictionException();
+        } else if (ps.size() == mydegree || ps.size() <= 0) {
+            for (int i = 0; i < ps.size(); i++)
                 if (!s.enqueue(ps.get(i))) {
-                    throw new ContradictionException(
-                        "Contradiction avec le litt?ral impliqu?.");
+                    throw new ContradictionException();
                 }
-            }
             return null;
         }
 
         // La contrainte est maintenant cr??e
-        MinWatchCard retour = new MinWatchCard(voc, ps, moreThan, degree);
+        MinWatchCard retour = new MinWatchCard(voc, ps, moreThan, mydegree);
 
-        retour.normalize();
-
-        if (degree <= 0) {
+        if (retour.degree <= 0)
             return null;
-        }
 
-        // On observe degre+1 litt?raux
-        int indSwap = retour.lits.length;
-        int tmpInt;
-        for (int i = 0; i <= retour.degree && i < indSwap; i++) {
-            while (voc.isFalsified(retour.lits[i]) && --indSwap <= i) {
-                tmpInt = retour.lits[i];
-                retour.lits[i] = retour.lits[indSwap];
-                retour.lits[indSwap] = tmpInt;
-            }
+        retour.computeWatches();
 
-            // Si le litt?ral est observable
-            if (!voc.isFalsified(retour.lits[i])) {
-                retour.watchCumul++;
-                voc.watch(retour.lits[i] ^ 1, retour);
-            }
-        }
-
-        // Si on observe pas suffisament
-        if (retour.watchCumul <= retour.degree) {
-            // Si l'on a les litt?rux impliqu?s
-            if (retour.watchCumul == retour.degree) {
-                for (int i = 0; i < retour.lits.length; i++) {
-                    if (!s.enqueue(retour.lits[i])) {
-                        throw new ContradictionException(
-                            "Contradiction avec le litt?ral impliqu?.");
-                    }
-                }
-                return null;
-            }
-            throw new ContradictionException("Contrainte non-satisfiable");
-        }
+        retour.computePropagation(s);
 
         return retour;
     }
 
     /**
-     * On normalise la contrainte au sens de Barth
+     * normalize the constraint (cf. P.Barth normalization)
      */
-    public void normalize() {
+    public final void normalize() {
         // Gestion du signe
         if (!moreThan) {
             // On multiplie le degr? par -1
@@ -320,13 +317,13 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
     }
 
     /**
-     * Propagation de la valeur de v?rit? d'un litt?ral falsifi?
+     * propagates the value of a falsified literal
      * 
      * @param s
-     *            outil pour la propagation des litt?raux
+     *            tool for literal propagation
      * @param p
-     *            le litt?ral propag?
-     * @return false si inconsistance d?t?ct?e, true sinon
+     *            falsified literal
+     * @return false if an inconistency is detected, else true
      */
     public boolean propagate(UnitPropagationListener s, int p) {
 
@@ -337,16 +334,15 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
         }
 
         // Recherche du litt?ral falsifi?
-        int indFalsified = -1;
-        while ((lits[++indFalsified] ^ 1) != p) {
-            ;
-        }
+        int indFalsified = 0;
+        while ((lits[indFalsified] ^ 1) != p)
+            indFalsified++;
+        assert watchCumul > degree;
 
         // Recherche du litt?ral swap
         int indSwap = degree + 1;
-        while (indSwap < lits.length && voc.isFalsified(lits[indSwap])) {
+        while (indSwap < lits.length && voc.isFalsified(lits[indSwap]))
             indSwap++;
-        }
 
         // Mise ? jour de la contrainte
         if (indSwap == lits.length) {
@@ -358,11 +354,9 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
             voc.undos(p).push(this);
 
             // On met en queue les litt?raux impliqu?s
-            for (int i = 0; i <= degree; i++) {
-                if ((p != (lits[i] ^ 1)) && !s.enqueue(lits[i], this)) {
+            for (int i = 0; i <= degree; i++)
+                if ((p != (lits[i] ^ 1)) && !s.enqueue(lits[i], this))
                     return false;
-                }
-            }
 
             return true;
         }
@@ -378,7 +372,7 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
     }
 
     /**
-     * Enl?ve une contrainte du prouveur
+     * Removes a constraint from the solver
      */
     public void remove() {
         for (int i = 0; i <= degree; i++) {
@@ -387,65 +381,71 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
     }
 
     /**
-     * Permet le r??chantillonage de l'activit? de la contrainte
+     * Rescales the activity value of the constraint
      * 
      * @param d
-     *            facteur d'ajustement
+     *            rescale factor
      */
     public void rescaleBy(double d) {
         // TODO rescaleBy
     }
 
     /**
-     * Simplifie la contrainte
+     * simplifies the constraint
      * 
-     * @return true si la contrainte est satisfaite, false sinon
+     * @return true if the constraint is satisfied, else false
      */
     public boolean simplify() {
-        // Calcule de la valeur actuelle
-        for (int i = 0, count = 0; i < lits.length; i++) {
-            if (voc.isSatisfied(lits[i])) {
-                if (++count == degree) {
-                    return true;
-                }
-            }
-        }
+        // Calcul de la valeur actuelle
+        for (int i = 0, count = 0; i < lits.length; i++)
+            if (voc.isSatisfied(lits[i]) && (++count == degree))
+                return true;
 
         return false;
     }
 
     /**
-     * Cha?ne repr?sentant la contrainte
+     * Returns a string representation of the constraint.
      * 
-     * @return Cha?ne repr?sentant la contrainte
+     * @return representation of the constraint.
      */
     @Override
     public String toString() {
         StringBuffer stb = new StringBuffer();
-
+        stb.append("Card (" + lits.length + ") : ");
         if (lits.length > 0) {
-            if (voc.isUnassigned(lits[0])) {
-                stb.append(this.lits[0]);
-                stb.append(" ");
-            }
+            // if (voc.isUnassigned(lits[0])) {
+            stb.append(Lits.toString(this.lits[0]));
+            stb.append("[");
+            stb.append(voc.valueToString(lits[0]));
+            stb.append("@");
+            stb.append(voc.getLevel(lits[0]));
+            stb.append("]");
+            stb.append(" "); //$NON-NLS-1$
+            // }
             for (int i = 1; i < lits.length; i++) {
-                if (voc.isUnassigned(lits[i])) {
-                    stb.append(" + ");
-                    stb.append(this.lits[i]);
-                    stb.append(" ");
-                }
+                // if (voc.isUnassigned(lits[i])) {
+                stb.append(" + "); //$NON-NLS-1$
+                stb.append(Lits.toString(this.lits[i]));
+                stb.append("[");
+                stb.append(voc.valueToString(lits[i]));
+                stb.append("@");
+                stb.append(voc.getLevel(lits[i]));
+                stb.append("]");
+                stb.append(" "); //$NON-NLS-1$
+                // }
             }
-            stb.append(">= ");
+            stb.append(">= "); //$NON-NLS-1$
             stb.append(this.degree);
         }
         return stb.toString();
     }
 
     /**
-     * M?thode appel?e lors du backtrack
+     * Updates information on the constraint in case of a backtrack
      * 
      * @param p
-     *            un litt?ral d?saffect?
+     *            unassigned literal
      */
     public void undo(int p) {
         // Le litt?ral observ? et falsifi? devient non assign?
@@ -472,25 +472,91 @@ public class MinWatchCard implements Constr, Undoable, Serializable {
         throw new UnsupportedOperationException();
     }
 
-    public void setVoc(ILits newvoc) {
-        voc = newvoc;
-    }
+    protected void computeWatches() {
+        int indSwap = lits.length;
+        int tmpInt;
+        for (int i = 0; i <= degree && i < indSwap; i++) {
+            while (voc.isFalsified(lits[i]) && --indSwap > i) {
+                tmpInt = lits[i];
+                lits[i] = lits[indSwap];
+                lits[indSwap] = tmpInt;
+            }
 
-    public void setStatus(long st) {
-        status = st;
-    }
-
-    public long getStatus() {
-        return status;
-    }
-
-    @Override
-    public Object clone() {
-        // TODO: deep copy
-        try {
-            return super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new InternalError(e.toString());
+            // Si le litteral est observable
+            if (!voc.isFalsified(lits[i])) {
+                watchCumul++;
+                voc.watch(lits[i] ^ 1, this);
+            }
         }
+        if (learnt()) {
+            // chercher tous les litteraux a regarder
+            // par ordre de niveau decroissant
+            int free = 1;
+            while ((watchCumul <= degree) && (free > 0)) {
+                free = 0;
+                // regarder le litteral falsifie au plus bas niveau
+                int maxlevel = -1, maxi = -1;
+                for (int i = watchCumul; i < lits.length; i++) {
+                    if (voc.isFalsified(lits[i])) {
+                        free++;
+                        int level = voc.getLevel(lits[i]);
+                        if (level > maxlevel) {
+                            maxi = i;
+                            maxlevel = level;
+                        }
+                    }
+                }
+                if (free > 0) {
+                    assert maxi >= 0;
+                    voc.watch(lits[maxi] ^ 1, this);
+                    tmpInt = lits[maxi];
+                    lits[maxi] = lits[watchCumul];
+                    lits[watchCumul] = tmpInt;
+                    watchCumul++;
+                    free--;
+                    assert free >= 0;
+                }
+            }
+            assert lits.length == 1 || watchCumul > 1;
+        }
+
+    }
+
+    protected MinWatchCard computePropagation(UnitPropagationListener s)
+            throws ContradictionException {
+
+        // Si on a des litteraux impliques
+        if (watchCumul == degree) {
+            for (int i = 0; i < lits.length; i++)
+                if (!s.enqueue(lits[i])) {
+                    throw new ContradictionException();
+                }
+            return null;
+        }
+
+        // Si on n'observe pas suffisamment
+        if (watchCumul < degree) {
+            throw new ContradictionException();
+        }
+        return this;
+    }
+
+    public int[] getLits() {
+        int[] tmp = new int[size()];
+        System.arraycopy(lits, 0, tmp, 0, size());
+        return tmp;
+    }
+
+    public ILits getVocabulary() {
+        return voc;
+    }
+
+    // SATIN
+    public void setLearntGlobal() {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean learntGlobal() {
+        return false;
     }
 }

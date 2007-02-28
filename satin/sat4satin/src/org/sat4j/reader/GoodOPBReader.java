@@ -1,23 +1,38 @@
 /*
- * Created on 8 sept. 2004
- *
- * To change the template for this generated file go to
- * Window - Preferences - Java - Code Generation - Code and Comments
+ * SAT4J: a SATisfiability library for Java Copyright (C) 2004-2006 Daniel Le Berre
+ * 
+ * Based on the original minisat specification from:
+ * 
+ * An extensible SAT solver. Niklas E?n and Niklas S?rensson. Proceedings of the
+ * Sixth International Conference on Theory and Applications of Satisfiability
+ * Testing, LNCS 2919, pp 502-518, 2003.
+ * 
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
+
 package org.sat4j.reader;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.LineNumberReader;
+import java.io.PrintWriter;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.zip.GZIPInputStream;
 
 import org.sat4j.core.Vec;
 import org.sat4j.core.VecInt;
@@ -35,7 +50,7 @@ import org.sat4j.specs.IVecInt;
  * 
  * @author leberre
  */
-public class GoodOPBReader implements Reader, Serializable {
+public class GoodOPBReader extends Reader implements Serializable {
 
     /**
      * Comment for <code>serialVersionUID</code>
@@ -44,7 +59,7 @@ public class GoodOPBReader implements Reader, Serializable {
 
     private static final String COMMENT_SYMBOL = "*";
 
-    private ISolver solver;
+    private final ISolver solver;
 
     private final Map<String, Integer> map = new HashMap<String, Integer>();
 
@@ -57,21 +72,14 @@ public class GoodOPBReader implements Reader, Serializable {
         this.solver = solver;
     }
 
-    public IProblem parseInstance(String filename)
-        throws FileNotFoundException, ParseFormatException, IOException,
-        ContradictionException {
-
-        if (filename.endsWith(".gz")) {
-            parseInstance(new LineNumberReader(new InputStreamReader(
-                new GZIPInputStream(new FileInputStream(filename)))));
-        } else {
-            parseInstance(new LineNumberReader(new FileReader(filename)));
-        }
-        return solver;
+    @Override
+    public final IProblem parseInstance(final java.io.Reader in)
+            throws ParseFormatException, ContradictionException, IOException {
+        return parseInstance(new LineNumberReader(in));
     }
 
-    public void parseInstance(LineNumberReader in)
-        throws ContradictionException, IOException {
+    private IProblem parseInstance(LineNumberReader in)
+            throws ContradictionException, IOException {
         solver.reset();
         String line;
         while ((line = in.readLine()) != null) {
@@ -82,22 +90,19 @@ public class GoodOPBReader implements Reader, Serializable {
             }
             parseLine(line);
         }
+        return solver;
     }
 
     void parseLine(String line) throws ContradictionException {
         // Skip commented line
-        if (line.startsWith(COMMENT_SYMBOL)) {
+        if (line.startsWith(COMMENT_SYMBOL))
             return;
-        }
-        if (line.startsWith("p")) {
+        if (line.startsWith("p")) // ignore p cnf with pbchaff format
             return;
-        }
-        if (line.startsWith("min:") || line.startsWith("min :")) {
+        if (line.startsWith("min:") || line.startsWith("min :"))
             return; // we will use that case later
-        }
-        if (line.startsWith("max:") || line.startsWith("max :")) {
+        if (line.startsWith("max:") || line.startsWith("max :"))
             return; // we will use that case later
-        }
 
         // skip name of constraints:
         int index = line.indexOf(":");
@@ -108,10 +113,10 @@ public class GoodOPBReader implements Reader, Serializable {
         IVecInt lits = new VecInt();
         IVec<BigInteger> coeffs = new Vec<BigInteger>();
         Scanner stk = new Scanner(line)
-            .useDelimiter("\\s*\\*\\s*|\\s*\\+\\s*|\\s+");
+                .useDelimiter("\\s*\\*\\s*|\\s*\\+\\s*|\\s+");
         while (stk.hasNext()) {
             String token = stk.next();
-            if (token.equals(">=") || token.equals("<=") || token.equals("=")) {
+            if (">=".equals(token) || "<=".equals(token) || "=".equals(token)) {
                 assert stk.hasNext();
                 String tok = stk.next();
                 // we need to remove + from the integer
@@ -121,13 +126,10 @@ public class GoodOPBReader implements Reader, Serializable {
                 BigInteger d = new BigInteger(tok);
 
                 try {
-                    // System.out.println("c constraint: " + line);
-                    // System.out.println("c lits: " + lits);
-                    // System.out.println("c coeffs: " + coeffs);
-                    if (token.equals(">=") || token.equals("=")) {
+                    if (">=".equals(token) || "=".equals(token)) {
                         solver.addPseudoBoolean(lits, coeffs, true, d);
                     }
-                    if (token.equals("<=") || token.equals("=")) {
+                    if ("<=".equals(token) || "=".equals(token)) {
                         solver.addPseudoBoolean(lits, coeffs, false, d);
                     }
                 } catch (ContradictionException ce) {
@@ -139,10 +141,10 @@ public class GoodOPBReader implements Reader, Serializable {
             } else {
                 // on est toujours en train de lire la partie gauche de la
                 // contrainte
-                if (token.equals("+")) {
+                if ("+".equals(token)) {
                     assert stk.hasNext();
                     token = stk.next();
-                } else if (token.equals("-")) {
+                } else if ("-".equals(token)) {
                     assert stk.hasNext();
                     token = token + stk.next();
                 }
@@ -160,7 +162,7 @@ public class GoodOPBReader implements Reader, Serializable {
                     // its only an identifier
                     coef = BigInteger.ONE;
                 }
-                if (token.equals("-") || token.equals("~")) {
+                if ("-".equals(token) || "~".equals(token)) {
                     assert stk.hasNext();
                     token = token + stk.next();
                 }
@@ -189,6 +191,7 @@ public class GoodOPBReader implements Reader, Serializable {
         }
     }
 
+    @Override
     public String decode(int[] model) {
         StringBuffer stb = new StringBuffer();
         for (int i = 0; i < model.length; i++) {
@@ -203,4 +206,16 @@ public class GoodOPBReader implements Reader, Serializable {
         return stb.toString();
     }
 
+    @Override
+    public void decode(int[] model, PrintWriter out) {
+        for (int i = 0; i < model.length; i++) {
+            if (model[i] < 0) {
+                out.print("-");
+                out.print(decode.get(-model[i] - 1));
+            } else {
+                out.print(decode.get(model[i] - 1));
+            }
+            out.print(" ");
+        }
+    }
 }

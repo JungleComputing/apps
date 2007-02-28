@@ -1,3 +1,27 @@
+/*
+ * SAT4J: a SATisfiability library for Java Copyright (C) 2004-2006 Daniel Le Berre
+ * 
+ * Based on the original minisat specification from:
+ * 
+ * An extensible SAT solver. Niklas E?n and Niklas S?rensson. Proceedings of the
+ * Sixth International Conference on Theory and Applications of Satisfiability
+ * Testing, LNCS 2919, pp 502-518, 2003.
+ * 
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
+ */
 package org.sat4j.minisat.core;
 
 import java.io.Serializable;
@@ -5,19 +29,25 @@ import java.io.Serializable;
 import org.sat4j.core.VecInt;
 import org.sat4j.specs.IVecInt;
 
-public class Heap implements Serializable, Cloneable {
+/**
+ * Heap implementation used to maintain the variables order in some heuristics.
+ * 
+ * @author daniel
+ * 
+ */
+public class Heap implements Serializable {
 
     /*
-     * default serial version id 
+     * default serial version id
      */
     private static final long serialVersionUID = 1L;
 
     private final static int left(int i) {
-        return i + i;
+        return i << 1;
     }
 
     private final static int right(int i) {
-        return i + i + 1;
+        return (i << 1) ^ 1;
     }
 
     private final static int parent(int i) {
@@ -28,13 +58,13 @@ public class Heap implements Serializable, Cloneable {
         return activity[a] > activity[b];
     }
 
-    private IVecInt heap = new VecInt(); // heap of ints
+    private final IVecInt heap = new VecInt(); // heap of ints
 
-    private IVecInt indices = new VecInt(); // int -> index in heap
+    private final IVecInt indices = new VecInt(); // int -> index in heap
 
-    // private final double [] activity;
-    private double[] activity;
+    private final double[] activity;
 
+    @SuppressWarnings("PMD")
     final void percolateUp(int i) {
         int x = heap.get(i);
         while (parent(i) != 0 && comp(x, heap.get(parent(i)))) {
@@ -50,11 +80,10 @@ public class Heap implements Serializable, Cloneable {
         int x = heap.get(i);
         while (left(i) < heap.size()) {
             int child = right(i) < heap.size()
-                && comp(heap.get(right(i)), heap.get(left(i))) ? right(i)
-                : left(i);
-            if (!comp(heap.get(child), x)) {
+                    && comp(heap.get(right(i)), heap.get(left(i))) ? right(i)
+                    : left(i);
+            if (!comp(heap.get(child), x))
                 break;
-            }
             heap.set(i, heap.get(child));
             indices.set(heap.get(i), i);
             i = child;
@@ -105,9 +134,8 @@ public class Heap implements Serializable, Cloneable {
         indices.set(heap.get(1), 1);
         indices.set(r, 0);
         heap.pop();
-        if (heap.size() > 1) {
+        if (heap.size() > 1)
             percolateDown(1);
-        }
         return r;
     }
 
@@ -117,29 +145,8 @@ public class Heap implements Serializable, Cloneable {
 
     public boolean heapProperty(int i) {
         return i >= heap.size()
-            || ((parent(i) == 0 || !comp(heap.get(i), heap.get(parent(i))))
-                && heapProperty(left(i)) && heapProperty(right(i)));
+                || ((parent(i) == 0 || !comp(heap.get(i), heap.get(parent(i))))
+                        && heapProperty(left(i)) && heapProperty(right(i)));
     }
 
-    public void setActivity(double[] activity) {
-        this.activity = activity;
-    }
-
-    @Override
-    public Object clone() {
-        Heap clone;
-
-        try {
-            clone = (Heap) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new InternalError(e.toString());
-        }
-
-        clone.heap = (VecInt) this.heap.clone();
-        clone.indices = (VecInt) this.indices.clone();
-        // NOTE: caller should update activity using setActivity!
-        clone.activity = null;
-
-        return clone;
-    }
 }

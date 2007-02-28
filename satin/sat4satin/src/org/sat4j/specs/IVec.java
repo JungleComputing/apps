@@ -1,9 +1,28 @@
 /*
- * Created on 20 dec. 2004
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * SAT4J: a SATisfiability library for Java Copyright (C) 2004-2006 Daniel Le Berre
+ * 
+ * Based on the original minisat specification from:
+ * 
+ * An extensible SAT solver. Niklas E?n and Niklas S?rensson. Proceedings of the
+ * Sixth International Conference on Theory and Applications of Satisfiability
+ * Testing, LNCS 2919, pp 502-518, 2003.
+ * 
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
+
 package org.sat4j.specs;
 
 import java.util.Comparator;
@@ -11,7 +30,7 @@ import java.util.Comparator;
 /**
  * An abstraction on the type of vector used in the library.
  * 
- * @author leberre 
+ * @author leberre
  */
 public interface IVec<T> extends Iterable<T> {
     /**
@@ -102,7 +121,7 @@ public interface IVec<T> extends Iterable<T> {
     T delete(int i);
 
     /**
-     * Ces operations devraient se faire en temps constant. Ce n'est pas le
+     * Ces op�rations devraient se faire en temps constant. Ce n'est pas le
      * cas ici.
      * 
      * @param copy
@@ -110,6 +129,15 @@ public interface IVec<T> extends Iterable<T> {
     void copyTo(IVec<T> copy);
 
     <E> void copyTo(E[] dest);
+
+    /**
+     * Allow to access the internal representation of the vector as an array.
+     * Note that only the content of index 0 to size() should be taken into
+     * account. USE WITH CAUTION
+     * 
+     * @return the internal represnetation of the Vector as an array.
+     */
+    T[] toArray();
 
     /**
      * Move the content of the vector into dest. Note that the vector become
@@ -121,12 +149,13 @@ public interface IVec<T> extends Iterable<T> {
     void moveTo(IVec<T> dest);
 
     /**
-     * Move elements inside the vector.
-     * The content of the method is equivalent to: 
-     * <code>vec[dest] = vec[source]</code>
+     * Move elements inside the vector. The content of the method is equivalent
+     * to: <code>vec[dest] = vec[source]</code>
      * 
-     * @param dest the index of the destination
-     * @param source the index of the source
+     * @param dest
+     *            the index of the destination
+     * @param source
+     *            the index of the source
      */
     void moveTo(int dest, int source);
 
@@ -137,5 +166,11 @@ public interface IVec<T> extends Iterable<T> {
 
     void sortUnique(Comparator<T> comparator);
 
-    Object clone();
+    /**
+     * To know if a vector is empty
+     * 
+     * @return true iff the vector is empty.
+     * @since 1.6
+     */
+    boolean isEmpty();
 }

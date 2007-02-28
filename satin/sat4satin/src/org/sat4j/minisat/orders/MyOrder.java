@@ -1,12 +1,30 @@
 /*
- * Created on 6 juin 2004
- *
- * To change the template for this generated file go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ * SAT4J: a SATisfiability library for Java Copyright (C) 2004-2006 Daniel Le Berre
+ * 
+ * Based on the original minisat specification from:
+ * 
+ * An extensible SAT solver. Niklas E?n and Niklas S?rensson. Proceedings of the
+ * Sixth International Conference on Theory and Applications of Satisfiability
+ * Testing, LNCS 2919, pp 502-518, 2003.
+ * 
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
+
 package org.sat4j.minisat.orders;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -17,16 +35,16 @@ import org.sat4j.minisat.core.ILits2;
  * @author leberre To change the template for this generated type comment go to
  *         Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
-public class MyOrder extends VarOrder implements Serializable, Cloneable {
+public class MyOrder extends VarOrder {
 
     private static final long serialVersionUID = 1L;
 
     private ILits2 lits;
 
     class Temp implements Comparable<Temp> {
-        private int id;
+        private final int id;
 
-        private int count;
+        private final int count;
 
         Temp(int id) {
             this.id = id;
@@ -45,7 +63,7 @@ public class MyOrder extends VarOrder implements Serializable, Cloneable {
 
         @Override
         public String toString() {
-            return "" + id + "(" + count + ")";
+            return "" + id + "(" + count + ")"; //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
         }
     }
 
@@ -87,22 +105,6 @@ public class MyOrder extends VarOrder implements Serializable, Cloneable {
 
     @Override
     public String toString() {
-        return "Init VSIDS order using a POSIT-like static order on 2 and 3 clauses.";
-    }
-
-    @Override
-    public Object clone() {
-        MyOrder clone;
-
-        // try {
-        clone = (MyOrder) super.clone();
-        // }
-        // catch (CloneNotSupportedException e) {
-        //    throw new InternalError(e.toString());
-        // }
-
-        clone.lits = (ILits2) this.lits.clone();
-
-        return clone;
+        return "Init VSIDS order using a POSIT-like static order on 2 and 3 clauses."; //$NON-NLS-1$
     }
 }

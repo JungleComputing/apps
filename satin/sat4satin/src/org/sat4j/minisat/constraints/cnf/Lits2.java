@@ -1,20 +1,37 @@
 /*
- * Created on 15 juin 2004
- *
- * To change the template for this generated file go to
- * Window - Preferences - Java - Code Generation - Code and Comments
+ * SAT4J: a SATisfiability library for Java Copyright (C) 2004-2006 Daniel Le Berre
+ * 
+ * Based on the original minisat specification from:
+ * 
+ * An extensible SAT solver. Niklas E?n and Niklas S?rensson. Proceedings of the
+ * Sixth International Conference on Theory and Applications of Satisfiability
+ * Testing, LNCS 2919, pp 502-518, 2003.
+ * 
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
+
 package org.sat4j.minisat.constraints.cnf;
 
-import org.sat4j.core.Vec;
 import org.sat4j.minisat.core.ILits2;
-import org.sat4j.minisat.core.Propagatable;
 
 /**
  * @author leberre To change the template for this generated type comment go to
  *         Window - Preferences - Java - Code Generation - Code and Comments
  */
-public class Lits2 extends Lits implements ILits2, Cloneable {
+public class Lits2 extends Lits implements ILits2 {
 
     private static final long serialVersionUID = 1L;
 
@@ -57,56 +74,9 @@ public class Lits2 extends Lits implements ILits2, Cloneable {
         }
         if (binclauses[p] == null) {
             binclauses[p] = new BinaryClauses(this, p);
-            if (watches[p ^ 1] == null) {
-                // created lazily after clone
-                watches[p ^ 1] = new Vec<Propagatable>();
-            }
             watches[p ^ 1].insertFirstWithShifting(binclauses[p]);
         }
         binclauses[p].addBinaryClause(q);
     }
 
-    @Override
-    public Object clone() {
-        final boolean debug = false;
-        Lits2 clone;
-
-        clone = (Lits2) super.clone();
-
-        if (debug) {
-            System.out.println("Lits2 clone " + clone + " orig super "
-                + super.toString() + ", orig " + this + " watches clone "
-                + clone.watches + " orig " + this.watches);
-        }
-
-        if (this.binclauses != null) {
-            clone.binclauses = new BinaryClauses[2 * nVars() + 2];
-            if (debug) {
-                System.out.println("Lits2: already binclauses "
-                    + this.binclauses + " cloned: " + clone.binclauses);
-            }
-
-            for (int p = 0; p < clone.binclauses.length; p++) {
-                if (this.binclauses[p] != null) {
-                    clone.binclauses[p] = (BinaryClauses) binclauses[p].clone();
-                    clone.binclauses[p].updateVoc(clone);
-                    if (clone.watches[p ^ 1] == null) {
-                        // created lazily after clone
-                        clone.watches[p ^ 1] = new Vec<Propagatable>();
-                    }
-                    clone.watches[p ^ 1]
-                        .insertFirstWithShifting(clone.binclauses[p]);
-
-                    if (debug) {
-                        System.out.println("now " + clone.watches[p ^ 1].size()
-                            + " watches for bin-clause lit " + p + " at "
-                            + clone.binclauses[p] + " was "
-                            + this.binclauses[p]);
-                    }
-                }
-            }
-        }
-
-        return clone;
-    }
 }

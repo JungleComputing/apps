@@ -1,33 +1,34 @@
 /*
- * MiniSAT in Java, a Java based-SAT framework
- * Copyright (C) 2004 Daniel Le Berre
- *
+ * SAT4J: a SATisfiability library for Java Copyright (C) 2004-2006 Daniel Le Berre
+ * 
  * Based on the original minisat specification from:
- *
- * An extensible SAT solver. Niklas E?n and Niklas S?rensson.
- * Proceedings of the Sixth International Conference on Theory
- * and Applications of Satisfiability Testing, LNCS 2919,
- * pp 502-518, 2003.
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
+ * 
+ * An extensible SAT solver. Niklas E?n and Niklas S?rensson. Proceedings of the
+ * Sixth International Conference on Theory and Applications of Satisfiability
+ * Testing, LNCS 2919, pp 502-518, 2003.
+ * 
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
+
 package org.sat4j.minisat.constraints.card;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 
+import org.sat4j.minisat.constraints.cnf.Lits;
 import org.sat4j.minisat.core.Constr;
 import org.sat4j.minisat.core.ILits;
 import org.sat4j.minisat.core.Undoable;
@@ -62,9 +63,7 @@ public class MaxWatchCard implements Constr, Undoable, Serializable {
     /**
      * Vocabulaire de la contrainte
      */
-    private ILits voc;
-
-    private long status = 0L;
+    private final ILits voc;
 
     /**
      * Constructeur de base cr?ant des contraintes vides
@@ -83,15 +82,14 @@ public class MaxWatchCard implements Constr, Undoable, Serializable {
 
         // On simplifie ps
         int[] index = new int[voc.nVars() * 2 + 2];
-        for (int i = 0; i < index.length; i++) {
+        for (int i = 0; i < index.length; i++)
             index[i] = 0;
-        }
         // On repertorie les litt?raux utiles
         for (int i = 0; i < ps.size(); i++) {
-            if (index[ps.get(i) ^ 1] != 0) {
-                index[ps.get(i) ^ 1]--;
-            } else {
+            if (index[ps.get(i) ^ 1] == 0) {
                 index[ps.get(i)]++;
+            } else {
+                index[ps.get(i) ^ 1]--;
             }
         }
         // On supprime les litt?raux inutiles
@@ -101,9 +99,8 @@ public class MaxWatchCard implements Constr, Undoable, Serializable {
                 index[ps.get(ind)]--;
                 ind++;
             } else {
-                if ((ps.get(ind) & 1) != 0) {
+                if ((ps.get(ind) & 1) != 0)
                     this.degree--;
-                }
                 ps.set(ind, ps.last());
                 ps.pop();
             }
@@ -211,21 +208,20 @@ public class MaxWatchCard implements Constr, Undoable, Serializable {
      * @throws ContradictionException
      */
     public static MaxWatchCard maxWatchCardNew(UnitPropagationListener s,
-        ILits voc, IVecInt ps, boolean moreThan, int degree)
-        throws ContradictionException {
+            ILits voc, IVecInt ps, boolean moreThan, int degree)
+            throws ContradictionException {
 
         MaxWatchCard outclause = null;
 
         // La contrainte ne doit pas ?tre vide
         if (ps.size() == 0) {
-            throw new ContradictionException("Cr?ation d'une clause vide");
+            throw new ContradictionException("Creating empty clause"); //$NON-NLS-1$
         } else if (ps.size() == degree) {
-            for (int i = 0; i < ps.size(); i++) {
+            for (int i = 0; i < ps.size(); i++)
                 if (!s.enqueue(ps.get(i))) {
                     throw new ContradictionException(
-                        "Contradiction avec le litt?ral impliqu?.");
+                            "Contradiction with implied literal"); //$NON-NLS-1$
                 }
-            }
             return null;
         }
 
@@ -233,21 +229,19 @@ public class MaxWatchCard implements Constr, Undoable, Serializable {
         outclause = new MaxWatchCard(voc, ps, moreThan, degree);
 
         // Si le degr? est insufisant
-        if (outclause.degree <= 0) {
+        if (outclause.degree <= 0)
             return null;
-        }
 
         // Si il n'y a aucune chance de satisfaire la contrainte
-        if (outclause.watchCumul < outclause.degree) {
-            throw new ContradictionException("Contrainte non-satisfiable");
-        }
+        if (outclause.watchCumul < outclause.degree)
+            throw new ContradictionException();
 
         // Si les litt?raux observ?s sont impliqu?s
         if (outclause.watchCumul == outclause.degree) {
             for (int i = 0; i < outclause.lits.length; i++) {
                 if (!s.enqueue(outclause.lits[i])) {
                     throw new ContradictionException(
-                        "Contradiction avec le litt?ral impliqu?.");
+                            "Contradiction with implied literal"); //$NON-NLS-1$
                 }
             }
             return null;
@@ -259,7 +253,7 @@ public class MaxWatchCard implements Constr, Undoable, Serializable {
     /**
      * On normalise la contrainte au sens de Barth
      */
-    public void normalize() {
+    public final void normalize() {
         // Gestion du signe
         if (!moreThan) {
             // On multiplie le degr? par -1
@@ -289,9 +283,8 @@ public class MaxWatchCard implements Constr, Undoable, Serializable {
         assert !voc.isFalsified(p);
 
         // Si le litt?ral p est impliqu?
-        if (this.watchCumul == this.degree) {
+        if (this.watchCumul == this.degree)
             return false;
-        }
 
         // On met en place la mise ? jour du compteur
         voc.undos(p).push(this);
@@ -299,15 +292,12 @@ public class MaxWatchCard implements Constr, Undoable, Serializable {
 
         // Si les litt?raux restant sont impliqu?s
         if (watchCumul == degree) {
-            for (int ind = 0; ind < lits.length; ind++) {
-                if (voc.isUnassigned(lits[ind])) {
-                    if (!s.enqueue(lits[ind], this)) {
-                        return false;
-                    }
+            for (int q : lits) {
+                if (voc.isUnassigned(q) && !s.enqueue(q, this)) {
+                    return false;
                 }
             }
         }
-
         return true;
     }
 
@@ -315,8 +305,8 @@ public class MaxWatchCard implements Constr, Undoable, Serializable {
      * Enl?ve une contrainte du prouveur
      */
     public void remove() {
-        for (int i = 0; i < lits.length; i++) {
-            voc.watches(lits[i] ^ 1).remove(this);
+        for (int q : lits) {
+            voc.watches(q ^ 1).remove(this);
         }
     }
 
@@ -327,8 +317,6 @@ public class MaxWatchCard implements Constr, Undoable, Serializable {
      *            facteur d'ajustement
      */
     public void rescaleBy(double d) {
-        // TODO Yann rescaleBy
-        System.out.println("rescaleBy");
     }
 
     /**
@@ -348,9 +336,8 @@ public class MaxWatchCard implements Constr, Undoable, Serializable {
             // On d?cr?mente si l'espoir n'est pas fond?
             if (voc.isUnassigned(lits[i++])) {
                 curr--;
-                if (curr < this.degree) {
+                if (curr < this.degree)
                     return false;
-                }
             }
         }
 
@@ -368,17 +355,17 @@ public class MaxWatchCard implements Constr, Undoable, Serializable {
 
         if (lits.length > 0) {
             if (voc.isUnassigned(lits[0])) {
-                stb.append(this.lits[0]);
-                stb.append(" ");
+                stb.append(Lits.toString(this.lits[0]));
+                stb.append(" "); //$NON-NLS-1$
             }
             for (int i = 1; i < lits.length; i++) {
                 if (voc.isUnassigned(lits[i])) {
-                    stb.append(" + ");
-                    stb.append(this.lits[i]);
-                    stb.append(" ");
+                    stb.append(" + "); //$NON-NLS-1$
+                    stb.append(Lits.toString(this.lits[i]));
+                    stb.append(" "); //$NON-NLS-1$
                 }
             }
-            stb.append(">= ");
+            stb.append(">= "); //$NON-NLS-1$
             stb.append(this.degree);
         }
         return stb.toString();
@@ -414,25 +401,34 @@ public class MaxWatchCard implements Constr, Undoable, Serializable {
         throw new UnsupportedOperationException();
     }
 
-    public void setVoc(ILits newvoc) {
-        voc = newvoc;
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.sat4j.minisat.constraints.pb.PBConstr#getCoefficient(int)
+     */
+    public BigInteger getCoef(int literal) {
+        return BigInteger.ONE;
     }
 
-    public void setStatus(long st) {
-        status = st;
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.sat4j.minisat.constraints.pb.PBConstr#getDegree()
+     */
+    public BigInteger getDegree() {
+        return BigInteger.valueOf(degree);
     }
 
-    public long getStatus() {
-        return status;
+    public ILits getVocabulary() {
+        return voc;
     }
 
-    @Override
-    public Object clone() {
-        // TODO: deep copy
-        try {
-            return super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new InternalError(e.toString());
-        }
+    // SATIN
+    public void setLearntGlobal() {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean learntGlobal() {
+        return false;
     }
 }

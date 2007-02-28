@@ -1,42 +1,36 @@
 /*
- * SAT4J: a SATisfiability library for Java   
- * Copyright (C) 2004 Daniel Le Berre
+ * SAT4J: a SATisfiability library for Java Copyright (C) 2004-2006 Daniel Le Berre
  * 
  * Based on the original minisat specification from:
  * 
- * An extensible SAT solver. Niklas E?n and Niklas S?rensson.
- * Proceedings of the Sixth International Conference on Theory 
- * and Applications of Satisfiability Testing, LNCS 2919, 
- * pp 502-518, 2003.
+ * An extensible SAT solver. Niklas E?n and Niklas S?rensson. Proceedings of the
+ * Sixth International Conference on Theory and Applications of Satisfiability
+ * Testing, LNCS 2919, pp 502-518, 2003.
  * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *  
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package org.sat4j.reader;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.LineNumberReader;
+import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.Scanner;
 import java.util.StringTokenizer;
-import java.util.zip.GZIPInputStream;
 
 import org.sat4j.core.VecInt;
 import org.sat4j.specs.ContradictionException;
@@ -65,7 +59,7 @@ import org.sat4j.specs.IVecInt;
  * @author dlb
  * @author or
  */
-public class DimacsReader implements Reader, Serializable {
+public class DimacsReader extends Reader implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -75,8 +69,15 @@ public class DimacsReader implements Reader, Serializable {
 
     private boolean checkConstrNb = true;
 
+    private final String formatString;
+
     public DimacsReader(ISolver solver) {
+        this(solver, "cnf");
+    }
+
+    public DimacsReader(ISolver solver, String format) {
         this.solver = solver;
+        formatString = format;
     }
 
     public void disableNumberOfConstraintCheck() {
@@ -114,22 +115,22 @@ public class DimacsReader implements Reader, Serializable {
      *             if the input stream does not comply with the DIMACS format.
      */
     protected void readProblemLine(LineNumberReader in) throws IOException,
-        ParseFormatException {
+            ParseFormatException {
 
         String line = in.readLine();
 
         if (line == null) {
             throw new ParseFormatException(
-                "premature end of file: <p cnf ...> expected  on line "
-                    + in.getLineNumber());
+                    "premature end of file: <p cnf ...> expected  on line "
+                            + in.getLineNumber());
         }
         StringTokenizer stk = new StringTokenizer(line);
 
         if (!(stk.hasMoreTokens() && stk.nextToken().equals("p")
-            && stk.hasMoreTokens() && stk.nextToken().equals("cnf"))) {
+                && stk.hasMoreTokens() && stk.nextToken().equals(formatString))) {
             throw new ParseFormatException(
-                "problem line expected (p cnf ...) on line "
-                    + in.getLineNumber());
+                    "problem line expected (p cnf ...) on line "
+                            + in.getLineNumber());
         }
 
         int vars;
@@ -141,6 +142,7 @@ public class DimacsReader implements Reader, Serializable {
         // reads the number of clauses
         expectedNbOfConstr = Integer.parseInt(stk.nextToken());
         assert expectedNbOfConstr > 0;
+        solver.setExpectedNumberOfClauses(expectedNbOfConstr);
 
     }
 
@@ -155,7 +157,7 @@ public class DimacsReader implements Reader, Serializable {
      *             si le probl?me est trivialement inconsistant.
      */
     protected void readConstrs(LineNumberReader in) throws IOException,
-        ParseFormatException, ContradictionException {
+            ParseFormatException, ContradictionException {
         String line;
 
         int realNbOfConstr = 0;
@@ -183,7 +185,7 @@ public class DimacsReader implements Reader, Serializable {
             }
             if (line.startsWith("%") && expectedNbOfConstr == realNbOfConstr) {
                 System.out
-                    .println("Ignoring the rest of the file (SATLIB format");
+                        .println("Ignoring the rest of the file (SATLIB format");
                 break;
             }
             boolean added = handleConstr(line, literals);
@@ -193,12 +195,12 @@ public class DimacsReader implements Reader, Serializable {
         }
         if (checkConstrNb && expectedNbOfConstr != realNbOfConstr) {
             throw new ParseFormatException("wrong nbclauses parameter. Found "
-                + realNbOfConstr + ", " + expectedNbOfConstr + " expected");
+                    + realNbOfConstr + ", " + expectedNbOfConstr + " expected");
         }
     }
 
     protected boolean handleConstr(String line, IVecInt literals)
-        throws ContradictionException {
+            throws ContradictionException {
         int lit;
         boolean added = false;
         Scanner scan;
@@ -206,44 +208,24 @@ public class DimacsReader implements Reader, Serializable {
         while (scan.hasNext()) {
             lit = scan.nextInt();
 
-            if (lit != 0) {
-                literals.push(lit);
-            } else {
+            if (lit == 0) {
                 if (literals.size() > 0) {
                     solver.addClause(literals);
                     literals.clear();
                     added = true;
                 }
+            } else {
+                literals.push(lit);
             }
         }
         return added;
     }
 
-    /**
-     * Remplit un prouveur ? partir d'un fichier Dimacs.
-     * 
-     * @param filename
-     *            le nom du fichier Dimacs (?ventuellement compress?)
-     * @throws FileNotFoundException
-     *             si le fichier n'est pas trouv?
-     * @throws ParseFormatException
-     *             si le fichier ne respecte pas le format Dimacs
-     * @throws IOException
-     *             pour un autre probl?me d'entr?e/sortie
-     * @throws ContradictionException
-     *             si le probl?me est trivialement inconsitant
-     */
-    public IProblem parseInstance(String filename)
-        throws FileNotFoundException, ParseFormatException, IOException,
-        ContradictionException {
+    @Override
+    public final IProblem parseInstance(final java.io.Reader in)
+            throws ParseFormatException, ContradictionException, IOException {
+        return parseInstance(new LineNumberReader(in));
 
-        if (filename.endsWith(".gz")) {
-            parseInstance(new LineNumberReader(new InputStreamReader(
-                new GZIPInputStream(new FileInputStream(filename)))));
-        } else {
-            parseInstance(new LineNumberReader(new FileReader(filename)));
-        }
-        return solver;
     }
 
     /**
@@ -254,21 +236,23 @@ public class DimacsReader implements Reader, Serializable {
      * @throws ContradictionException
      *             si le probl?me est trivialement inconsitant
      */
-    public void parseInstance(LineNumberReader in) throws ParseFormatException,
-        ContradictionException {
+    private IProblem parseInstance(LineNumberReader in)
+            throws ParseFormatException, ContradictionException {
         solver.reset();
         try {
             skipComments(in);
             readProblemLine(in);
             readConstrs(in);
+            return solver;
         } catch (IOException e) {
             throw new ParseFormatException(e);
         } catch (NumberFormatException e) {
             throw new ParseFormatException("integer value expected on line "
-                + in.getLineNumber(), e);
+                    + in.getLineNumber(), e);
         }
     }
 
+    @Override
     public String decode(int[] model) {
         StringBuffer stb = new StringBuffer();
         for (int i = 0; i < model.length; i++) {
@@ -277,6 +261,15 @@ public class DimacsReader implements Reader, Serializable {
         }
         stb.append("0");
         return stb.toString();
+    }
+
+    @Override
+    public void decode(int[] model, PrintWriter out) {
+        for (int i = 0; i < model.length; i++) {
+            out.print(model[i]);
+            out.print(" ");
+        }
+        out.print("0");
     }
 
     protected ISolver getSolver() {

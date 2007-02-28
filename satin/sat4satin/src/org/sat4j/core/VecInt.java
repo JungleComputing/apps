@@ -1,28 +1,26 @@
 /*
- * SAT4J: a SATisfiability library for Java   
- * Copyright (C) 2004 Daniel Le Berre
+ * SAT4J: a SATisfiability library for Java Copyright (C) 2004-2006 Daniel Le Berre
  * 
  * Based on the original minisat specification from:
  * 
- * An extensible SAT solver. Niklas Een and Niklas Serensson.
- * Proceedings of the Sixth International Conference on Theory 
- * and Applications of Satisfiability Testing, LNCS 2919, 
- * pp 502-518, 2003.
+ * An extensible SAT solver. Niklas E?n and Niklas S?rensson. Proceedings of the
+ * Sixth International Conference on Theory and Applications of Satisfiability
+ * Testing, LNCS 2919, pp 502-518, 2003.
  * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *  
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package org.sat4j.core;
@@ -39,7 +37,9 @@ import org.sat4j.specs.IVecInt;
  */
 
 /**
- * A vector specific for primitive integers, widely used in the solver.
+ * A vector specific for primitive integers, widely used in the solver. Note
+ * that if the vector has a sort method, the operations on the vector DO NOT
+ * preserve sorting.
  * 
  * @author leberre
  */
@@ -49,6 +49,7 @@ public class VecInt implements Serializable, IVecInt {
 
     private static final int RANDOM_SEED = 91648253;
 
+    @SuppressWarnings("PMD")
     public static final IVecInt EMPTY = new VecInt() {
 
         /**
@@ -170,13 +171,27 @@ public class VecInt implements Serializable, IVecInt {
     }
 
     /**
-     * Construit un vecteur contenant de taille size rempli e l'aide de size
-     * pad.
+     * Adapter method to translate an array of int into an IVecInt.
+     * 
+     * The array is used inside the VecInt, so the elements may be modified
+     * outside the VecInt. But it should not take much memory.The size of the
+     * created VecInt is the length of the array.
+     * 
+     * @param lits
+     *            a filled array of int.
+     */
+    public VecInt(int[] lits) {
+        myarray = lits;
+        nbelem = lits.length;
+    }
+
+    /**
+     * Build a vector of a given initial size filled with an integer.
      * 
      * @param size
-     *            la taille du vecteur
+     *            the initial size of the vector
      * @param pad
-     *            l'objet servant e remplir le vecteur
+     *            the integer to fill the vector with
      */
     public VecInt(int size, int pad) {
         myarray = new int[size];
@@ -208,7 +223,7 @@ public class VecInt implements Serializable, IVecInt {
     }
 
     /**
-     * depile le dernier element du vecteur. Si le vecteur est vide, ne
+     * d�pile le dernier �l�ment du vecteur. Si le vecteur est vide, ne
      * fait rien.
      */
     public IVecInt pop() {
@@ -254,8 +269,7 @@ public class VecInt implements Serializable, IVecInt {
     }
 
     public int get(int i) {
-        assert i >= 0;
-        assert i < nbelem;
+        assert i >= 0 && i < nbelem;
         return myarray[i];
     }
 
@@ -264,22 +278,21 @@ public class VecInt implements Serializable, IVecInt {
     }
 
     public void set(int i, int o) {
-        assert i >= 0;
-        assert i < nbelem;
+        assert i >= 0 && i < nbelem;
         myarray[i] = o;
     }
 
     public boolean contains(int e) {
+        final int[] workArray = myarray; // dvh, faster access
         for (int i = 0; i < nbelem; i++) {
-            if (myarray[i] == e) {
+            if (workArray[i] == e)
                 return true;
-            }
         }
         return false;
     }
 
     /**
-     * C'est operations devraient se faire en temps constant. Ce n'est pas le
+     * C'est op�rations devraient se faire en temps constant. Ce n'est pas le
      * cas ici.
      * 
      * @param copy
@@ -295,13 +308,6 @@ public class VecInt implements Serializable, IVecInt {
         ncopy.ensure(nsize);
         System.arraycopy(myarray, 0, ncopy.myarray, ncopy.nbelem, nbelem);
         ncopy.nbelem = nsize;
-    }
-
-    @Override
-    public Object clone() {
-        VecInt clone = new VecInt(this.myarray.length);
-        copyTo(clone);
-        return clone;
     }
 
     /**
@@ -369,9 +375,7 @@ public class VecInt implements Serializable, IVecInt {
         for (; myarray[j] != elem; j++) {
             assert j < size();
         }
-        for (; j < size() - 1; j++) {
-            myarray[j] = myarray[j + 1];
-        }
+        System.arraycopy(myarray, j + 1, myarray, j, size() - j);
         pop();
     }
 
@@ -385,8 +389,7 @@ public class VecInt implements Serializable, IVecInt {
      *         vector
      */
     public int delete(int i) {
-        assert i >= 0;
-        assert i < nbelem;
+        assert i >= 0 && i < nbelem;
         int ith = myarray[i];
         myarray[i] = myarray[--nbelem];
         return ith;
@@ -406,7 +409,7 @@ public class VecInt implements Serializable, IVecInt {
         StringBuffer stb = new StringBuffer();
         for (int i = 0; i < nbelem - 1; i++) {
             stb.append(myarray[i]);
-            stb.append(",");
+            stb.append(","); //$NON-NLS-1$
         }
         if (nbelem > 0) {
             stb.append(myarray[nbelem - 1]);
@@ -423,9 +426,8 @@ public class VecInt implements Serializable, IVecInt {
         for (i = from; i < to - 1; i++) {
             best_i = i;
             for (j = i + 1; j < to; j++) {
-                if (myarray[j] < myarray[best_i]) {
+                if (myarray[j] < myarray[best_i])
                     best_i = j;
-                }
             }
             tmp = myarray[i];
             myarray[i] = myarray[best_i];
@@ -435,29 +437,30 @@ public class VecInt implements Serializable, IVecInt {
 
     void sort(int from, int to) {
         int width = to - from;
-        if (to - from <= 15) {
+        if (to - from <= 15)
             selectionSort(from, to);
-        } else {
-            int pivot = myarray[rand.nextInt(width) + from];
+
+        else {
+            final int[] locarray = myarray;
+            int pivot = locarray[rand.nextInt(width) + from];
             int tmp;
             int i = from - 1;
             int j = to;
 
             for (;;) {
-                do {
+                do
                     i++;
-                } while (myarray[i] < pivot);
-                do {
+                while (locarray[i] < pivot);
+                do
                     j--;
-                } while (pivot < myarray[j]);
+                while (pivot < locarray[j]);
 
-                if (i >= j) {
+                if (i >= j)
                     break;
-                }
 
-                tmp = myarray[i];
-                myarray[i] = myarray[j];
-                myarray[j] = tmp;
+                tmp = locarray[i];
+                locarray[i] = locarray[j];
+                locarray[j] = tmp;
             }
 
             sort(from, i);
@@ -475,16 +478,16 @@ public class VecInt implements Serializable, IVecInt {
     public void sortUnique() {
         int i, j;
         int last;
-        if (nbelem == 0) {
+        if (nbelem == 0)
             return;
-        }
 
         sort(0, nbelem);
         i = 1;
-        last = myarray[0];
+        int[] locarray = myarray;
+        last = locarray[0];
         for (j = 1; j < nbelem; j++) {
-            if (last < myarray[j]) {
-                last = myarray[i] = myarray[j];
+            if (last < locarray[j]) {
+                last = locarray[i] = locarray[j];
                 i++;
             }
         }
@@ -492,20 +495,24 @@ public class VecInt implements Serializable, IVecInt {
         nbelem = i;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * Two vectors are equals iff they have the very same elements in the order.
+     * 
+     * @param obj
+     *            an object
+     * @return true iff obj is a VecInt and has the same elements as this vector
+     *         at each index.
      * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof IVecInt) {
-            IVecInt v = (IVecInt) obj;
-            if (v.size() != size()) {
+        if (obj instanceof VecInt) {
+            VecInt v = (VecInt) obj;
+            if (v.nbelem != nbelem)
                 return false;
-            }
-            for (int i = 0; i < size(); i++) {
-                if (v.get(i) != get(i)) {
+            for (int i = 0; i < nbelem; i++) {
+                if (v.myarray[i] != myarray[i]) {
                     return false;
                 }
             }
@@ -521,11 +528,11 @@ public class VecInt implements Serializable, IVecInt {
      */
     @Override
     public int hashCode() {
-        int sum = 0;
+        long sum = 0;
         for (int i = 0; i < nbelem; i++) {
-            sum += myarray.hashCode() / nbelem;
+            sum += myarray[i];
         }
-        return sum;
+        return (int) sum / nbelem;
     }
 
     /*
@@ -541,28 +548,26 @@ public class VecInt implements Serializable, IVecInt {
         nbelem = nsize;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * to detect that the vector is a subset of another one. Note that the
+     * method assumes that the two vectors are sorted!
      * 
-     * @see org.sat4j.specs.IVecInt2#isSubsetOf(org.sat4j.specs.IVecInt2)
+     * @param vec
+     *            a vector
+     * @return true iff the current vector is a subset of vec
      */
-    public boolean isSubsetOf(IVecInt vec) {
-        boolean isSubSet = (this.size() <= vec.size());
-
+    public boolean isSubsetOf(VecInt vec) {
         int i = 0;
         int j = 0;
-        while (isSubSet && (i < this.size()) && (j < vec.size())) {
-            while ((j < vec.size()) && (vec.get(j) < this.get(i))) {
+        while ((i < this.nbelem) && (j < vec.nbelem)) {
+            while ((j < vec.nbelem) && (vec.myarray[j] < this.myarray[i])) {
                 j++;
             }
-            if (j < vec.size()) {
-                isSubSet = (this.get(i) == vec.get(j));
-            } else {
-                isSubSet = false;
-            }
+            if (j == vec.nbelem || this.myarray[i] != vec.myarray[j])
+                return false;
             i++;
         }
-        return isSubSet;
+        return true;
     }
 
     public Iterator<Integer> iterator() {
@@ -574,9 +579,8 @@ public class VecInt implements Serializable, IVecInt {
             }
 
             public Integer next() {
-                if (i == nbelem) {
+                if (i == nbelem)
                     throw new NoSuchElementException();
-                }
                 return myarray[i++];
             }
 
@@ -584,5 +588,9 @@ public class VecInt implements Serializable, IVecInt {
                 throw new UnsupportedOperationException();
             }
         };
+    }
+
+    public boolean isEmpty() {
+        return nbelem == 0;
     }
 }

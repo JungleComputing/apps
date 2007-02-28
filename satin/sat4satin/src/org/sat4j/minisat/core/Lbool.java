@@ -1,46 +1,42 @@
 /*
- * SAT4J: a SATisfiability library for Java   
- * Copyright (C) 2004 Daniel Le Berre
+ * SAT4J: a SATisfiability library for Java Copyright (C) 2004-2006 Daniel Le Berre
  * 
  * Based on the original minisat specification from:
  * 
- * An extensible SAT solver. Niklas Een and Niklas Serensson.
- * Proceedings of the Sixth International Conference on Theory 
- * and Applications of Satisfiability Testing, LNCS 2919, 
- * pp 502-518, 2003.
+ * An extensible SAT solver. Niklas E?n and Niklas S?rensson. Proceedings of the
+ * Sixth International Conference on Theory and Applications of Satisfiability
+ * Testing, LNCS 2919, pp 502-518, 2003.
  * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *  
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package org.sat4j.minisat.core;
 
-/*
- * Created on 9 oct. 2003 Probleme : comment rendre opposite final ?
- */
-
 /**
- * @author leberre Cette classe represente les valeurs booleennes qui
- *         peuvent etre associees aux litteraux.
+ * That enumeration defines the possible truth value for a variable: satisfied,
+ * falsified or unknown/undefined.
+ * 
+ * @author leberre
  */
 public enum Lbool {
 
-    FALSE("F"), TRUE("T"), UNDEFINED("U");
+    FALSE("F"), TRUE("T"), UNDEFINED("U"); //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
 
     static {
-        // on cree ici les regles de la negation
+        // usual boolean rules for negation
         FALSE.opposite = TRUE;
         TRUE.opposite = FALSE;
         UNDEFINED.opposite = UNDEFINED;
@@ -51,19 +47,18 @@ public enum Lbool {
     }
 
     /**
-     * Negation booleenne
+     * boolean negation.
      * 
-     * @return la negation de la valeur boolenne. La negation de la valeur
-     *         UNDEFINED est UNDEFINED.
+     * @return Boolean negation. The negation of UNDEFINED is UNDEFINED.
      */
     public Lbool not() {
         return opposite;
     }
 
     /**
-     * Une valeur booleenne est representee par T,F ou U.
+     * Textual representation for the truth value.
      * 
-     * @return l'une des trois lettres
+     * @return "T","F" or "U"
      */
     @Override
     public String toString() {
@@ -71,12 +66,12 @@ public enum Lbool {
     }
 
     /**
-     * Le symbole representant la valeur booleenne
+     * The symbol representing the truth value.
      */
     private final String symbol;
 
     /**
-     * la valeur booleenne opposee
+     * the opposite truth value.
      */
     private Lbool opposite;
 

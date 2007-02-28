@@ -1,28 +1,26 @@
 /*
- * SAT4J: a SATisfiability library for Java   
- * Copyright (C) 2004 Daniel Le Berre
+ * SAT4J: a SATisfiability library for Java Copyright (C) 2004-2006 Daniel Le Berre
  * 
  * Based on the original minisat specification from:
  * 
- * An extensible SAT solver. Niklas Een and Niklas Serensson.
- * Proceedings of the Sixth International Conference on Theory 
- * and Applications of Satisfiability Testing, LNCS 2919, 
- * pp 502-518, 2003.
+ * An extensible SAT solver. Niklas E?n and Niklas S?rensson. Proceedings of the
+ * Sixth International Conference on Theory and Applications of Satisfiability
+ * Testing, LNCS 2919, pp 502-518, 2003.
  * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *  
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package org.sat4j.minisat.orders;
@@ -33,8 +31,6 @@ import java.util.Collections;
 import org.sat4j.minisat.core.ILits;
 import org.sat4j.minisat.core.ILits23;
 
-import java.io.Serializable;
-
 /*
  * Created on 16 oct. 2003
  */
@@ -43,7 +39,7 @@ import java.io.Serializable;
  * @author leberre Heuristique du prouveur. Changement par rapport au MiniSAT
  *         original : la gestion activity est faite ici et non plus dans Solver.
  */
-public class JWOrder extends VarOrder implements Serializable, Cloneable {
+public class JWOrder extends VarOrder {
 
     private static final long serialVersionUID = 1L;
 
@@ -55,14 +51,21 @@ public class JWOrder extends VarOrder implements Serializable, Cloneable {
         int neg2 = lits.nBinaryClauses(p ^ 1);
         int pos3 = lits.nTernaryClauses(p);
         int neg3 = lits.nTernaryClauses(p ^ 1);
-        return (pos2 * neg2 * 100 + pos2 + neg2) * 5 + pos3 * neg3 * 10 + pos3
-            + neg3;
+        long weight = (pos2 * neg2 * 100 + pos2 + neg2) * 5 + pos3 * neg3 * 10
+                + pos3 + neg3;
+        assert weight <= Integer.MAX_VALUE;
+        if (weight == 0) {
+            int pos = lits.watches(p).size();
+            int neg = lits.watches(p ^ 1).size();
+            weight = pos + neg;
+        }
+        return (int) weight;
     }
 
     class Temp implements Comparable<Temp> {
-        private int id;
+        private final int id;
 
-        private int count;
+        private final int count;
 
         Temp(int id) {
             this.id = id;
@@ -81,7 +84,7 @@ public class JWOrder extends VarOrder implements Serializable, Cloneable {
 
         @Override
         public String toString() {
-            return "" + id + "(" + count + ")";
+            return "" + id + "(" + count + ")"; //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$
         }
     }
 
@@ -135,23 +138,6 @@ public class JWOrder extends VarOrder implements Serializable, Cloneable {
 
     @Override
     public String toString() {
-        return "Jeroslow-Wang static like heuristics updated when new clauses are learnt";
+        return "Jeroslow-Wang static like heuristics updated when new clauses are learnt"; //$NON-NLS-1$
     }
-
-    @Override
-    public Object clone() {
-        JWOrder clone;
-
-        // try {
-        clone = (JWOrder) super.clone();
-        // }
-        // catch (CloneNotSupportedException e) {
-        //    throw new InternalError(e.toString());
-        // }
-
-        clone.lits = (ILits23) this.lits.clone();
-
-        return clone;
-    }
-
 }

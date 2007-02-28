@@ -1,9 +1,28 @@
 /*
- * Created on 22 mars 2004
+ * SAT4J: a SATisfiability library for Java Copyright (C) 2004-2006 Daniel Le Berre
  * 
- * To change the template for this generated file go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ * Based on the original minisat specification from:
+ * 
+ * An extensible SAT solver. Niklas E?n and Niklas S?rensson. Proceedings of the
+ * Sixth International Conference on Theory and Applications of Satisfiability
+ * Testing, LNCS 2919, pp 502-518, 2003.
+ * 
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
+
 package org.sat4j.tools;
 
 import java.io.Serializable;
@@ -15,8 +34,8 @@ import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.TimeoutException;
 
 /**
- * That class allows to iterate through all the models
- * (implicants) of a formula.
+ * That class allows to iterate through all the models (implicants) of a
+ * formula.
  * 
  * <pre>
  * ISolver solver = new ModelIterator(SolverFactory.OneSolver());
@@ -31,7 +50,7 @@ import org.sat4j.specs.TimeoutException;
  * }
  * </pre>
  * 
- * @author leberre 
+ * @author leberre
  */
 public class ModelIterator extends SolverDecorator implements Serializable {
 
@@ -55,8 +74,8 @@ public class ModelIterator extends SolverDecorator implements Serializable {
     public int[] model() {
         int[] last = super.model();
         IVecInt clause = new VecInt(last.length);
-        for (int i = 0; i < last.length; i++) {
-            clause.push(-last[i]);
+        for (int q : last) {
+            clause.push(-q);
         }
         try {
             // System.out.println("adding " + clause);

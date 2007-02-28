@@ -1,6 +1,5 @@
 /*
- * MiniSAT in Java, a Java based-SAT framework Copyright (C) 2004 Daniel Le
- * Berre
+ * SAT4J: a SATisfiability library for Java Copyright (C) 2004-2006 Daniel Le Berre
  * 
  * Based on the original minisat specification from:
  * 
@@ -21,16 +20,17 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this library; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
- *  
+ * 
  */
+
 package org.sat4j.minisat.constraints.pb;
 
+import java.io.Serializable;
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 
 import org.sat4j.core.Vec;
+import org.sat4j.core.VecInt;
 import org.sat4j.minisat.constraints.cnf.Lits;
 import org.sat4j.minisat.core.Constr;
 import org.sat4j.minisat.core.ILits;
@@ -40,72 +40,60 @@ import org.sat4j.specs.ContradictionException;
 import org.sat4j.specs.IVec;
 import org.sat4j.specs.IVecInt;
 
-public abstract class WatchPb implements Constr, Undoable {
+public abstract class WatchPb implements PBConstr, Undoable, Serializable {
 
     /**
-     * Constante pour le type d'in?galit?
+     * constant for the initial type of inequality less than or equal
      */
     public static final boolean ATMOST = false;
 
+    /**
+     * constant for the initial type of inequality more than or equal
+     */
     public static final boolean ATLEAST = true;
 
     /**
-     * Variable pour la g?n?ration de nombre al?atoire (sort)
+     * variable needed for the sort method
      */
     private static final Random rand = new Random(91648253);
 
     /**
-     * D???termine l'activit??? de la contrainte
+     * constraint activity
      */
     protected double activity;
 
     /**
-     * Liste des coefficients des litt???raux de la contrainte
+     * coefficients of the literals of the constraint
      */
     protected BigInteger[] coefs;
 
     /**
-     * Degr??? de la contrainte pseudo-bool???enne
+     * degree of the pseudo-boolean constraint
      */
     protected BigInteger degree;
 
     /**
-     * Liste des litt???raux de la contrainte
+     * literals of the constraint
      */
     protected int[] lits;
 
     /**
-     * D???termine si la contrainte est apprise
+     * true if the constraint is a learned constraint
      */
     protected boolean learnt = false;
 
     /**
-     * D???termine si la contrainte est la cause d'une propagation unitaire
+     * true if the constraint is the origin of unit propagation
      */
     protected boolean locked;
 
     /**
-     * Est-ce une in???galit??? sup???rieure ou ???gale
-     */
-    protected boolean moreThan;
-
-    /**
-     * Possibilit??? pour la satisfaction de la contrainte
+     * sum of the coefficients of the literals satisfied or unvalued
      */
     protected BigInteger watchCumul = BigInteger.ZERO;
 
     /**
-     * Indice des litt???raux dans l'ordre des propagations
-     */
-    protected IVecInt undos;
-
-    protected int backtrackLiteral;
-
-    // protected Logger logger = Logger
-    // .getLogger("org.sat4j.minisat.constraints.pb");
-
-    /**
-     * Vocabulaire de la contrainte
+     * constraint's vocabulary
      */
     protected ILits voc;
 
@@ -115,43 +103,13 @@ public abstract class WatchPb implements Constr, Undoable {
     WatchPb() {
     }
 
-    WatchPb(IVecInt ps, IVec<BigInteger> bigCoefs, boolean moreThan,
-        BigInteger bigDeg) {
-        assert ps.size() > 0;
-        assert ps.size() == bigCoefs.size();
-        this.moreThan = moreThan;
-
-        MapPb mpb = new MapPb();
-        lits = new int[ps.size()];
-        ps.copyTo(lits);
-        BigInteger[] bc = new BigInteger[bigCoefs.size()];
-        bigCoefs.copyTo(bc);
-        BigInteger bigDegree = bigDeg;
-        if (!moreThan) {
-            for (int i = 0; i < lits.length; i++) {
-                bc[i] = bc[i].negate();
-            }
-            bigDegree = bigDegree.negate();
-        }
-        for (int i = 0; i < bc.length; i++) {
-            if (bc[i].signum() < 0) {
-                lits[i] = lits[i] ^ 1;
-                bc[i] = bc[i].negate();
-                bigDegree = bigDegree.add(bc[i]);
-            }
-        }
-        if (bigDegree.signum() > 0) {
-            bigDegree = mpb.addCoeffNewConstraint(lits, bc, bigDegree);
-        }
-        if (bigDegree.signum() > 0) {
-            bigDegree = mpb.saturation();
-        }
+    WatchPb(IDataStructurePB mpb) {
         int size = mpb.size();
         lits = new int[size];
         this.coefs = new BigInteger[size];
         mpb.buildConstraintFromMapPb(lits, coefs);
 
-        this.degree = bigDegree;
+        this.degree = mpb.getDegree();
 
         // On peut trier suivant les coefficients
         sort();
@@ -167,18 +125,16 @@ public abstract class WatchPb implements Constr, Undoable {
         BigInteger slack = BigInteger.ZERO;
         for (int i = 0; i < lits.length; i++) {
             if ((coefs[i].signum() > 0)
-                && ((!voc.isFalsified(lits[i]) || voc.getLevel(lits[i]) >= dl))) {
+                    && ((!voc.isFalsified(lits[i]) || voc.getLevel(lits[i]) >= dl)))
                 slack = slack.add(coefs[i]);
-            }
         }
         slack = slack.subtract(degree);
-        if (slack.signum() < 0) {
+        if (slack.signum() < 0)
             return false;
-        }
         for (int i = 0; i < lits.length; i++) {
             if ((coefs[i].signum() > 0)
-                && (voc.isUnassigned(lits[i]) || voc.getLevel(lits[i]) >= dl)
-                && (slack.subtract(coefs[i]).signum() < 0)) {
+                    && (voc.isUnassigned(lits[i]) || voc.getLevel(lits[i]) >= dl)
+                    && (slack.compareTo(coefs[i]) < 0)) {
                 return true;
             }
         }
@@ -206,7 +162,7 @@ public abstract class WatchPb implements Constr, Undoable {
     abstract protected void computeWatches() throws ContradictionException;
 
     abstract protected void computePropagation(UnitPropagationListener s)
-        throws ContradictionException;
+            throws ContradictionException;
 
     /**
      * Permet d'obtenir le i-???me litt???ral de la contrainte
@@ -240,16 +196,51 @@ public abstract class WatchPb implements Constr, Undoable {
         return activity;
     }
 
-    protected static void niceParameter(IVecInt lits, IVec<BigInteger> coefs)
-        throws ContradictionException {
+    public static IDataStructurePB niceParameters(IVecInt ps,
+            IVec<BigInteger> bigCoefs, boolean moreThan, BigInteger bigDeg,
+            ILits voc) throws ContradictionException {
         // Ajouter les simplifications quand la structure sera d?finitive
-        if (lits.size() == 0) {
+        if (ps.size() == 0) {
             throw new ContradictionException("Creating Empty clause ?");
-        } else if (lits.size() != coefs.size()) {
+        } else if (ps.size() != bigCoefs.size()) {
             throw new IllegalArgumentException(
-                "Contradiction dans la taille des tableaux ps=" + lits.size()
-                    + " coefs=" + coefs.size() + ".");
+                    "Contradiction dans la taille des tableaux ps=" + ps.size()
+                            + " coefs=" + bigCoefs.size() + ".");
         }
+        return niceCheckedParameters(ps, bigCoefs, moreThan, bigDeg, voc);
+    }
+
+    public static IDataStructurePB niceCheckedParameters(IVecInt ps,
+            IVec<BigInteger> bigCoefs, boolean moreThan, BigInteger bigDeg,
+            ILits voc) {
+        assert ps.size() != 0 && ps.size() == bigCoefs.size();
+        int[] lits = new int[ps.size()];
+        ps.copyTo(lits);
+        BigInteger[] bc = new BigInteger[bigCoefs.size()];
+        bigCoefs.copyTo(bc);
+        BigInteger bigDegree = bigDeg;
+        if (!moreThan) {
+            for (int i = 0; i < lits.length; i++) {
+                bc[i] = bc[i].negate();
+            }
+            bigDegree = bigDegree.negate();
+        }
+
+        for (int i = 0; i < bc.length; i++)
+            if (bc[i].signum() < 0) {
+                lits[i] = lits[i] ^ 1;
+                bc[i] = bc[i].negate();
+                bigDegree = bigDegree.add(bc[i]);
+            }
+
+        IDataStructurePB mpb = new MapPb(voc);
+        if (bigDegree.signum() > 0)
+            bigDegree = mpb.cuttingPlane(lits, bc, bigDegree);
+        if (bigDegree.signum() > 0)
+            bigDegree = mpb.saturation();
+        if (bigDegree.signum() <= 0)
+            return null;
+        return mpb;
     }
 
     /**
@@ -294,11 +285,11 @@ public abstract class WatchPb implements Constr, Undoable {
     public BigInteger recalcLeftSide(BigInteger[] coefs) {
         BigInteger poss = BigInteger.ZERO;
         // Pour chaque litteral
-        for (int i = 0; i < coefs.length; i++) {
-            if ((coefs[i].signum() > 0) && (!voc.isFalsified(lits[i]))) {
+        for (int i = 0; i < lits.length; i++)
+            if (!voc.isFalsified(lits[i])) {
+                assert coefs[i].signum() >= 0;
                 poss = poss.add(coefs[i]);
             }
-        }
         return poss;
     }
 
@@ -318,14 +309,7 @@ public abstract class WatchPb implements Constr, Undoable {
      * @return la contrainte est encore satisfiable
      */
     protected boolean isSatisfiable() {
-        BigInteger sum = BigInteger.ZERO;
-        for (int i = 0; i < lits.length; i++) {
-            if (!voc.isFalsified(lits[i])) {
-                assert coefs[i].signum() > 0;
-                sum = sum.add(coefs[i]);
-            }
-        }
-        return sum.compareTo(degree) >= 0;
+        return recalcLeftSide().compareTo(degree) >= 0;
     }
 
     /**
@@ -346,54 +330,6 @@ public abstract class WatchPb implements Constr, Undoable {
      */
     public boolean locked() {
         return true;
-    }
-
-    /**
-     * La contrainte est la cause d'une propagation unitaire
-     * 
-     * @return true si c'est le cas, false sinon
-     * @see Constr#locked()
-     */
-    protected void normalize() {
-        // logger.entering(this.getClass().getName(), "normalize");
-        // logger.finer("Before normalizing " + this.toString());
-        // Translate into >= form
-        if (!moreThan) {
-            for (int i = 0; i < lits.length; i++) {
-                coefs[i] = coefs[i].negate();
-            }
-            degree = degree.negate();
-            moreThan = true;
-        }
-        assert moreThan == true;
-
-        // Replace negative coeff
-        for (int indLit = 0; indLit < this.lits.length; indLit++) {
-            if (coefs[indLit].signum() < 0) {
-                lits[indLit] = lits[indLit] ^ 1;
-                coefs[indLit] = coefs[indLit].negate();
-                degree = degree.add(coefs[indLit]);
-            }
-            assert coefs[indLit].signum() >= 0;
-        }
-        // On peut trier suivant les coefficients
-        sort();
-
-        // Saturation
-        int indLit = 0;
-        while (coefs.length > indLit && coefs[indLit].compareTo(degree) > 0) {
-            coefs[indLit++] = degree;
-        }
-        // si tous les coefficients ont la valeur degree (et degree > 0)
-        // alors il s'agit d'une clause
-        if (indLit == coefs.length && degree.signum() > 0) {
-            degree = BigInteger.ONE;
-            for (int i = 0; i < coefs.length; i++) {
-                coefs[i] = degree;
-            }
-        }
-
-        // logger.finer("After normalizing " + this.toString());
     }
 
     /**
@@ -427,9 +363,8 @@ public abstract class WatchPb implements Constr, Undoable {
         for (i = from; i < to - 1; i++) {
             best_i = i;
             for (j = i + 1; j < to; j++) {
-                if (coefs[j].compareTo(coefs[best_i]) > 0) {
+                if (coefs[j].compareTo(coefs[best_i]) > 0)
                     best_i = j;
-                }
             }
             tmp = coefs[i];
             coefs[i] = coefs[best_i];
@@ -474,12 +409,12 @@ public abstract class WatchPb implements Constr, Undoable {
     /**
      * Tri des tableaux
      */
-    protected void sort() {
+    final protected void sort() {
         assert this.lits != null;
-        if (size() > 0) {
+        if (coefs.length > 0) {
             this.sort(0, size());
             BigInteger buffInt = coefs[0];
-            for (int i = 1; i < size(); i++) {
+            for (int i = 1; i < coefs.length; i++) {
                 assert buffInt.compareTo(coefs[i]) >= 0;
                 buffInt = coefs[i];
             }
@@ -495,11 +430,12 @@ public abstract class WatchPb implements Constr, Undoable {
      * @param to
      *            indice de fin du tri
      */
-    protected void sort(int from, int to) {
+    final protected void sort(int from, int to) {
         int width = to - from;
-        if (to - from <= 15) {
+        if (to - from <= 15)
             selectionSort(from, to);
-        } else {
+
+        else {
             BigInteger pivot = coefs[rand.nextInt(width) + from];
             BigInteger tmp;
             int i = from - 1;
@@ -507,16 +443,15 @@ public abstract class WatchPb implements Constr, Undoable {
             int tmp2;
 
             for (;;) {
-                do {
+                do
                     i++;
-                } while (coefs[i].compareTo(pivot) > 0);
-                do {
+                while (coefs[i].compareTo(pivot) > 0);
+                do
                     j--;
-                } while (pivot.compareTo(coefs[j]) > 0);
+                while (pivot.compareTo(coefs[j]) > 0);
 
-                if (i >= j) {
+                if (i >= j)
                     break;
-                }
 
                 tmp = coefs[i];
                 coefs[i] = coefs[j];
@@ -542,18 +477,7 @@ public abstract class WatchPb implements Constr, Undoable {
         StringBuffer stb = new StringBuffer();
 
         if (lits.length > 0) {
-            // if(voc.isUnassigned(lits[0])){
-            stb.append(this.coefs[0]);
-            stb.append(".");
-            stb.append(Lits.toString(this.lits[0]));
-            stb.append("[");
-            stb.append(voc.valueToString(lits[0]));
-            stb.append("@");
-            stb.append(voc.getLevel(lits[0]));
-            stb.append("]");
-            stb.append(" ");
-            // }
-            for (int i = 1; i < lits.length; i++) {
+            for (int i = 0; i < lits.length; i++) {
                 // if (voc.isUnassigned(lits[i])) {
                 stb.append(" + ");
                 stb.append(this.coefs[i]);
@@ -567,56 +491,16 @@ public abstract class WatchPb implements Constr, Undoable {
                 stb.append(" ");
                 // }
             }
-            stb.append((this.moreThan) ? ">= " : "<= ");
+            stb.append(">= ");
             stb.append(this.degree);
         }
         return stb.toString();
     }
 
-    /**
-     * retourne le niveau de backtrack : c'est-?-dire le niveau le plus haut
-     * pour lequel la contrainte est assertive
-     * 
-     * @param maxLevel 
-     *            le plus bas niveau pour lequel la contrainte est assertive
-     * @return the highest level (smaller int) for which the constraint is assertive.
-     */
-    public int getBacktrackLevel(int maxLevel) {
-        int litLevel;
-        int borneMax = maxLevel;
-        // System.out.println(this);
-        // System.out.println("assertive au niveau : " + maxLevel);
-        assert isAssertive(borneMax);
-        int borneMin = -1;
-        // on calcule borneMax,
-        // le niveau le plus haut dans l'arbre ou la contrainte est assertive
-        for (int i = 0; i < lits.length; i++) {
-            litLevel = voc.getLevel(lits[i]);
-            if (litLevel < borneMax && litLevel > borneMin) {
-                if (isAssertive(litLevel)) {
-                    borneMax = litLevel;
-                } else {
-                    borneMin = litLevel;
-                }
-            }
-        }
-        // on retourne le niveau immediatement inferieur ? borneMax
-        // pour lequel la contrainte possede un literal
-        int retour = 0;
-        for (int i = 0; i < lits.length; i++) {
-            litLevel = voc.getLevel(lits[i]);
-            if (litLevel > retour && litLevel < borneMax) {
-                retour = litLevel;
-            }
-        }
-        return retour;
-    }
-
     public void assertConstraint(UnitPropagationListener s) {
         BigInteger tmp = slackConstraint();
         for (int i = 0; i < lits.length; i++) {
-            if (voc.isUnassigned(lits[i])
-                && tmp.subtract(coefs[i]).signum() < 0) {
+            if (voc.isUnassigned(lits[i]) && tmp.compareTo(coefs[i]) < 0) {
                 boolean ret = s.enqueue(lits[i], this);
                 assert ret;
             }
@@ -642,38 +526,65 @@ public abstract class WatchPb implements Constr, Undoable {
         }
     }
 
-    protected static IVec<BigInteger> toVecBigInt(IVecInt vec) {
+    public static IVec<BigInteger> toVecBigInt(IVecInt vec) {
         IVec<BigInteger> bigVec = new Vec<BigInteger>(vec.size());
-        for (int i = 0; i < vec.size(); ++i) {
+        for (int i = 0; i < vec.size(); ++i)
             bigVec.push(BigInteger.valueOf(vec.get(i)));
-        }
         return bigVec;
     }
 
-    protected static BigInteger toBigInt(int i) {
+    public static BigInteger toBigInt(int i) {
         return BigInteger.valueOf(i);
     }
 
-    protected Conflict createConflict() {
-        Map<Integer, BigInteger> m = new HashMap<Integer, BigInteger>();
-        for (int i = 0; i < lits.length; i++) {
-            assert lits[i] != 0;
-            assert coefs[i].signum() > 0;
-            m.put(lits[i], coefs[i]);
-        }
-        return new Conflict(m, degree, voc);
-    }
-
-    protected BigInteger[] getCoefs() {
+    public BigInteger[] getCoefs() {
         BigInteger[] coefsBis = new BigInteger[coefs.length];
         System.arraycopy(coefs, 0, coefsBis, 0, coefs.length);
         return coefsBis;
     }
 
-    protected int[] getLits() {
+    public int[] getLits() {
         int[] litsBis = new int[lits.length];
         System.arraycopy(lits, 0, litsBis, 0, lits.length);
         return litsBis;
     }
 
+    public ILits getVocabulary() {
+        return voc;
+    }
+
+    /**
+     * compute an implied clause on the literals with the greater coefficients
+     */
+    public IVecInt computeAnImpliedClause() {
+        BigInteger cptCoefs = BigInteger.ZERO;
+        int index = coefs.length;
+        while ((cptCoefs.compareTo(degree) > 0) && (index > 0)) {
+            cptCoefs = cptCoefs.add(coefs[--index]);
+        }
+        if (index > 0 && index < size() / 2) {
+            // System.out.println(this);
+            // System.out.println("index : "+index);
+            IVecInt literals = new VecInt(index);
+            for (int j = 0; j <= index; j++)
+                literals.push(lits[j]);
+            return literals;
+        }
+        return null;
+    }
+
+    public boolean coefficientsEqualToOne() {
+        return false;
+    }
+
+    // SATIN:
+    protected boolean learntGlobal = false;
+
+    public boolean learntGlobal() {
+        return learntGlobal;
+    }
+
+    public void setLearntGlobal() {
+        learntGlobal = true;
+    }
 }

@@ -1,28 +1,26 @@
 /*
- * SAT4J: a SATisfiability library for Java   
- * Copyright (C) 2004 Daniel Le Berre
+ * SAT4J: a SATisfiability library for Java Copyright (C) 2004-2006 Daniel Le Berre
  * 
  * Based on the original minisat specification from:
  * 
- * An extensible SAT solver. Niklas E?n and Niklas S?rensson.
- * Proceedings of the Sixth International Conference on Theory 
- * and Applications of Satisfiability Testing, LNCS 2919, 
- * pp 502-518, 2003.
+ * An extensible SAT solver. Niklas E?n and Niklas S?rensson. Proceedings of the
+ * Sixth International Conference on Theory and Applications of Satisfiability
+ * Testing, LNCS 2919, pp 502-518, 2003.
  * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *  
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package org.sat4j.minisat.core;
@@ -35,43 +33,54 @@ import org.sat4j.specs.IVecInt;
  */
 
 /**
- * @author leberre Cette interface repr?sente les services offerts par une
- *         contrainte
+ * Basic constraint abstraction used in Solver.
+ * 
+ * Any new constraint type should implement that interface.
+ * 
+ * @author leberre
  */
 public interface Constr extends Propagatable, IConstr {
 
     /**
-     * Enl?ve une contrainte du prouveur
+     * Remove a constraint from the solver.
      * 
      */
     void remove();
 
     /**
-     * Simplifie une contrainte, par exemple en enlevant les litt?raux
-     * falsifi?s.
+     * Simplifies a constraint, by removing top level falsified literals for
+     * instance.
      * 
-     * @return true ssi la contrainte est satisfaite.
+     * @return true iff the constraint is satisfied.
      */
     boolean simplify();
 
     /**
-     * Calcule la cause de l'affection d'un litt?ral
+     * Compute the reason for a given assignment.
+     * 
+     * If the constraint is a clause, it is supposed to be either a unit clause
+     * or a falsified one.
      * 
      * @param p
-     *            un litt?ral falsifi? (ou Lit.UNDEFINED)
+     *            a satisfied literal (or Lit.UNDEFINED)
      * @param outReason
-     *            la liste des litt?raux falsifi?s dont la n?gation correspond ?
-     *            la raison de l'affectation.
+     *            the list of falsified literals whose negation is the reason of
+     *            the assignment of p to true.
      */
     void calcReason(int p, IVecInt outReason);
 
     /**
-     * @param claInc  the value to increase the activity with
+     * Increase the constraint activity.
+     * 
+     * @param claInc
+     *            the value to increase the activity with
      */
     void incActivity(double claInc);
 
     /**
-     * @return the activity of the clause. 
+     * To obtain the activity of the constraint.
+     * 
+     * @return the activity of the clause.
      */
     double getActivity();
 
@@ -96,7 +105,8 @@ public interface Constr extends Propagatable, IConstr {
     /**
      * Rescale the clause activity by a value.
      * 
-     * @param d the value to rescale the clause activity with.
+     * @param d
+     *            the value to rescale the clause activity with.
      */
     void rescaleBy(double d);
 
@@ -111,10 +121,9 @@ public interface Constr extends Propagatable, IConstr {
      */
     void assertConstraint(UnitPropagationListener s);
 
-    // Extensions for satin version:
-    void setVoc(ILits voc);
+    /**
+     * SATIN: Mark a constraint as learnt from other threads
+     */
 
-    long getStatus();
-
-    void setStatus(long st);
+    void setLearntGlobal();
 }

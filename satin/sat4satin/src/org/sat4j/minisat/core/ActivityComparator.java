@@ -2,8 +2,9 @@ package org.sat4j.minisat.core;
 
 import java.io.Serializable;
 import java.util.Comparator;
+import org.sat4j.specs.IConstr;
 
-public class ActivityComparator implements Comparator<Constr>, Serializable {
+class ActivityComparator implements Comparator<Constr>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -16,3 +17,4 @@ public class ActivityComparator implements Comparator<Constr>, Serializable {
         return (int) Math.round(c1.getActivity() - c2.getActivity());
     }
 }
+

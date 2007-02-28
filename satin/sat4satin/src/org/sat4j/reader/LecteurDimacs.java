@@ -1,37 +1,35 @@
 /*
- * SAT4J: a SATisfiability library for Java   
- * Copyright (C) 2004 Daniel Le Berre
+ * SAT4J: a SATisfiability library for Java Copyright (C) 2004-2006 Daniel Le Berre
  * 
  * Based on the original minisat specification from:
  * 
- * An extensible SAT solver. Niklas E?n and Niklas S?rensson.
- * Proceedings of the Sixth International Conference on Theory 
- * and Applications of Satisfiability Testing, LNCS 2919, 
- * pp 502-518, 2003.
+ * An extensible SAT solver. Niklas E?n and Niklas S?rensson. Proceedings of the
+ * Sixth International Conference on Theory and Applications of Satisfiability
+ * Testing, LNCS 2919, pp 502-518, 2003.
  * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *  
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package org.sat4j.reader;
 
 import java.io.BufferedInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
 import java.io.Serializable;
-import java.util.zip.GZIPInputStream;
 
 import org.sat4j.core.VecInt;
 import org.sat4j.specs.ContradictionException;
@@ -40,25 +38,31 @@ import org.sat4j.specs.ISolver;
 import org.sat4j.specs.IVecInt;
 
 /**
- * Dimacs Reader written by Frederic Laihem. It is much faster that
- * DimacsReader.
+ * Dimacs Reader written by Frederic Laihem. It is much faster than DimacsReader
+ * because it does not split the input file into strings but reads and interpret
+ * the input char by char. Hence, it is a bit more difficult to read and to
+ * modify than DimacsReader.
  * 
+ * This reader is used during the SAT Competitions.
+ * 
+ * @author laihem
  * @author leberre
- * 
  */
-public class LecteurDimacs implements Reader, Serializable {
+public class LecteurDimacs extends Reader implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /* taille du buffer */
     private final static int TAILLE_BUF = 16384;
 
-    private ISolver s;
+    private final ISolver s;
 
     private transient BufferedInputStream in;
 
     /* nombre de literaux dans le fichier */
     private int nbLit = 0;
+
+    private int nbClauses = 0;
 
     private static final char EOF = (char) -1;
 
@@ -69,32 +73,30 @@ public class LecteurDimacs implements Reader, Serializable {
         this.s = s;
     }
 
-    /**
-     * lit la base de clauses et la met dans le vecteur donn? en param?tre
-     */
-    public IProblem parseInstance(String nomFichier) throws IOException,
-        ContradictionException {
-        if (nomFichier.endsWith(".gz")) {
-            in = new BufferedInputStream(new GZIPInputStream(
-                new FileInputStream(nomFichier), TAILLE_BUF));
-        } else {
-            in = new BufferedInputStream(new FileInputStream(nomFichier),
-                TAILLE_BUF);
-        }
+    @Override
+    public final IProblem parseInstance(final InputStream in)
+            throws ParseFormatException, ContradictionException, IOException {
+
+        this.in = new BufferedInputStream(in, LecteurDimacs.TAILLE_BUF);
         s.reset();
         char car = passerCommentaire();
-        if (nbLit == 0) {
+        if (nbLit == 0)
             throw new IOException(
-                "DIMACS non valide (nombre de Literaux non valide)");
-        }
+                    "DIMACS non valide (nombre de Literaux non valide)");
         s.newVar(nbLit);
+        s.setExpectedNumberOfClauses(nbClauses);
         car = passerEspaces();
-        if (car == EOF) {
+        if (car == EOF)
             throw new IOException("DIMACS non valide (o? sont les clauses ?)");
-        }
         ajouterClauses(car);
         in.close();
         return s;
+    }
+
+    @Override
+    public IProblem parseInstance(java.io.Reader in) throws IOException,
+            ContradictionException {
+        throw new UnsupportedOperationException();
     }
 
     /** on passe les commentaires et on lit le nombre de literaux */
@@ -105,13 +107,11 @@ public class LecteurDimacs implements Reader, Serializable {
             if (car == 'p') {
                 car = lectureNombreLiteraux();
             }
-            if (car != 'c' && car != 'p') {
+            if (car != 'c' && car != 'p')
                 break; /* fin des commentaires */
-            }
             car = nextLine(); /* on passe la ligne de commentaire */
-            if (car == EOF) {
+            if (car == EOF)
                 break;
-            }
         }
         return car;
     }
@@ -123,21 +123,27 @@ public class LecteurDimacs implements Reader, Serializable {
             nbLit = car - '0';
             for (;;) { /* on lit le chiffre repr?sentant le nombre de literaux */
                 car = (char) in.read();
-                if (car < '0' || car > '9') {
+                if (car < '0' || car > '9')
                     break;
-                }
                 nbLit = 10 * nbLit + (car - '0');
             }
-            if (car != EOF) {
-                nextLine(); /* on lit la fin de la ligne */
+            car = nextChiffre();
+            nbClauses = car - '0';
+            for (;;) { /* on lit le chiffre repr?sentant le nombre de literaux */
+                car = (char) in.read();
+                if (car < '0' || car > '9')
+                    break;
+                nbClauses = 10 * nbClauses + (car - '0');
             }
+            if (car != '\n' && car != EOF)
+                nextLine(); /* on lit la fin de la ligne */
         }
         return car;
     }
 
     /** lit les clauses et les ajoute dans le vecteur donn? en param?tre */
     private void ajouterClauses(char car) throws IOException,
-        ContradictionException {
+            ContradictionException {
         final IVecInt lit = new VecInt();
         int val = 0;
         boolean neg = false;
@@ -146,15 +152,14 @@ public class LecteurDimacs implements Reader, Serializable {
             if (car == '-') {
                 neg = true;
                 car = (char) in.read();
-            } else if (car == '+') {
+            } else if (car == '+')
                 car = (char) in.read();
-            } else /* on le 1er chiffre du literal */
+            else /* on le 1er chiffre du literal */
             if (car >= '0' && car <= '9') {
                 val = car - '0';
                 car = (char) in.read();
-            } else {
+            } else
                 break;
-            }
             /* on lit la suite du literal */
             while (car >= '0' && car <= '9') {
                 val = (val * 10) + car - '0';
@@ -170,21 +175,19 @@ public class LecteurDimacs implements Reader, Serializable {
                 neg = false;
                 val = 0; /* on reinitialise les variables */
             }
-            if (car != EOF) {
+            if (car != EOF)
                 car = passerEspaces();
-            }
-            if (car == EOF) {
+            if (car == EOF)
                 break; /* on a lu tout le fichier */
-            }
         }
     }
 
     /** passe tout les caract?res d'espacement (espace ou \n) */
     private char passerEspaces() throws IOException {
         char car;
-        while ((car = (char) in.read()) == ' ' || car == '\n') {
+
+        while ((car = (char) in.read()) == ' ' || car == '\n')
             ;
-        }
         return car;
     }
 
@@ -206,6 +209,7 @@ public class LecteurDimacs implements Reader, Serializable {
         return car;
     }
 
+    @Override
     public String decode(int[] model) {
         StringBuffer stb = new StringBuffer();
         for (int i = 0; i < model.length; i++) {
@@ -214,5 +218,14 @@ public class LecteurDimacs implements Reader, Serializable {
         }
         stb.append("0");
         return stb.toString();
+    }
+
+    @Override
+    public void decode(int[] model, PrintWriter out) {
+        for (int i = 0; i < model.length; i++) {
+            out.print(model[i]);
+            out.print(" ");
+        }
+        out.print("0");
     }
 }

@@ -1,35 +1,32 @@
 /*
- * SAT4J: a SATisfiability library for Java   
- * Copyright (C) 2004 Daniel Le Berre
+ * SAT4J: a SATisfiability library for Java Copyright (C) 2004-2006 Daniel Le Berre
  * 
  * Based on the original minisat specification from:
  * 
- * An extensible SAT solver. Niklas Een and Niklas Serensson.
- * Proceedings of the Sixth International Conference on Theory 
- * and Applications of Satisfiability Testing, LNCS 2919, 
- * pp 502-518, 2003.
+ * An extensible SAT solver. Niklas E?n and Niklas S?rensson. Proceedings of the
+ * Sixth International Conference on Theory and Applications of Satisfiability
+ * Testing, LNCS 2919, pp 502-518, 2003.
  * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *  
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * 
  */
 
 package org.sat4j.minisat.orders;
 
-import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.io.Serializable;
-import java.util.Random;
 
 import org.sat4j.minisat.core.Heap;
 import org.sat4j.minisat.core.ILits;
@@ -43,7 +40,7 @@ import org.sat4j.minisat.core.IOrder;
  * @author leberre Heuristique du prouveur. Changement par rapport au MiniSAT
  *         original : la gestion activity est faite ici et non plus dans Solver.
  */
-public class VarOrderHeap implements IOrder, Serializable, Cloneable {
+public class VarOrderHeap implements IOrder, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -52,14 +49,14 @@ public class VarOrderHeap implements IOrder, Serializable, Cloneable {
     private static final double VAR_RESCALE_BOUND = 1 / VAR_RESCALE_FACTOR;
 
     /**
-     * mesure heuristique de l'activite d'une variable.
+     * mesure heuristique de l'activit� d'une variable.
      */
     protected double[] activity = new double[1];
 
     private double varDecay = 1.0;
 
     /**
-     * increment pour l'activite des variables.
+     * incr�ment pour l'activit� des variables.
      */
     private double varInc = 1.0;
 
@@ -67,41 +64,35 @@ public class VarOrderHeap implements IOrder, Serializable, Cloneable {
 
     private long nullchoice = 0;
 
-    private long randchoice = 0;
+    protected Heap heap;
 
-    private Random rand = new Random(12345);
-
-    private final static double RANDOM_WALK = 0.05;
-
-    private Heap heap;
-
-    private int[] phase;
+    protected int[] phase;
 
     public void setLits(ILits lits) {
         this.lits = lits;
     }
 
     /**
-     * Appelee quand une nouvelle variable est creee.
+     * Appel�e quand une nouvelle variable est cr��e.
      */
     public void newVar() {
         newVar(1);
     }
 
     /**
-     * Appelee lorsque plusieurs variables sont creees
+     * Appel�e lorsque plusieurs variables sont cr��es
      * 
      * @param howmany
-     *            le nombre de variables creees
+     *            le nombre de variables cr��es
      */
     public void newVar(int howmany) {
     }
 
     /**
-     * Selectionne une nouvelle variable, non affectee, ayant l'activite
-     * la plus elevee.
+     * S�lectionne une nouvelle variable, non affect�e, ayant l'activit�
+     * la plus �lev�e.
      * 
-     * @return Lit.UNDEFINED si aucune variable n'est trouvee
+     * @return Lit.UNDEFINED si aucune variable n'est trouv�e
      */
     public int select() {
         while (!heap.empty()) {
@@ -114,22 +105,6 @@ public class VarOrderHeap implements IOrder, Serializable, Cloneable {
                 return next;
             }
         }
-
-        // Satin debug:
-        System.out.println("*** order.select(): UNDEFINED");
-        System.out.println("*** order.select(): heap " + heap);
-        int nlength = lits.nVars() + 1;
-        for (int i = 1; i < nlength; i++) {
-            if (lits.belongsToPool(i)) {
-                if (lits.isUnassigned(i << 1)) {
-                    System.out.println("might still have chosen " + i
-                        + " phase " + phase[i] + " activity " + activity[i]);
-                }
-            } else {
-                System.out.println("not in pool " + i);
-            }
-        }
-
         return ILits.UNDEFINED;
     }
 
@@ -144,42 +119,32 @@ public class VarOrderHeap implements IOrder, Serializable, Cloneable {
     }
 
     /**
-     * Methode appelee quand la variable x est desaffectee.
+     * M�thode appel�e quand la variable x est d�saffect�e.
      * 
      * @param x
      */
     public void undo(int x) {
-        if (!heap.inHeap(x)) {
+        if (!heap.inHeap(x))
             heap.insert(x);
-        }
     }
 
     /**
-     * Appelee lorsque l'activite de la variable x a change.
+     * Appel�e lorsque l'activit� de la variable x a chang�.
      * 
-     * @param p a literal
+     * @param p
+     *            a literal
      */
     public void updateVar(int p) {
         int var = p >> 1;
         updateActivity(var);
         phase[var] = p;
-        if (heap.inHeap(var)) {
+        if (heap.inHeap(var))
             heap.increase(var);
-        }
     }
 
     protected void updateActivity(final int var) {
         if ((activity[var] += varInc) > VAR_RESCALE_BOUND) {
             varRescaleActivity();
-        }
-    }
-
-    // For satin:
-    public void setActivity(int p, double val) {
-        int var = p >> 1;
-        activity[var] = val;
-        if (heap.inHeap(var)) {
-            heap.increase(var);
         }
     }
 
@@ -202,6 +167,15 @@ public class VarOrderHeap implements IOrder, Serializable, Cloneable {
 
     public double varActivity(int p) {
         return activity[p >> 1];
+    }
+
+    // Added for SATIN:
+    public void addActivity(int p, double val) {
+        int var = p >> 1;
+        activity[var] += val; // Don't rescale at this point
+        // Also don't update phase[var]
+        if (heap.inHeap(var))
+            heap.increase(var);
     }
 
     /**
@@ -230,7 +204,7 @@ public class VarOrderHeap implements IOrder, Serializable, Cloneable {
         heap.setBounds(nlength);
         for (int i = 1; i < nlength; i++) {
             assert i > 0;
-            assert i <= lits.nVars() : "" + lits.nVars() + "/" + i;
+            assert i <= lits.nVars() : "" + lits.nVars() + "/" + i; //$NON-NLS-1$ //$NON-NLS-2$
             activity[i] = 0.0;
             if (lits.belongsToPool(i)) {
                 heap.insert(i);
@@ -242,35 +216,15 @@ public class VarOrderHeap implements IOrder, Serializable, Cloneable {
     }
 
     @Override
-    public Object clone() {
-        VarOrderHeap clone;
-
-        try {
-            clone = (VarOrderHeap) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new InternalError(e.toString());
-        }
-
-        clone.activity = this.activity.clone();
-        clone.phase = this.phase.clone();
-        clone.heap = (Heap) this.heap.clone();
-        clone.heap.setActivity(clone.activity);
-        // lits is set by setLits() after cloning
-
-        return clone;
-    }
-
-    @Override
     public String toString() {
-        return "VSIDS like heuristics from MiniSAT using a heap";
+        return "VSIDS like heuristics from MiniSAT using a heap"; //$NON-NLS-1$
     }
 
     public ILits getVocabulary() {
         return lits;
     }
 
-    public void printStat(PrintStream out, String prefix) {
-        out.println(prefix + "non guided choices\t" + nullchoice);
-        out.println(prefix + "random choices\t" + randchoice);
+    public void printStat(PrintWriter out, String prefix) {
+        out.println(prefix + "non guided choices\t" + nullchoice); //$NON-NLS-1$
     }
 }
