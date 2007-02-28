@@ -8,9 +8,16 @@
     <property name="ibis"        location="${env.IBIS_HOME}"/>
     <property name="build"       value="build"/>
 
+    <path id="classpath">
+	<fileset dir="lib">
+	    <include name="*.jar"/>
+	</fileset>
+    </path>
+
     <property name="main-class" value="org.sat4j.Lanceur"/>
     <property name="satin-main-class" value="${main-class}"/>
     <property name="satin-classes" value="org.sat4j.Lanceur,org.sat4j.minisat.core.SolverSpawner,org.sat4j.minisat.core.SolverState"/>
+    <property name="user-classpath" refid="classpath"/>
 
     <!-- does not work. TODO: find out how to run it ...
     <property name="test-par-java-args" value="-Dsatin.closed"/>
