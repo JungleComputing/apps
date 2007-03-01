@@ -24,7 +24,8 @@ import java.util.ArrayList;
 
 /*strictfp*/final class BodyTreeNode implements java.io.Serializable {
 
-    private static ArrayList treeNodeIds = new ArrayList();
+    private static ArrayList<BodyTreeNode> treeNodeIds
+            = new ArrayList<BodyTreeNode>();
 
     static Timer intTimer = Timer.createTimer();
     static Timer barnesBodyTimer = Timer.createTimer();
@@ -168,7 +169,7 @@ import java.util.ArrayList;
     }
 
     public static BodyTreeNode getTreeNode(int id) {
-        return (BodyTreeNode) treeNodeIds.get(id);
+        return treeNodeIds.get(id);
     }
 
     public int getId() {

@@ -5,7 +5,7 @@ import java.util.LinkedList;
 
 public interface LocusRouteInterface extends Spawnable {
 
-    public LinkedList computeWires(LinkedList wires, CostArray costArray);
+    public LinkedList<Wire> computeWires(LinkedList<Wire> wires, CostArray costArray);
         
 }
     

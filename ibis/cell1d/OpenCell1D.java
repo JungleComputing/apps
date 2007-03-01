@@ -860,7 +860,8 @@ class OpenCell1D implements OpenConfig, PredefinedCapabilities {
 
             // The properties of the worksteal port.
             CapabilitySet sprop = new CapabilitySet(SERIALIZATION_DATA,
-                    COMMUNICATION_RELIABLE, RECEIVE_AUTO_UPCALLS);
+                    COMMUNICATION_RELIABLE, RECEIVE_AUTO_UPCALLS,
+                    RESIZE_UPCALLS);
             ibis = IbisFactory.createIbis( iprop, null, null, rszHandler );
             myName = ibis.identifier();
 

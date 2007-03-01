@@ -58,8 +58,8 @@ public class Main {
     }
 
     public static void main(String args[]) {
-        ArrayList classnames = new ArrayList();
-        ArrayList arraytypes = new ArrayList();
+        ArrayList<String> classnames = new ArrayList<String>();
+        ArrayList<Integer> arraytypes = new ArrayList<Integer>();
 
         for (int i = 0; i < args.length; i++) {
             if (false) {
@@ -127,7 +127,7 @@ public class Main {
         }
 
         for (int i = 0; i < classnames.size(); i++) {
-            String classname = (String) classnames.get(i);
+            String classname = classnames.get(i);
             if (sun)
                 run_class(classname, SUN);
             if (ibis)
@@ -135,7 +135,7 @@ public class Main {
         }
 
         for (int i = 0; i < arraytypes.size(); i++) {
-            int type = ((Integer) arraytypes.get(i)).intValue();
+            int type = arraytypes.get(i).intValue();
             TestObject obj = new ArrayContainer(type, size);
 
             if (sun) {

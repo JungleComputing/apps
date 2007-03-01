@@ -12,7 +12,7 @@ class Main {
         try {
             int count = Integer.parseInt(args[0]);
 
-            HashMap h = new HashMap();
+            HashSet<Tree> h = new HashSet<Tree>();
 
             for (int j = 16; j < (64 * 1024); j *= 2) {
 

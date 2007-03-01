@@ -9,7 +9,8 @@ import java.util.TreeMap;
 
 public class Index implements java.io.Serializable {
     protected String files[];
-    protected final TreeMap wordOccurences = new TreeMap();
+    protected final TreeMap<String, int[]> wordOccurences
+        = new TreeMap<String, int[]>();
     private static final boolean compactSpans = true;
     private static final boolean showSpanCompaction = false;
 
@@ -24,14 +25,11 @@ public class Index implements java.io.Serializable {
      * @param fnm The file that was indexed.
      * @param s The set of words in that file.
      */
-    public Index( String fnm, java.util.SortedSet s )
+    public Index( String fnm, java.util.SortedSet<String> s )
     {
         files = new String[] { fnm };
 
-        java.util.Iterator it = s.iterator();
-
-        while( it.hasNext() ){
-            String w = (String) it.next();
+        for (String w : s) {
             wordOccurences.put( w, new int[] { 0 } );
         }
     }
@@ -133,11 +131,9 @@ public class Index implements java.io.Serializable {
         // Now add all word occurrences of `ix' to our own set.
         // Renumber all merged in occurrences to use the index that
         // we use.
-        java.util.Iterator it = ix.wordOccurences.keySet().iterator();
-        while( it.hasNext() ){
-            String key = (String) it.next();
-            int l1[] = (int[]) wordOccurences.get( key );
-            int l2[] = (int[]) ix.wordOccurences.get( key );
+        for (String key : ix.wordOccurences.keySet()) {
+            int l1[] = wordOccurences.get( key );
+            int l2[] = ix.wordOccurences.get( key );
             int l[] = mergeOccurenceLists( l1, offset, l2 );
             if( l != null && l != l1 ){
                 wordOccurences.put( key, l );
@@ -153,13 +149,11 @@ public class Index implements java.io.Serializable {
             w.write( '\n' );
         }
 
-        java.util.Iterator it = wordOccurences.keySet().iterator();
-        while( it.hasNext() ){
-            String key = (String) it.next();
+        for (String key : wordOccurences.keySet()) {
             w.write( key );
             w.write( ':' );
             int prev = -1;
-            int l[] = (int[]) wordOccurences.get( key );
+            int l[] = wordOccurences.get( key );
             for( int i=0; i<l.length; i++ ){
                 int v = l[i];
 

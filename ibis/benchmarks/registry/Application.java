@@ -55,7 +55,7 @@ final class Application implements Runnable, ResizeHandler, ibis.ipl.PredefinedC
         try {
             CapabilitySet s = new CapabilitySet(SERIALIZATION_OBJECT,
                     WORLDMODEL_OPEN, COMMUNICATION_RELIABLE,
-                    RECEIVE_EXPLICIT);
+                    RECEIVE_EXPLICIT, RESIZE_UPCALLS);
 
             logger.debug("creating ibis");
             Ibis ibis = IbisFactory.createIbis(s, null, null, this);

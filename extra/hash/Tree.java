@@ -18,10 +18,10 @@ public final class Tree implements Serializable {
             right = new Tree(j - k - 1);
     }
 
-    public final void generated_WriteObject(HashMap h)
+    public final void generated_WriteObject(HashSet<Tree> h)
             throws java.io.IOException {
-        if (h.get(this) == null) {
-            h.put(this, this);
+        if (! h.contains(this)) {
+            h.add(this);
             if (right != null)
                 right.generated_WriteObject(h);
             if (left != null)

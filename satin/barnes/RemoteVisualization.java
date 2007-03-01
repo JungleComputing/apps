@@ -51,7 +51,7 @@ public class RemoteVisualization extends Thread {
 
     private DataOutputStream out;
 
-    private LinkedList list = new LinkedList();
+    private LinkedList<BodyList> list = new LinkedList<BodyList>();
 
     public RemoteVisualization() {
         getProperties();
@@ -163,7 +163,7 @@ public class RemoteVisualization extends Thread {
             }
         }
 
-        return (BodyList) list.removeFirst();
+        return list.removeFirst();
     }
 
     private void doSend() {

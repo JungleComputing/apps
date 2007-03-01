@@ -25,8 +25,8 @@ class LocusRoute extends SatinObject implements LocusRouteInterface {
     public LocusRoute() {}
 
     /*returns the first half of the list*/
-    private LinkedList firstHalf(LinkedList list) {
-	LinkedList newList = new LinkedList();
+    private LinkedList<Wire> firstHalf(LinkedList<Wire> list) {
+	LinkedList<Wire> newList = new LinkedList<Wire>();
 	for (int i = 0; i < list.size() / 2; i++) {
 	    newList.add(list.get(i));
 	}
@@ -34,16 +34,16 @@ class LocusRoute extends SatinObject implements LocusRouteInterface {
     }
 
     /*returns the second half of the list*/
-    private LinkedList secondHalf(LinkedList list) {
-	LinkedList newList = new LinkedList();
+    private LinkedList<Wire> secondHalf(LinkedList<Wire> list) {
+	LinkedList<Wire> newList = new LinkedList<Wire>();
 	for (int i = list.size() / 2; i < list.size(); i++) {
 	    newList.add(list.get(i));
 	}
 	return newList;
     }
 
-    private LinkedList merge(LinkedList list1, LinkedList list2) {
-	LinkedList newList = new LinkedList();
+    private LinkedList<Wire> merge(LinkedList<Wire> list1, LinkedList<Wire> list2) {
+	LinkedList<Wire> newList = new LinkedList<Wire>();
 	newList.addAll(list1);
 	newList.addAll(list2);
 	return newList;
@@ -51,12 +51,12 @@ class LocusRoute extends SatinObject implements LocusRouteInterface {
 
 
     /*spawnable*/
-    public LinkedList computeWires(LinkedList wires, CostArray costArray) {
+    public LinkedList<Wire> computeWires(LinkedList<Wire> wires, CostArray costArray) {
     
 	if (wires.size() <= WIRE_SPAWN_THRESHOLD) {
 	    /*compute wires sequentially*/
 	    for (int i=0; i<wires.size(); i++) {
-		Wire wire = (Wire) wires.get(i);
+		Wire wire = wires.get(i);
 		computeWire(wire, costArray);
 	    }
 	    return wires;
@@ -64,11 +64,11 @@ class LocusRoute extends SatinObject implements LocusRouteInterface {
 	    /*this is the most simple version, to exploit locality, do a sort of
 	      two dimensional quick sort here: divide the wire list into four parts
 	      corresponding to four subareas of the cicuit*/
-	    LinkedList wires1, wires2;
+	    LinkedList<Wire> wires1, wires2;
 	    wires1 = /*spawn*/computeWires(firstHalf(wires), costArray);
 	    wires2 = /*spawn*/computeWires(secondHalf(wires), costArray);
 	    sync();
-	    LinkedList result = merge(wires1, wires2);
+	    LinkedList<Wire> result = merge(wires1, wires2);
 	    return result;
 	}
     }
@@ -142,7 +142,7 @@ class LocusRoute extends SatinObject implements LocusRouteInterface {
     }
 
 
-    static void readInputFile(String inputFileName, LinkedList wires) {
+    static void readInputFile(String inputFileName, LinkedList<Wire> wires) {
 
 	FileInputStream fis = null;
 	InputStreamReader isr = null;
@@ -253,7 +253,7 @@ class LocusRoute extends SatinObject implements LocusRouteInterface {
     public static void main(String[] args) {
 
 	int numIterations;
-	LinkedList wires;
+	LinkedList<Wire> wires;
 	int globalCost;
 	CostArray costArray;
 	LocusRoute locusRoute;
@@ -265,7 +265,7 @@ class LocusRoute extends SatinObject implements LocusRouteInterface {
 	}
 	
 	numIterations = Integer.parseInt(args[0]);
-	wires = new LinkedList();
+	wires = new LinkedList<Wire>();
 
 	readInputFile(args[1], wires);
 	
@@ -290,7 +290,7 @@ class LocusRoute extends SatinObject implements LocusRouteInterface {
 	    /* recalculate the cost array locally because the shared object might not be consistent */
 	    costArray.clear();
 	    for (int j=0; j<wires.size(); j++) {
-		Wire wire = (Wire) wires.get(j);
+		Wire wire = wires.get(j);
 		costArray.placeWire_locally(wire);
 	    }
 	    globalCost = costArray.globalCost();

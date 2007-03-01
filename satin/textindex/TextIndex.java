@@ -44,7 +44,7 @@ public final class TextIndex extends ibis.satin.SatinObject implements IndexerIn
         else {
             r = new BufferedReader( new FileReader( f ) );
         }
-        TreeSet set = new TreeSet();
+        TreeSet<String> set = new TreeSet<String>();
 
         while( true ){
             String s = r.readLine();
