@@ -31,12 +31,21 @@ public final class SolverState
 
     public SolverState()
     {
-	reinit(true);
+	// Comment by Ceriel:
+        // Don't call reinit() here, i.e., a write method in constructor
+	// of shared object.  The reason is this causes a broadcast, and
+	// this invocation may or may not be processed, depending on wether
+	// the destination has seen the object yet.
+	doInit(true);
     }
 
     /* write method */
     public void reinit(boolean init)
     {
+        doInit(init);
+    }
+
+    private void doInit(boolean init) {
 	status = Lbool.UNDEFINED;
 	wasSet = false;
 	globalConflicts = 0;

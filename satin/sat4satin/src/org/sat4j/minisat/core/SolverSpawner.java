@@ -47,6 +47,13 @@ public class SolverSpawner
     guard_spawn_recSearch(Solver solver, long nofConflicts, int satinDepth,
 			  SolverState globalState, Vec<VecInt> reasons)
     {
+        if (globalState.iter > solver.satinSearchIter) {
+            System.err.println("OOPS: globalState.iter = " + globalState.iter
+                + ", solver.satinSearchIter = " + solver.satinSearchIter);
+            (new Throwable()).printStackTrace(System.err);
+            throw new RuntimeException("OOPS");
+        }
+
 	return (globalState.iter == solver.satinSearchIter);
     }
 

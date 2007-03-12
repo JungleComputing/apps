@@ -1715,6 +1715,11 @@ public class Solver extends SatinObject
 	}
     }
 
+    private void setFinished(SolverState globalState, Lbool bool)
+    {
+	globalState.setFinished(bool);
+    }
+
     private long initialFreeMem;
 
     // TODO: need auto-inferring of what constitutes a "big" problem
@@ -1897,7 +1902,7 @@ public class Solver extends SatinObject
 				       loop + " iterations");
 		    if (satinUseSharedObjects) {
 			updateTimingStats(globalState, begintime, loop);
-			globalState.setFinished(Lbool.TRUE);
+			setFinished(globalState, Lbool.TRUE);
 		    }
                     return searchResult(Lbool.TRUE);
                 }
@@ -1915,7 +1920,7 @@ public class Solver extends SatinObject
 			// Publishing learnts is useful in case of restarts:
 			publishLearnts(globalState, conflictC);
 			updateTimingStats(globalState, begintime, loop);
-			globalState.setFinished(Lbool.UNDEFINED);
+			setFinished(globalState, Lbool.UNDEFINED);
 		    }
 
                     return searchResult(Lbool.UNDEFINED);
@@ -1991,7 +1996,7 @@ public class Solver extends SatinObject
 
 	System.out.println("c " + name + ": timeout: UNDEFINED");
 	if (satinUseSharedObjects) {
-	    globalState.setFinished(Lbool.UNDEFINED);
+	    setFinished(globalState, Lbool.UNDEFINED);
 	}
         return searchResult(Lbool.UNDEFINED); // timeout occured
     }
@@ -2376,12 +2381,15 @@ public class Solver extends SatinObject
 	double scaledNofLearnts = nConstraints()
 	    * params.getInitLearntBoundConstraintFactor();
 	SolverState globalState = new SolverState();
+        // Ceriel: changed order. Did setAllConstraints first, but that
+        // causes two broadcasts of the allConstrs value: one in the
+        // shared method invocation and one as part of the exportObject.
+	if (satinUseSharedObjects) {
+	    globalState.exportObject();
+	}
 	if (satinUseSharedClauses) {
 	    // export allConstrs as part of the shared object
 	    globalState.setAllConstraints(allConstrs);
-	}
-	if (satinUseSharedObjects) {
-	    globalState.exportObject();
 	}
 	// but don't pass it on as part of the dynamic Solver state:
 	allConstrs = null;
