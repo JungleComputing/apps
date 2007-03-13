@@ -14,6 +14,7 @@ interface SolverStateInterface extends ibis.satin.WriteMethodsInterface {
     public void removeLearnts(String key);
     public void updateTime(TimeInfo timeinfo);
     public void setAllConstraints(Vec<VecInt> allconstrs);
+    public void addPercDone(double done);
 }
 
 public final class SolverState
@@ -28,6 +29,7 @@ public final class SolverState
     Vector timeVec;
     Vec<VecInt> allConstrs;
     int iter;
+    double percDone;
 
     public SolverState()
     {
@@ -51,6 +53,7 @@ public final class SolverState
 	globalConflicts = 0;
 	learnedHash = new Hashtable();
 	timeVec = new Vector();
+	percDone = 0.0;
 	iter++;
 	// leave allConstrs alone
     }
@@ -72,6 +75,12 @@ public final class SolverState
 	globalConflicts += conflicts;
 	// System.out.println("globalConflicts now " + globalConflicts + 
 	//		   " added " + conflicts);
+    }
+
+    /* write method */
+    public void addPercDone(double done)
+    {
+	percDone += done;
     }
 
     /* write method */

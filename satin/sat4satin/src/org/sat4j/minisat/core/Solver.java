@@ -846,7 +846,7 @@ public class Solver extends SatinObject
     protected Vec<VecInt> allConstrs = new Vec<VecInt>();
 
     // Temporary workarounds/experiments/..
-    private static final int DEFAULT_SATIN_FIXES = 0x38; // = 56
+    private static final int DEFAULT_SATIN_FIXES = 0x30; // = 48
     public int satinFixes = DEFAULT_SATIN_FIXES;
     /* Current semantics of satinFixes:
      * 0x01: <not used currently>
@@ -1331,6 +1331,8 @@ public class Solver extends SatinObject
 	    if (learnts.size() > nofLearnts) {
 		// Reduce the set of learnt clauses
 		reduceDB();
+	        System.out.println("c " + getStatus(globalState) + " " + name +
+				   " " + learnts.size() + " learnts[G]");
 	    }
 	}
 
@@ -1536,10 +1538,8 @@ public class Solver extends SatinObject
 		satinRecSearch(nofConflicts, satinDepth, globalState);
 	    double secs = (System.currentTimeMillis() - begintime) / 1000.0;
 	    if (satinDepth < 6 || secs > 10.0) {
-		// System.out.println(name + ": " + res.satin_res);
-		System.out.println("c " + name + 
-				   (res.seqTimeOut ? " time " : " took ") +
-				   secs + " sec");
+	        System.out.println("c " + getStatus(globalState) +
+				   " " + name + " " + secs + " sec");
 	    }
 	    return res;
 	}
@@ -1587,9 +1587,8 @@ public class Solver extends SatinObject
 	System.out.println();
     }
 
-    public int splitParent()
+    public void splitParent()
     {
-	int ret = -1;
 	int thisRootLevel = (rootLevel == 0) ? 1 : rootLevel;
 
 	if (false && splitDebug) {
@@ -1604,7 +1603,6 @@ public class Solver extends SatinObject
 	for (int i = rootVarIndex; i < trail.size(); i++) {
 	    int p = trail.get(i);
 	    if (i == rootVarIndex) {
-		ret = p;
 		if (voc.getReason(p) == null) {
 		    // analyze() by default assumes every assignment at the
 		    // same decision level has a proper reason clause that
@@ -1637,7 +1635,6 @@ public class Solver extends SatinObject
 	trailLim.pop();
 
 	if (splitDebug) {
-	    System.out.println("parent trail: split var " + ret);
 	    System.out.print("new trailLim: ");
 	    for (int i = 0; i < trailLim.size(); i++) {
 		System.out.print(" " + i + "=" + trailLim.get(i));
@@ -1647,8 +1644,6 @@ public class Solver extends SatinObject
 	}
 
 	splitLevel = 1;
-
-	return ret;
     }
 
     private boolean inconsistentPropagation = false;
@@ -1689,15 +1684,6 @@ public class Solver extends SatinObject
 	if (splitDebug) {
 	    System.out.println("child trail after split:");
 	    printTrail();
-
-	    if (false) {
-	        if (voc.isFalsified(lit)) {
-	  	    System.out.println("*** Firstvar falsified: " + lit);
-	        }
-	        if (voc.isFalsified(neglit)) {
-		    System.out.println("*** -Firstvar falsified:  " + neglit);
-	        }
-	    }
 	}
     }
 
@@ -1730,6 +1716,18 @@ public class Solver extends SatinObject
     // Added for spawner:
     public int lastConflicts;
 
+    private long curMaxConflicts;
+
+    public String getStatus(SolverState globalState)
+    {
+	return  String.format("done %.4f%% ", (globalState.percDone * 100.0))  +
+		String.format("bound %.4f%% ",
+		    ((100.0 * globalState.globalConflicts) / curMaxConflicts)) +
+		String.format("free %.1f%%",
+		      (100.0 * Runtime.getRuntime().freeMemory() /
+			(double) initialFreeMem));
+    }
+
     public SolverResult
     satinRecSearch(long nofConflicts, int satinDepth, SolverState globalState)
     {
@@ -1746,6 +1744,8 @@ public class Solver extends SatinObject
         final long bound1 = (initialFreeMem / 3);
         final long bound2 = 32 * 1024 * 1024;
         final long memorybound = (bound1 < bound2) ? bound2 : bound1;
+
+	curMaxConflicts = nofConflicts;
 
 	if (inconsistentPropagation) {
 	    // Just after the problem was split, the childs may find out
@@ -1803,11 +1803,7 @@ public class Solver extends SatinObject
 		stats.maxSpawnDepth = satinDepth;
 	    }
 
-	    System.out.println("c " + name + " "
-			       + (int) (100.0 *
-					Runtime.getRuntime().freeMemory() /
-					(double) initialFreeMem)
-			       + "% memory free");
+	    System.out.println("c " + getStatus(globalState) + " " + name);
 	}
 
         do {
@@ -1935,6 +1931,9 @@ public class Solver extends SatinObject
                 if (nofLearnts >= 0 && learnts.size() > nofLearnts) {
                     // Reduce the set of learnt clauses
                     reduceDB();
+	            System.out.println("c " + getStatus(globalState) +
+				       " " + name +
+				       " " + learnts.size() + " learnts");
                 }
 
 		if (satinUseSharedObjects && (loop2++ & 0x3ff) == 0x3ff) {
@@ -1949,7 +1948,7 @@ public class Solver extends SatinObject
 			// Root solver may still want to use our learnts:
 			updateTimingStats(globalState, begintime, loop);
 			publishLearnts(globalState, conflictC);
-			return searchResult(Lbool.FALSE);
+			return searchResult(Lbool.UNDEFINED);
 		    }
 		    if ((loop2 & 0xfff) == 0xfff) {
 			// Occasionally publish additional learnts
@@ -1965,7 +1964,7 @@ public class Solver extends SatinObject
 		if ((loop > maxIter)
 		    && (conflictC + conflictCsav > minLocalConflicts)
 		    && (satinDepth < satinMaxSpawnDepth)
-		    && (decisionLevel() > rootLevel + 1) // SATIN TODO!!
+		    && (decisionLevel() > rootLevel + 1) // for GridSAT split
 		    // also need enough memory left for spawner:
 		    && (Runtime.getRuntime().freeMemory() > memorybound)
 		    )
@@ -1974,6 +1973,10 @@ public class Solver extends SatinObject
 			stats.maxIter = loop;
 		    }
 
+		    // Publishing current learnts at this point is also useful
+		    // for other branches (not for our subtree of course)
+		    publishLearnts(globalState, conflictC); // TODO: TEST
+	    	    // globalState.addConflicts(conflictC); // done by above
 		    // Don't spawn ourselves, but let caller decide
 		    SolverResult res = new SolverResult(Lbool.UNDEFINED,
 							null, stats,
@@ -2322,11 +2325,6 @@ public class Solver extends SatinObject
         // System.out.println("c cleaning " + (learnts.size() - j) //$NON-NLS-1$
         //        + " clauses out of " + learnts.size() + " for limit " + lim); //$NON-NLS-1$ //$NON-NLS-2$
 
-        System.out.println("c " + name + " cleaning " + (learnts.size() - j) //$NON-NLS-1$
-                + " clauses out of " + learnts.size() + ", "
-		+ (int) (100.0 * (double) Runtime.getRuntime().freeMemory() /
-			 (double) initialFreeMem)
-		+ "% free mem"); //$NON-NLS-1$ //$NON-NLS-2$
         learnts.shrinkTo(j);
     }
 
@@ -2465,6 +2463,20 @@ public class Solver extends SatinObject
 		    // - may want to start with whole new path based on latest
 		    //   statistics anyway
 		    cancelUntil(0);
+		    // printTrail();
+		    if ((satinFixes & 0x8) != 0) {
+			// Learnt literals in the root solver are not to be
+			// trusted at this point, since they may depend on
+			// the "split" choices made during the previous round.
+			// This is only an issue when we pass the root solver
+			// itself down the search tree, rather than a copy.
+			cancelLearntLiterals();
+			if (propagate() != null) {
+			    System.out.println("c propagate() failed");
+			    return false;
+			}
+			// printTrail(); 
+		    }
 		}
 
 		globalState.reinit(false);
