@@ -179,8 +179,8 @@ final class Tsp extends ibis.satin.SatinObject implements TspInterface,
                 + global_minimum + (verbose ? "verbose" : ""));
 
 	Minimum minimum = new Minimum();	
-	minimum.set(global_minimum);
 	minimum.exportObject();
+	minimum.set(global_minimum);
         start = System.currentTimeMillis();
         int result = tsp.spawn_tsp(1, path, length, distance, minimum);
         tsp.sync();

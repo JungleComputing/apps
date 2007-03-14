@@ -119,6 +119,7 @@ strictfp public class BarnesHut {
             }
         } catch (Exception e) {
             System.err.println("Caught exception! " + e.getMessage());
+            e.printStackTrace(System.err);
         }
     }
 
@@ -151,6 +152,7 @@ strictfp public class BarnesHut {
 
         } catch (InterruptedException e) {
             System.err.println("Caught exception! " + e.getMessage());
+            e.printStackTrace(System.err);
         }
 
         System.out.println("All threads finished!");
@@ -193,6 +195,7 @@ strictfp public class BarnesHut {
 
         } catch (InterruptedException e) {
             System.err.println("Caught exception! " + e.getMessage());
+            e.printStackTrace(System.err);
         }
 
         if (d.rank() == 0) {

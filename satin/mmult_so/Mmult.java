@@ -98,13 +98,12 @@ final class Mmult extends ibis.satin.SatinObject implements MmultInterface,
         Matrix c = new Matrix(task, rec, loop, 0.0f, false);
 
         SharedMatrix a = new SharedMatrix();
+        a.exportObject();
         a.setMatrix(aM);
         
         SharedMatrix b = new SharedMatrix();
-        b.setMatrix(bM);
-
-        a.exportObject();
         b.exportObject();
+        b.setMatrix(bM);
         
         //    System.out.println("A:");
         //    a.print(task, rec, loop);
