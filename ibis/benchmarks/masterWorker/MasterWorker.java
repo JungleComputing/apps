@@ -33,7 +33,8 @@ final class MasterWorker implements PredefinedCapabilities {
 
             CapabilitySet s = new CapabilitySet(WORLDMODEL_OPEN,
                     SERIALIZATION_OBJECT, COMMUNICATION_RELIABLE,
-                    RECEIVE_EXPLICIT, CONNECTION_MANY_TO_ONE);
+                    CONNECTION_ONE_TO_ONE, RECEIVE_EXPLICIT,
+                    CONNECTION_MANY_TO_ONE);
             ibis = IbisFactory.createIbis(s, null, null, null);
 
             registry = ibis.registry();
@@ -45,6 +46,7 @@ final class MasterWorker implements PredefinedCapabilities {
             manyToOneType = ibis.createPortType(s);
 
             s = new CapabilitySet(SERIALIZATION_OBJECT,
+                    CONNECTION_ONE_TO_ONE,
                     COMMUNICATION_RELIABLE, RECEIVE_EXPLICIT);
 
             oneToOneType = ibis.createPortType(s);

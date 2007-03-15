@@ -504,7 +504,7 @@ public final class Ping implements PredefinedCapabilities {
 
             CapabilitySet props = new CapabilitySet(SERIALIZATION_BYTE,
                     WORLDMODEL_CLOSED, COMMUNICATION_RELIABLE,
-                    RECEIVE_EXPLICIT);
+                    CONNECTION_ONE_TO_ONE, RECEIVE_EXPLICIT);
             ibis = IbisFactory.createIbis(props, null, null, null);
 
             // Configuration information

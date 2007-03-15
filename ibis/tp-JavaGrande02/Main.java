@@ -250,6 +250,7 @@ final class Main implements PredefinedCapabilities {
 	    } 
 
 	    CapabilitySet s = new CapabilitySet(COMMUNICATION_RELIABLE,
+                    CONNECTION_ONE_TO_ONE,
                     WORLDMODEL_CLOSED, RECEIVE_AUTO_UPCALLS,
                     RECEIVE_EXPLICIT, SERIALIZATION_OBJECT);
             Properties attribs = new Properties();

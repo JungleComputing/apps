@@ -86,6 +86,7 @@ static class ExplicitReceiver {
         try {
             CapabilitySet s = new CapabilitySet(
                     WORLDMODEL_CLOSED, SERIALIZATION_OBJECT,
+                    CONNECTION_ONE_TO_ONE,
                     COMMUNICATION_RELIABLE, RECEIVE_EXPLICIT,
                     RECEIVE_POLL);
             ibis = IbisFactory.createIbis(s, null, null, null);

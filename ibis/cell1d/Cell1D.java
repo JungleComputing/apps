@@ -175,6 +175,7 @@ class Cell1D implements Config, PredefinedCapabilities {
         try {
             info = PoolInfo.createPoolInfo();
             CapabilitySet s = new CapabilitySet(WORLDMODEL_CLOSED,
+                    CONNECTION_ONE_TO_ONE,
                     COMMUNICATION_RELIABLE, RECEIVE_EXPLICIT,
                     SERIALIZATION_DATA);
             ibis = IbisFactory.createIbis( s, null, null, null );

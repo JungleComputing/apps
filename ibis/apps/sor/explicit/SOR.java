@@ -257,7 +257,7 @@ public class SOR  implements ibis.ipl.PredefinedCapabilities {
         CapabilitySet reqprops = new CapabilitySet(SERIALIZATION_DATA,
                 WORLDMODEL_CLOSED, COMMUNICATION_RELIABLE,
                 CONNECTION_ONE_TO_MANY, CONNECTION_MANY_TO_ONE,
-                RECEIVE_EXPLICIT);
+                CONNECTION_ONE_TO_ONE, RECEIVE_EXPLICIT);
 
         try {
             ibis = IbisFactory.createIbis(reqprops, null, null, null);
@@ -282,7 +282,8 @@ public class SOR  implements ibis.ipl.PredefinedCapabilities {
     private void createNeighbourPorts() throws IOException {
 
         CapabilitySet reqprops = new CapabilitySet(SERIALIZATION_DATA,
-                COMMUNICATION_RELIABLE, RECEIVE_EXPLICIT);
+                COMMUNICATION_RELIABLE, CONNECTION_ONE_TO_ONE,
+                RECEIVE_EXPLICIT);
 
         PortType portTypeNeighbour = ibis.createPortType(reqprops);
 

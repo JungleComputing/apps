@@ -230,7 +230,7 @@ class ConcurrentSenders implements PredefinedCapabilities {
             CapabilitySet sp = new CapabilitySet(SERIALIZATION_OBJECT,
                     WORLDMODEL_CLOSED, COMMUNICATION_RELIABLE,
                     RECEIVE_AUTO_UPCALLS, RECEIVE_EXPLICIT,
-                    CONNECTION_ONE_TO_MANY);
+                    CONNECTION_ONE_TO_ONE, CONNECTION_ONE_TO_MANY);
 
             ibis = IbisFactory.createIbis(sp, null, null, null);
 

@@ -100,7 +100,7 @@ public class ClusterReducer extends TreeReducer {
         // System.err.println("}");
 
         CapabilitySet reqprops = new CapabilitySet(SERIALIZATION_DATA,
-                COMMUNICATION_RELIABLE, RECEIVE_EXPLICIT);
+                CONNECTION_ONE_TO_ONE, COMMUNICATION_RELIABLE, RECEIVE_EXPLICIT);
 
         PortType portTypeReduce = ibis.createPortType(reqprops);
 

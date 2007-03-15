@@ -185,6 +185,7 @@ class Latency implements PredefinedCapabilities {
 
         try {
             CapabilitySet s = new CapabilitySet(WORLDMODEL_CLOSED,
+                    CONNECTION_ONE_TO_ONE,
                     COMMUNICATION_RELIABLE, SERIALIZATION_OBJECT,
                     RECEIVE_AUTO_UPCALLS, RECEIVE_POLL);
 

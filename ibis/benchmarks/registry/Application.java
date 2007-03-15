@@ -3,7 +3,6 @@ import org.apache.log4j.Logger;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
 
-import ibis.ipl.CapabilitySet;
 import ibis.ipl.Ibis;
 import ibis.ipl.IbisFactory;
 import ibis.ipl.IbisIdentifier;
@@ -54,6 +53,7 @@ final class Application implements Runnable, ResizeHandler, ibis.ipl.PredefinedC
     public void run() {
         try {
             CapabilitySet s = new CapabilitySet(SERIALIZATION_OBJECT,
+                    CONNECTION_ONE_TO_ONE,
                     WORLDMODEL_OPEN, COMMUNICATION_RELIABLE,
                     RECEIVE_EXPLICIT, RESIZE_UPCALLS);
 

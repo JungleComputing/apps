@@ -32,7 +32,8 @@ class Latency implements PredefinedCapabilities {
             CapabilitySet sp = new CapabilitySet(WORLDMODEL_CLOSED,
                     SERIALIZATION_OBJECT, COMMUNICATION_RELIABLE,
                     RECEIVE_AUTO_UPCALLS,  RECEIVE_EXPLICIT,
-                    CONNECTION_MANY_TO_ONE, CONNECTION_ONE_TO_MANY);
+                    CONNECTION_ONE_TO_ONE, CONNECTION_MANY_TO_ONE,
+                    CONNECTION_ONE_TO_MANY);
 
             ibis = IbisFactory.createIbis(sp, null, null, null);
             registry = ibis.registry();

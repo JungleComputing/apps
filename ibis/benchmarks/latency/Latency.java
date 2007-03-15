@@ -382,6 +382,7 @@ class Latency implements PredefinedCapabilities {
             CapabilitySet s = new CapabilitySet(
                     noneSer ? SERIALIZATION_BYTE : SERIALIZATION_OBJECT,
                     WORLDMODEL_OPEN, COMMUNICATION_RELIABLE,
+                    CONNECTION_ONE_TO_ONE,
                     RECEIVE_AUTO_UPCALLS, RECEIVE_EXPLICIT);
             Properties p = new Properties();
             if (ibisSer) {
