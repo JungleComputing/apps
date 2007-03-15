@@ -717,6 +717,7 @@ final class NQueens extends SatinObject implements NQueensInterface,
 
         if (args.length > 1) {
             System.err.println("usage: nqueens [ <filename> ]");
+            throw new Error("oops");
         } else {
             NQueens nq = new NQueens();
             nq.readInput(args);
