@@ -19,14 +19,14 @@ import ibis.ipl.Upcall;
 import ibis.ipl.CapabilitySet;
 import ibis.ipl.ReceivePortConnectUpcall;
 import ibis.ipl.SendPortDisconnectUpcall;
-import ibis.ipl.ResizeHandler;
+import ibis.ipl.RegistryEventHandler;
 
 import ibis.util.TypedProperties;
 import ibis.util.Timer;
 import ibis.util.PoolInfo;
 import java.util.HashMap;
 
-class RszHandler implements ResizeHandler {
+class RszHandler implements RegistryEventHandler {
 
     java.util.Vector<IbisIdentifier> idents
             = new java.util.Vector<IbisIdentifier>();
@@ -571,12 +571,12 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
                 send_one(true /* is_server */, 0);
             }
 
-            // myIbis.disableResizeUpcalls();
+            // myIbis.disableRegistryEvents();
             //if (myIbis instanceof ibis.impl.messagePassing.Ibis) {
             //    ibis.impl.messagePassing.Ibis.resetStats();
             //}
             System.gc();
-            // myIbis.enableResizeUpcalls();
+            // myIbis.enableRegistryEvents();
 
             // test
             synchronized (this) {
@@ -633,7 +633,7 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
             sport.setProperties(dp);
         }
 
-        myIbis.enableResizeUpcalls();
+        myIbis.enableRegistryEvents();
 
         registry.elect("client"+rank);
         if (connectUpcalls) {
@@ -711,7 +711,7 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
             sport.setProperties(dp);
         }
 
-        myIbis.enableResizeUpcalls();
+        myIbis.enableRegistryEvents();
 
         registry.elect("server" + (rank - clients));
         if (upcall) {

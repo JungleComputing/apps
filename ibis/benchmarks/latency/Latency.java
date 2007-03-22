@@ -210,7 +210,6 @@ class UpcallReceiver implements Upcall {
         }
 
         System.err.println("Finished Receiver");
-
     }
 }
 
@@ -396,6 +395,11 @@ class Latency implements PredefinedCapabilities {
 
             registry = ibis.registry();
 
+            s = new CapabilitySet(
+                    noneSer ? SERIALIZATION_BYTE : SERIALIZATION_OBJECT,
+                    COMMUNICATION_RELIABLE,
+                    CONNECTION_ONE_TO_ONE,
+                    RECEIVE_AUTO_UPCALLS, RECEIVE_EXPLICIT);
             PortType t = ibis.createPortType(s);
 
             SendPort sport = t.createSendPort("send port");

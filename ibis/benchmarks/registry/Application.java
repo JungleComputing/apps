@@ -6,11 +6,11 @@ import sun.misc.SignalHandler;
 import ibis.ipl.Ibis;
 import ibis.ipl.IbisFactory;
 import ibis.ipl.IbisIdentifier;
-import ibis.ipl.ResizeHandler;
+import ibis.ipl.RegistryEventHandler;
 import ibis.ipl.CapabilitySet;
 import ibis.util.ThreadPool;
 
-final class Application implements Runnable, ResizeHandler, ibis.ipl.PredefinedCapabilities {
+final class Application implements Runnable, RegistryEventHandler, ibis.ipl.PredefinedCapabilities {
 
     private static final Logger logger = Logger.getLogger(Application.class);
 
@@ -61,7 +61,7 @@ final class Application implements Runnable, ResizeHandler, ibis.ipl.PredefinedC
             Ibis ibis = IbisFactory.createIbis(s, null, null, this);
             logger.debug("ibis created, enabling upcalls");
 
-            ibis.enableResizeUpcalls();
+            ibis.enableRegistryEvents();
             logger.debug("upcalls enabled");
 
             synchronized (this) {

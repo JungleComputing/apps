@@ -71,7 +71,7 @@ final class Problem implements OpenConfig {
     }
 }
 
-class RszHandler implements OpenConfig, ResizeHandler {
+class RszHandler implements OpenConfig, RegistryEventHandler {
     private int members = 0;
     private IbisIdentifier prev = null;
 
@@ -908,7 +908,7 @@ class OpenCell1D implements OpenConfig, PredefinedCapabilities {
             PortType updatePort = ibis.createPortType( s );
             PortType stealPort = ibis.createPortType( s );
 
-            ibis.enableResizeUpcalls();
+            ibis.enableRegistryEvents();
 
             if( me != 0 && leftNeighbour == null ){
                 System.out.println( "P" + me + ": there is no left neighbour???" );
