@@ -1,5 +1,7 @@
 import org.apache.log4j.Logger;
 
+import java.io.IOException;
+
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
 
@@ -88,6 +90,13 @@ final class Application implements Runnable, RegistryEventHandler, ibis.ipl.Pred
         if (printStats && seen % step == 0) {
             double time = (System.currentTimeMillis() - start) / 1000.0;
             logger.info(time + ": seen " + seen + " joins so far");
+/*	    try {
+		    ibis.registry().signal("I see you", ident);
+	    } catch (IOException e) {
+	    	System.err.println("could not send signal");
+		e.printStackTrace(System.err);
+	    }
+*/
         }
     }
 
@@ -99,8 +108,8 @@ final class Application implements Runnable, RegistryEventHandler, ibis.ipl.Pred
         // IGNORE
     }
 
-    public void mustLeave(IbisIdentifier[] ibisses) {
-        // IGNORE
+    public void gotSignal(String signal) {
+    	System.err.println("got signal: " + signal);
     }
     
     private static class Shutdown extends Thread {

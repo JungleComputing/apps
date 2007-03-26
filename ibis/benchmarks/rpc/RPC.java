@@ -52,7 +52,7 @@ class RszHandler implements RegistryEventHandler {
         left(corpse);
     }
 
-    public void mustLeave(IbisIdentifier[] ids) {
+    public void gotSignal(String signal) {
         // We don't do this.
     }
 

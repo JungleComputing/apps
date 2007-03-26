@@ -1,8 +1,11 @@
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
 
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
+
+import ibis.util.Log;
 
 
 public final class Main {
@@ -35,6 +38,9 @@ public final class Main {
         int threads = 1;
         int step = 1;
         boolean sync = false;
+
+	Log.initLog4J("Main", Level.INFO);
+	Log.initLog4J("Application", Level.INFO);
         
         for (int i = 0; i < args.length;i++) {
             if (args[i].equalsIgnoreCase("--threads")) {

@@ -121,7 +121,7 @@ class RszHandler implements OpenConfig, RegistryEventHandler {
         members--;
     }
 
-    public void mustLeave( IbisIdentifier[] ids )
+    public void gotSignal( String signal )
     {
         // We don't do this.
     }
