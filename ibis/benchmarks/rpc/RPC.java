@@ -630,7 +630,7 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
             HashMap<String, Object> dp = new HashMap<String, Object>();
             dp.put("InputBufferSize", new Integer(BUFSIZ));
             dp.put("OutputBufferSize", new Integer(BUFSIZ));
-            sport.setProperties(dp);
+            sport.setDynamicProperties(dp);
         }
 
         myIbis.enableRegistryEvents();
@@ -648,7 +648,7 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
             HashMap<String, Object> dp = new HashMap<String, Object>();
             dp.put("InputBufferSize", new Integer(BUFSIZ));
             dp.put("OutputBufferSize", new Integer(BUFSIZ));
-            rport.setProperties(dp);
+            rport.setDynamicProperties(dp);
         }
         rport.enableConnections();
 
@@ -708,7 +708,7 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
             HashMap<String, Object> dp = new HashMap<String, Object>();
             dp.put("InputBufferSize", new Integer(BUFSIZ));
             dp.put("OutputBufferSize", new Integer(BUFSIZ));
-            sport.setProperties(dp);
+            sport.setDynamicProperties(dp);
         }
 
         myIbis.enableRegistryEvents();
@@ -736,7 +736,7 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
             HashMap<String, Object> dp = new HashMap<String, Object>();
             dp.put("InputBufferSize", new Integer(BUFSIZ));
             dp.put("OutputBufferSize", new Integer(BUFSIZ));
-            rport.setProperties(dp);
+            rport.setDynamicProperties(dp);
         }
 
         rport.enableConnections();
