@@ -16,6 +16,11 @@
 
     <import file="${ibis}/build-files/apps/build-ibis-app.xml"/>
 
+    <property name="test-par-java-args" value=""/>
+    <property name="test-par-run" value="ASP 1024"/>
+    <property name="test-seq-java-args" value=""/>
+    <property name="test-seq-run" value="ASP 1024"/>
+
 </project>
 
 

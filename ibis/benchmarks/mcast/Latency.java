@@ -38,10 +38,10 @@ class Latency implements PredefinedCapabilities {
             ibis = IbisFactory.createIbis(sp, null, null, null);
             registry = ibis.registry();
 
-            PortType t = ibis.createPortType(sp);
+            CapabilitySet t = sp;
 
-            ReceivePort rport = t.createReceivePort("receive port");
-            SendPort sport = t.createSendPort("send port");
+            ReceivePort rport = ibis.createReceivePort(t, "receive port");
+            SendPort sport = ibis.createSendPort(t, "send port");
 
             rport.enableConnections();
 

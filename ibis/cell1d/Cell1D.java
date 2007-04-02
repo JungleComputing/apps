@@ -42,7 +42,7 @@ class Cell1D implements Config, PredefinedCapabilities {
      * @param me My own processor number.
      * @param procno The processor number to connect to.
      */
-    private static SendPort createUpdateSendPort( PortType t, int me, int procno )
+    private static SendPort createUpdateSendPort( CapabilitySet t, int me, int procno )
         throws java.io.IOException
     {
         String portclass;
@@ -56,7 +56,7 @@ class Cell1D implements Config, PredefinedCapabilities {
         String sendportname = "send" + portclass + me;
         String receiveportname = "receive" + portclass + procno;
 
-        SendPort res = t.createSendPort( sendportname );
+        SendPort res = ibis.createSendPort( t, sendportname );
         if( tracePortCreation ){
             System.err.println( "P" + me + ": created send port " + sendportname  );
         }
@@ -74,7 +74,7 @@ class Cell1D implements Config, PredefinedCapabilities {
      * @param me My own processor number.
      * @param procno The processor to receive from.
      */
-    private static ReceivePort createUpdateReceivePort( PortType t, int me, int procno )
+    private static ReceivePort createUpdateReceivePort( CapabilitySet t, int me, int procno )
         throws java.io.IOException
     {
         String portclass;
@@ -88,7 +88,7 @@ class Cell1D implements Config, PredefinedCapabilities {
         String receiveportname = portclass + me;
 
         registry.elect( receiveportname );
-        ReceivePort res = t.createReceivePort( receiveportname );
+        ReceivePort res = ibis.createReceivePort( t, receiveportname );
         if( tracePortCreation ){
             System.err.println( "P" + me + ": created receive port " + receiveportname  );
         }
@@ -186,7 +186,7 @@ class Cell1D implements Config, PredefinedCapabilities {
             final int me = info.rank();         // My processor number.
             final int nProcs = info.size();     // Total number of procs.
 
-            PortType t = ibis.createPortType( s );
+            CapabilitySet t = s;
 
             SendPort leftSendPort = null;
             SendPort rightSendPort = null;

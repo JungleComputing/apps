@@ -8,7 +8,6 @@ import ibis.ipl.Ibis;
 import ibis.ipl.IbisFactory;
 import ibis.ipl.IbisIdentifier;
 import ibis.ipl.Registry;
-import ibis.ipl.PortType;
 import ibis.ipl.SendPort;
 import ibis.ipl.ReceivePort;
 import ibis.ipl.ReceivePortIdentifier;
@@ -84,9 +83,9 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
 
     private RszHandler rszHandler;
 
-    private PortType requestPortType;
+    private CapabilitySet requestPortType;
 
-    private PortType replyPortType;
+    private CapabilitySet replyPortType;
 
     private SendPort sport;
 
@@ -621,10 +620,10 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
                 + "; client port name \"client port " + rank + "\"");
 
         if (connectUpcalls) {
-            sport = requestPortType.createSendPort("latency-client",
+            sport = myIbis.createSendPort(requestPortType, "latency-client",
                     (SendPortDisconnectUpcall) this);
         } else {
-            sport = requestPortType.createSendPort("latency-client");
+            sport = myIbis.createSendPort(requestPortType, "latency-client");
         }
         if (BUFSIZ != 0) {
             HashMap<String, Object> dp = new HashMap<String, Object>();
@@ -637,10 +636,10 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
 
         registry.elect("client"+rank);
         if (connectUpcalls) {
-            rport = replyPortType.createReceivePort("client port",
+            rport = myIbis.createReceivePort(replyPortType, "client port",
                     (ReceivePortConnectUpcall) this);
         } else {
-            rport = replyPortType.createReceivePort("client port");
+            rport = myIbis.createReceivePort(replyPortType, "client port");
         }
         // System.err.println(rank + ": t = " + ((ibis.impl.net.NetIbis)myIbis).now() + "  created \"client port " + rank + "\"");
 
@@ -698,10 +697,10 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
                         + (rank - clients) + "\"");
 
         if (connectUpcalls) {
-            sport = replyPortType.createSendPort("latency-server",
+            sport = myIbis.createSendPort(replyPortType, "latency-server",
                     (SendPortDisconnectUpcall) this);
         } else {
-            sport = replyPortType.createSendPort("latency-server");
+            sport = myIbis.createSendPort(replyPortType, "latency-server");
         }
 
         if (BUFSIZ != 0) {
@@ -716,19 +715,19 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
         registry.elect("server" + (rank - clients));
         if (upcall) {
             if (connectUpcalls) {
-                rport = requestPortType.createReceivePort("server port",
+                rport = myIbis.createReceivePort(requestPortType, "server port",
                         this,
                         (ReceivePortConnectUpcall) this);
             } else {
-                rport = requestPortType.createReceivePort("server port",
+                rport = myIbis.createReceivePort(requestPortType, "server port",
                         (Upcall) this);
             }
         } else {
             if (connectUpcalls) {
-                rport = requestPortType.createReceivePort("server port",
+                rport = myIbis.createReceivePort(requestPortType, "server port",
                         (ReceivePortConnectUpcall) this);
             } else {
-                rport = requestPortType.createReceivePort("server port");
+                rport = myIbis.createReceivePort(requestPortType, "server port");
             }
         }
         // System.err.println(rank + ": created \"server port " + (rank - clients) + "\"");
@@ -1052,14 +1051,14 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
                 RECEIVE_EXPLICIT, CONNECTION_UPCALLS,
                 sequenced ? COMMUNICATION_NUMBERED : COMMUNICATION_FIFO,
                 CONNECTION_ONE_TO_MANY);
-        requestPortType = myIbis.createPortType(s);
+        requestPortType = s;
 
         s = new CapabilitySet(SERIALIZATION_OBJECT,
                 COMMUNICATION_RELIABLE, RECEIVE_AUTO_UPCALLS,
                 RECEIVE_EXPLICIT, CONNECTION_UPCALLS,
                 sequenced ? COMMUNICATION_NUMBERED : COMMUNICATION_FIFO,
                 CONNECTION_MANY_TO_ONE);
-        replyPortType = myIbis.createPortType(s);
+        replyPortType = s;
 
         if (rank == -1 && rszHandler != null) {
             rszHandler.sync(clients + servers);

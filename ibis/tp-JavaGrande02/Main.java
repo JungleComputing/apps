@@ -269,8 +269,8 @@ final class Main implements PredefinedCapabilities {
 		System.out.println("Got registry");
 	    }
 
-	    PortType t = ibis.createPortType(null);			
-	    SendPort sport = t.createSendPort();					      
+	    CapabilitySet t = s;
+	    SendPort sport = ibis.createSendPort(t);					      
 	    ReceivePort rport;
 
 	    if (verbose) { 
@@ -279,7 +279,7 @@ final class Main implements PredefinedCapabilities {
 
 	    if (rank == 0) {
                 registry.elect("0");
-		rport = t.createReceivePort("test port");
+		rport = ibis.createReceivePort(t, "test port");
 		rport.enableConnections();
                 IbisIdentifier other = registry.getElectionResult("1");
 		sport.connect(other, "test port");
@@ -389,12 +389,12 @@ final class Main implements PredefinedCapabilities {
 
 		if (upcalls) {
 		    Receiver receiver = new Receiver(null, sport, tests*retries*count, one_way, false);
-		    rport = t.createReceivePort("test port", receiver);
+		    rport = ibis.createReceivePort(t, "test port", receiver);
 		    rport.enableConnections();
 		    rport.enableUpcalls();
 		    receiver.finish();
 		} else { 
-		    rport = t.createReceivePort("test port");
+		    rport = ibis.createReceivePort(t, "test port");
 		    rport.enableConnections();
 		    Receiver receiver = new Receiver(rport, sport, count, one_way, stream);
 

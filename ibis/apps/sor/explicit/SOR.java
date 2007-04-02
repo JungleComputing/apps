@@ -21,7 +21,6 @@ import java.io.IOException;
 
 import ibis.ipl.Ibis;
 import ibis.ipl.IbisFactory;
-import ibis.ipl.PortType;
 import ibis.ipl.SendPort;
 import ibis.ipl.ReceivePort;
 import ibis.ipl.SendPortIdentifier;
@@ -281,18 +280,16 @@ public class SOR  implements ibis.ipl.PredefinedCapabilities {
 
     private void createNeighbourPorts() throws IOException {
 
-        CapabilitySet reqprops = new CapabilitySet(SERIALIZATION_DATA,
+        CapabilitySet portTypeNeighbour = new CapabilitySet(SERIALIZATION_DATA,
                 COMMUNICATION_RELIABLE, CONNECTION_ONE_TO_ONE,
                 RECEIVE_EXPLICIT);
-
-        PortType portTypeNeighbour = ibis.createPortType(reqprops);
 
         if (rank != 0) {
             if (upcall) {
                 leftSyncer = new Syncer(g[lb - 1]);
             }
-            leftR = portTypeNeighbour.createReceivePort("leftR", leftSyncer);
-            leftS = portTypeNeighbour.createSendPort("leftS");
+            leftR = ibis.createReceivePort(portTypeNeighbour, "leftR", leftSyncer);
+            leftS = ibis.createSendPort(portTypeNeighbour, "leftS");
             leftR.enableConnections();
 
             // System.out.println(rank + " created leftR and leftS");
@@ -302,8 +299,8 @@ public class SOR  implements ibis.ipl.PredefinedCapabilities {
             if (upcall) {
                 rightSyncer = new Syncer(g[ub]);
             }
-            rightR = portTypeNeighbour.createReceivePort("rightR", rightSyncer);
-            rightS = portTypeNeighbour.createSendPort("rightS");
+            rightR = ibis.createReceivePort(portTypeNeighbour, "rightR", rightSyncer);
+            rightS = ibis.createSendPort(portTypeNeighbour, "rightS");
             rightR.enableConnections();
 
             // System.out.println(rank + " created rightR and rightS");

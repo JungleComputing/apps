@@ -21,9 +21,9 @@ final class MasterWorker implements PredefinedCapabilities {
 
     Registry registry;
 
-    PortType oneToOneType;
+    CapabilitySet oneToOneType;
 
-    PortType manyToOneType;
+    CapabilitySet manyToOneType;
 
     IbisIdentifier masterID;
 
@@ -43,13 +43,13 @@ final class MasterWorker implements PredefinedCapabilities {
 
             boolean master = masterID.equals(ibis.identifier());
 
-            manyToOneType = ibis.createPortType(s);
+            manyToOneType = s;
 
             s = new CapabilitySet(SERIALIZATION_OBJECT,
                     CONNECTION_ONE_TO_ONE,
                     COMMUNICATION_RELIABLE, RECEIVE_EXPLICIT);
 
-            oneToOneType = ibis.createPortType(s);
+            oneToOneType = s;
 
             if (master) {
                 master();
@@ -78,8 +78,8 @@ final class MasterWorker implements PredefinedCapabilities {
         long end;
         int max = 0;
 
-        ReceivePort rport = manyToOneType
-                .createReceivePort("master receive port");
+        ReceivePort rport = ibis.createReceivePort(manyToOneType,
+                "master receive port");
         rport.enableConnections();
 
         while (true) {
@@ -95,7 +95,7 @@ final class MasterWorker implements PredefinedCapabilities {
                 sendPort = workers.get(origin);
 
                 if (sendPort == null) {
-                    sendPort = oneToOneType.createSendPort();
+                    sendPort = ibis.createSendPort(oneToOneType);
                     sendPort.connect(origin.ibis(), "receiveport");
 
                     workers.put(origin, sendPort);
@@ -132,9 +132,9 @@ final class MasterWorker implements PredefinedCapabilities {
         long start;
         long end;
 
-        ReceivePort rport = oneToOneType.createReceivePort("receiveport");
+        ReceivePort rport = ibis.createReceivePort(oneToOneType, "receiveport");
         rport.enableConnections();
-        SendPort sport = manyToOneType.createSendPort();
+        SendPort sport = ibis.createSendPort(manyToOneType);
 
         sport.connect(masterID, "master receive port");
 

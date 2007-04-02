@@ -16,13 +16,13 @@ class Sender extends Thread {
 
     Ibis ibis;
 
-    PortType t;
+    CapabilitySet t;
 
     boolean sendTree;
 
     IbisIdentifier master;
 
-    Sender(Ibis ibis, PortType t, int count, int repeat, boolean sendTree,
+    Sender(Ibis ibis, CapabilitySet t, int count, int repeat, boolean sendTree,
             IbisIdentifier master) {
         this.ibis = ibis;
         this.t = t;
@@ -39,7 +39,7 @@ class Sender extends Thread {
                 tree = new DITree(1023);
             }
 
-            SendPort sport = t.createSendPort("send port");
+            SendPort sport = ibis.createSendPort(t, "send port");
             sport.connect(master, "receive port");
 
             System.err.println(this
@@ -99,13 +99,13 @@ class Receiver implements Upcall {
 
     Ibis ibis;
 
-    PortType t;
+    CapabilitySet t;
 
     int msgs = 0;
 
     int senders;
 
-    Receiver(Ibis ibis, PortType t, int count, int repeat, int senders,
+    Receiver(Ibis ibis, CapabilitySet t, int count, int repeat, int senders,
             boolean doFinish) {
         this.ibis = ibis;
         this.t = t;
@@ -115,7 +115,7 @@ class Receiver implements Upcall {
         System.err.println(this + ": I'm a Receiver");
 
         try {
-            ReceivePort rport = t.createReceivePort("receive port", this);
+            ReceivePort rport = ibis.createReceivePort(t, "receive port", this);
             rport.enableConnections();
 
             long time = System.currentTimeMillis();
@@ -248,7 +248,7 @@ class ConcurrentSenders implements PredefinedCapabilities {
                 rank = 1;
             }
 
-            PortType t = ibis.createPortType(sp);
+            CapabilitySet t = sp;
 
             if (rank == 0) {
                 new Receiver(ibis, t, count, repeat, senders, doFinish);

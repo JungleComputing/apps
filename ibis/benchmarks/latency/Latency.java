@@ -400,9 +400,9 @@ class Latency implements PredefinedCapabilities {
                     COMMUNICATION_RELIABLE,
                     CONNECTION_ONE_TO_ONE,
                     RECEIVE_AUTO_UPCALLS, RECEIVE_EXPLICIT);
-            PortType t = ibis.createPortType(s);
+            CapabilitySet t = s;
 
-            SendPort sport = t.createSendPort("send port");
+            SendPort sport = ibis.createSendPort(t, "send port");
             ReceivePort rport;
             Latency lat = null;
 
@@ -430,7 +430,7 @@ class Latency implements PredefinedCapabilities {
                 }
 
                 if (!upcallsend) {
-                    rport = t.createReceivePort("test port");
+                    rport = ibis.createReceivePort(t, "test port");
                     rport.enableConnections();
                     sport.connect(remote, "test port");
                     Sender sender = new Sender(rport, sport);
@@ -440,7 +440,7 @@ class Latency implements PredefinedCapabilities {
                 } else {
                     UpcallSender sender = new UpcallSender(sport, count,
                             earlyFinish, delayedFinish, repeat, c);
-                    rport = t.createReceivePort("test port", sender);
+                    rport = ibis.createReceivePort(t, "test port", sender);
                     rport.enableConnections();
                     sport.connect(remote, "test port");
                     rport.enableUpcalls();
@@ -459,12 +459,12 @@ class Latency implements PredefinedCapabilities {
                 if (upcalls) {
                     UpcallReceiver receiver = new UpcallReceiver(sport, count,
                             earlyFinish, delayedFinish, repeat, c);
-                    rport = t.createReceivePort("test port", receiver);
+                    rport = ibis.createReceivePort(t, "test port", receiver);
                     rport.enableConnections();
                     rport.enableUpcalls();
                     receiver.finish();
                 } else {
-                    rport = t.createReceivePort("test port");
+                    rport = ibis.createReceivePort(t, "test port");
                     rport.enableConnections();
 
                     ExplicitReceiver receiver = new ExplicitReceiver(rport,

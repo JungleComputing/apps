@@ -119,10 +119,10 @@ class Throughput extends Thread implements PredefinedCapabilities {
             }
 
 
-            PortType t = ibis.createPortType(s);
-            rport = t.createReceivePort("test port");
+            CapabilitySet t = s;
+            rport = ibis.createReceivePort(t, "test port");
             rport.enableConnections();
-            sport = t.createSendPort();
+            sport = ibis.createSendPort(t);
             sport.connect(remote, "test port");
 
             if (rank == 0) {

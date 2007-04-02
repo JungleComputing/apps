@@ -93,9 +93,9 @@ static class ExplicitReceiver {
 
             registry = ibis.registry();
 
-            PortType t = ibis.createPortType(s);
+            CapabilitySet t = s;
 
-            SendPort sport = t.createSendPort("send port");
+            SendPort sport = ibis.createSendPort(t, "send port");
             ReceivePort rport;
 //            Latency lat = null;
 
@@ -114,14 +114,14 @@ static class ExplicitReceiver {
 	    Sender sender = null;
 	    ExplicitReceiver receiver = null;
             if (rank == 0) {
-                rport = t.createReceivePort("test port");
+                rport = ibis.createReceivePort(t, "test port");
                 rport.enableConnections();
                 sport.connect(remote, "test port");
                 sender = new Sender(rport, sport);
                 sender.send(count, repeat);
             } else {
                 sport.connect(remote, "test port");
-                rport = t.createReceivePort("test port");
+                rport = ibis.createReceivePort(t, "test port");
                 rport.enableConnections();
                 receiver = new ExplicitReceiver(rport, sport);
                 receiver.receive(count, repeat);

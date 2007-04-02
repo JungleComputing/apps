@@ -13,7 +13,6 @@
 import java.io.IOException;
 
 import ibis.ipl.Ibis;
-import ibis.ipl.PortType;
 import ibis.ipl.SendPort;
 import ibis.ipl.ReceivePort;
 import ibis.ipl.SendPortIdentifier;
@@ -57,29 +56,26 @@ public class Reducer implements ibis.ipl.PredefinedCapabilities {
         size = info.size();
 
         Registry registry = ibis.registry();
-        CapabilitySet reqprops = new CapabilitySet(SERIALIZATION_DATA,
+        CapabilitySet portTypeReduce = new CapabilitySet(SERIALIZATION_DATA,
             CONNECTION_MANY_TO_ONE, COMMUNICATION_RELIABLE, RECEIVE_EXPLICIT);
 
-        PortType portTypeReduce = ibis.createPortType(reqprops);
 
-        reqprops = new CapabilitySet(SERIALIZATION_DATA,
+        CapabilitySet portTypeBroadcast = new CapabilitySet(SERIALIZATION_DATA,
             CONNECTION_ONE_TO_MANY, COMMUNICATION_RELIABLE, RECEIVE_EXPLICIT);
-
-        PortType portTypeBroadcast = ibis.createPortType(reqprops);
 
         if (rank == 0) {
             // one-to-many to bcast result
-            reduceR = portTypeReduce.createReceivePort("SORreduceR");
+            reduceR = ibis.createReceivePort(portTypeReduce, "SORreduceR");
             reduceR.enableConnections();
-            reduceS = portTypeBroadcast.createSendPort("SORreduceS");
+            reduceS = ibis.createSendPort(portTypeBroadcast, "SORreduceS");
             for (int i = 1; i < size; i++) {
                 IbisIdentifier id = registry.getElectionResult("" + i);
                 reduceS.connect(id, "SORreduceR");
             }
         } else {
-            reduceR = portTypeBroadcast.createReceivePort("SORreduceR");
+            reduceR = ibis.createReceivePort(portTypeBroadcast, "SORreduceR");
             reduceR.enableConnections();
-            reduceS = portTypeReduce.createSendPort("SORreduceS");
+            reduceS = ibis.createSendPort(portTypeReduce, "SORreduceS");
 
             // many-to-one to gather values
             IbisIdentifier id = registry.getElectionResult("" + 0);

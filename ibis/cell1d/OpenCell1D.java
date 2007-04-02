@@ -213,13 +213,13 @@ class OpenCell1D implements OpenConfig, PredefinedCapabilities {
      * @param dest The destination processor.
      * @param prefix The prefix of the port names.
      */
-    private static SendPort createNeighbourSendPort( PortType updatePort, IbisIdentifier dest, String prefix )
+    private static SendPort createNeighbourSendPort( CapabilitySet updatePort, IbisIdentifier dest, String prefix )
         throws java.io.IOException
     {
         String sendportname = prefix + "Send" + myName;
         String receiveportname = prefix + "Receive" + dest;
 
-        SendPort res = updatePort.createSendPort( sendportname );
+        SendPort res = ibis.createSendPort( updatePort, sendportname );
         if( tracePortCreation ){
             System.out.println( "P" + me + ": created send port " + res  );
         }
@@ -236,7 +236,7 @@ class OpenCell1D implements OpenConfig, PredefinedCapabilities {
      * @param updatePort The type of the port to construct.
      * @param prefix The prefix of the port names.
      */
-    private static ReceivePort createNeighbourReceivePort( PortType updatePort, String prefix, Upcall up )
+    private static ReceivePort createNeighbourReceivePort( CapabilitySet updatePort, String prefix, Upcall up )
         throws java.io.IOException
     {
         String receiveportname = prefix + "Receive" + myName;
@@ -244,10 +244,10 @@ class OpenCell1D implements OpenConfig, PredefinedCapabilities {
         ReceivePort res;
         registry.elect( receiveportname );
         if( up == null ){
-            res = updatePort.createReceivePort( receiveportname );
+            res = ibis.createReceivePort( updatePort, receiveportname );
         }
         else {
-            res = updatePort.createReceivePort( receiveportname, up );
+            res = ibis.createReceivePort( updatePort, receiveportname, up );
         }
         if( tracePortCreation ){
             System.out.println( "P" + me + ": created receive port " + res  );
@@ -872,8 +872,8 @@ class OpenCell1D implements OpenConfig, PredefinedCapabilities {
 
             // TODO: be more precise about the properties for the two
             // port types.
-            PortType updatePort = ibis.createPortType( uprop );
-            PortType stealPort = ibis.createPortType( sprop );
+            CapabilitySet updatePort = uprop;
+            CapabilitySet stealPort = sprop;
 
             long startTime = System.currentTimeMillis();
             ibis.enableRegistryEvents();

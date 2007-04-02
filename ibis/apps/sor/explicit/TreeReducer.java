@@ -14,7 +14,6 @@
 import java.io.IOException;
 
 import ibis.ipl.Ibis;
-import ibis.ipl.PortType;
 import ibis.ipl.SendPort;
 import ibis.ipl.ReceivePort;
 import ibis.ipl.SendPortIdentifier;
@@ -62,15 +61,14 @@ public class TreeReducer extends Reducer {
         int rank = info.rank();
         int size = info.size();
 
-        CapabilitySet reqprops = new CapabilitySet(SERIALIZATION_DATA,
-                CONNECTION_ONE_TO_ONE, COMMUNICATION_RELIABLE, RECEIVE_EXPLICIT);
+        CapabilitySet portTypeReduce = new CapabilitySet(SERIALIZATION_DATA,
+                CONNECTION_ONE_TO_ONE, COMMUNICATION_RELIABLE,
+                RECEIVE_EXPLICIT);
 
-        PortType portTypeReduce = ibis.createPortType(reqprops);
-
-        reqprops = new CapabilitySet(SERIALIZATION_DATA, CONNECTION_ONE_TO_MANY,
-                COMMUNICATION_RELIABLE, RECEIVE_EXPLICIT);
+        CapabilitySet portTypeBroadcast = new CapabilitySet(SERIALIZATION_DATA,
+                CONNECTION_ONE_TO_MANY, COMMUNICATION_RELIABLE,
+                RECEIVE_EXPLICIT);
         
-        PortType portTypeBroadcast = ibis.createPortType(reqprops);
         if (rank == 0) {
             parent = LEAF_NODE;
         } else {
@@ -94,8 +92,8 @@ public class TreeReducer extends Reducer {
             reduceRreduce = new ReceivePort[2];
             for (int c = 0; c < 2; c++) {
                 if (child[c] != LEAF_NODE) {
-                    reduceRreduce[c] = portTypeReduce.createReceivePort("SOR"
-                            + c + "_reduceR");
+                    reduceRreduce[c] = ibis.createReceivePort(portTypeReduce,
+                            "SOR" + c + "_reduceR");
                     reduceRreduce[c].enableConnections();
                 }
             }
@@ -103,19 +101,20 @@ public class TreeReducer extends Reducer {
 
         if (parent != LEAF_NODE) {
             int childrank = rank - 2 * parent - 1;
-            reduceSreduce = portTypeReduce.createSendPort("SORreduceS");
+            reduceSreduce = ibis.createSendPort(portTypeReduce, "SORreduceS");
             IbisIdentifier id = registry.getElectionResult("" + parent);
             reduceSreduce.connect(id, "SOR" + childrank + "_reduceR");
         }
 
         /* Create and connect ports for the bcast phase */
         if (parent != LEAF_NODE) {
-            reduceRbcast = portTypeBroadcast.createReceivePort("SORreduceR");
+            reduceRbcast = ibis.createReceivePort(portTypeBroadcast,
+                    "SORreduceR");
             reduceRbcast.enableConnections();
         }
 
         if (children > 0) {
-            reduceSbcast = portTypeBroadcast.createSendPort("SORreduceS");
+            reduceSbcast = ibis.createSendPort(portTypeBroadcast, "SORreduceS");
             for (int c = 0; c < 2; c++) {
                 if (child[c] != LEAF_NODE) {
                     IbisIdentifier id = registry.getElectionResult("" + child[c]);

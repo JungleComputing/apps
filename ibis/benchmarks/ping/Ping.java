@@ -520,14 +520,14 @@ public final class Ping implements PredefinedCapabilities {
             }
 
             // Local communication setup
-            PortType t = ibis.createPortType(null);
-            sport = t.createSendPort();
+            CapabilitySet t = props;
+            sport = ibis.createSendPort(t);
             rport = null;
             ibis.registry().elect("" + rank);
 
             // Connection setup and test
             if (rank == 0) {
-                rport = t.createReceivePort("ping");
+                rport = ibis.createReceivePort(t, "ping");
                 rport.enableConnections();
                 IbisIdentifier id = ibis.registry().getElectionResult("1");
                 sport.connect(id, "ping");
@@ -537,7 +537,7 @@ public final class Ping implements PredefinedCapabilities {
             } else {
                 IbisIdentifier id = ibis.registry().getElectionResult("0");
                 sport.connect(id, "ping");
-                rport = t.createReceivePort("ping");
+                rport = ibis.createReceivePort(t, "ping");
                 rport.enableConnections();
 
                 System.err.println("Slave: starting test");

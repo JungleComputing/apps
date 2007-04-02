@@ -178,9 +178,9 @@ class Latency implements PredefinedCapabilities {
                     RECEIVE_AUTO_UPCALLS, RECEIVE_EXPLICIT);
             ibis = IbisFactory.createIbis(p, null, null, null);
             registry = ibis.registry();
-            PortType t = ibis.createPortType(p);
+            CapabilitySet t = p;
 
-            SendPort sport = t.createSendPort();
+            SendPort sport = ibis.createSendPort(t);
             ReceivePort rport;
             Latency lat = null;
 
@@ -197,7 +197,7 @@ class Latency implements PredefinedCapabilities {
 
             if (rank == 0) {
 
-                rport = t.createReceivePort("test port");
+                rport = ibis.createReceivePort(t, "test port");
                 rport.enableConnections();
                 sport.connect(remote, "test port");
                 Sender sender = new Sender(rport, sport);
@@ -209,12 +209,12 @@ class Latency implements PredefinedCapabilities {
                 if (upcall) {
                     UpcallReceiver receiver = new UpcallReceiver(sport,
                             2 * count);
-                    rport = t.createReceivePort("test port", receiver);
+                    rport = ibis.createReceivePort(t, "test port", receiver);
                     rport.enableConnections();
                     rport.enableUpcalls();
                     receiver.finish();
                 } else {
-                    rport = t.createReceivePort("test port");
+                    rport = ibis.createReceivePort(t, "test port");
                     rport.enableConnections();
                     ExplicitReceiver receiver = new ExplicitReceiver(rport,
                             sport);
