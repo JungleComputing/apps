@@ -97,7 +97,7 @@ class Throughput extends Thread implements PredefinedCapabilities {
         Random rand = new Random();
         try {
             CapabilitySet s = new CapabilitySet(
-                    SERIALIZATION_OBJECT, WORLDMODEL_OPEN,
+                    SERIALIZATION_OBJECT,
                     CONNECTION_ONE_TO_ONE,
                     COMMUNICATION_RELIABLE, RECEIVE_EXPLICIT);
             Ibis ibis = IbisFactory.createIbis(s, null, null, null);

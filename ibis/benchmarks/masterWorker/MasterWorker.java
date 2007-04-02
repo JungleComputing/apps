@@ -31,7 +31,7 @@ final class MasterWorker implements PredefinedCapabilities {
 
         try {
 
-            CapabilitySet s = new CapabilitySet(WORLDMODEL_OPEN,
+            CapabilitySet s = new CapabilitySet(
                     SERIALIZATION_OBJECT, COMMUNICATION_RELIABLE,
                     CONNECTION_ONE_TO_ONE, RECEIVE_EXPLICIT,
                     CONNECTION_MANY_TO_ONE);

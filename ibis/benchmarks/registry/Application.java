@@ -56,8 +56,8 @@ final class Application implements Runnable, RegistryEventHandler, ibis.ipl.Pred
         try {
             CapabilitySet s = new CapabilitySet(SERIALIZATION_OBJECT,
                     CONNECTION_ONE_TO_ONE,
-                    WORLDMODEL_OPEN, COMMUNICATION_RELIABLE,
-                    RECEIVE_EXPLICIT, RESIZE_UPCALLS);
+                    COMMUNICATION_RELIABLE,
+                    RECEIVE_EXPLICIT, REGISTRY_EVENTS);
 
             logger.debug("creating ibis");
             Ibis ibis = IbisFactory.createIbis(s, null, null, this);

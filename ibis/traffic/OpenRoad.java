@@ -897,7 +897,7 @@ class OpenCell1D implements OpenConfig, PredefinedCapabilities {
             CapabilitySet s = new CapabilitySet(SERIALIZATION_DATA,
                     CONNECTION_ONE_TO_ONE,
                     COMMUNICATION_RELIABLE, RECEIVE_AUTO_UPCALLS,
-                    RECEIVE_EXPLICIT, WORLDMODEL_OPEN, RESIZE_UPCALLS);
+                    RECEIVE_EXPLICIT, REGISTRY_EVENTS);
             ibis = IbisFactory.createIbis( s, null, null, rszHandler );
             myName = ibis.identifier();
 
