@@ -88,7 +88,7 @@ class Sender extends Thread {
     }
 }
 
-class Receiver implements Upcall {
+class Receiver implements MessageUpcall {
     int count;
 
     int repeat;
@@ -119,7 +119,7 @@ class Receiver implements Upcall {
             rport.enableConnections();
 
             long time = System.currentTimeMillis();
-            rport.enableUpcalls();
+            rport.enableMessageUpcalls();
             finish();
             time = System.currentTimeMillis() - time;
             double speed = (time * 1000.0) / (double) count;

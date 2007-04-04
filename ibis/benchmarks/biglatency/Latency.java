@@ -96,7 +96,7 @@ class ExplicitReceiver {
     }
 }
 
-class UpcallReceiver implements Upcall {
+class UpcallReceiver implements MessageUpcall {
 
     SendPort sport;
 
@@ -211,7 +211,7 @@ class Latency implements PredefinedCapabilities {
                             2 * count);
                     rport = ibis.createReceivePort(t, "test port", receiver);
                     rport.enableConnections();
-                    rport.enableUpcalls();
+                    rport.enableMessageUpcalls();
                     receiver.finish();
                 } else {
                     rport = ibis.createReceivePort(t, "test port");

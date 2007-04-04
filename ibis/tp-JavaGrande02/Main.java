@@ -6,7 +6,7 @@ import java.util.Properties;
 
 import java.io.IOException;
 
-final class Receiver implements Upcall { 
+final class Receiver implements MessageUpcall { 
 
     SendPort sport;
     ReceivePort rport;
@@ -391,7 +391,7 @@ final class Main implements PredefinedCapabilities {
 		    Receiver receiver = new Receiver(null, sport, tests*retries*count, one_way, false);
 		    rport = ibis.createReceivePort(t, "test port", receiver);
 		    rport.enableConnections();
-		    rport.enableUpcalls();
+		    rport.enableMessageUpcalls();
 		    receiver.finish();
 		} else { 
 		    rport = ibis.createReceivePort(t, "test port");

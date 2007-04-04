@@ -131,7 +131,7 @@ class RszHandler implements OpenConfig, RegistryEventHandler {
     }
 }
 
-class LevelRecorder implements ibis.ipl.Upcall {
+class LevelRecorder implements MessageUpcall {
     int level = -1;
 
     public LevelRecorder(){}
@@ -235,7 +235,7 @@ class OpenCell1D implements OpenConfig, PredefinedCapabilities {
      * @param updatePort The type of the port to construct.
      * @param prefix The prefix of the port names.
      */
-    private static ReceivePort createNeighbourReceivePort( CapabilitySet updatePort, String prefix, Upcall up )
+    private static ReceivePort createNeighbourReceivePort( CapabilitySet updatePort, String prefix, MessageUpcall up )
         throws java.io.IOException
     {
         String receiveportname = prefix + "Receive";

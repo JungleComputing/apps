@@ -31,7 +31,7 @@ import ibis.ipl.Registry;
 import ibis.ipl.CapabilitySet;
 import ibis.ipl.IbisIdentifier;
 import ibis.ipl.NoMatchingIbisException;
-import ibis.ipl.Upcall;
+import ibis.ipl.MessageUpcall;
 
 import ibis.util.PoolInfo;
 import ibis.util.Timer;
@@ -429,7 +429,7 @@ public class SOR  implements ibis.ipl.PredefinedCapabilities {
         m.finish();
     }
 
-    private static class Syncer implements Upcall {
+    private static class Syncer implements MessageUpcall {
 
         private boolean arrived = false;
 

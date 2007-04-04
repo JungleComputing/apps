@@ -8,7 +8,7 @@ import ibis.util.Ticket;
 
 import java.io.IOException;
 
-class Sender implements Upcall {
+class Sender implements MessageUpcall {
 
     Ticket t;
 
@@ -106,7 +106,7 @@ class Sender implements Upcall {
     }
 }
 
-class UpcallReceiver implements Upcall {
+class UpcallReceiver implements MessageUpcall {
 
     SendPort sport;
 
@@ -215,7 +215,7 @@ class Latency implements PredefinedCapabilities {
                 Sender sender = new Sender(sport, ibis);
                 rport = ibis.createReceivePort(t, "test port", sender);
                 rport.enableConnections();
-                rport.enableUpcalls();
+                rport.enableMessageUpcalls();
                 sport.connect(remote, "test port");
                 System.out.println("Created sender");
                 sender.send(count);
@@ -228,7 +228,7 @@ class Latency implements PredefinedCapabilities {
                         ibis);
                 rport = ibis.createReceivePort(t, "test port", receiver);
                 rport.enableConnections();
-                rport.enableUpcalls();
+                rport.enableMessageUpcalls();
                 System.out.println("Created receiver");
                 receiver.finish();
             }

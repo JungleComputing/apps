@@ -142,7 +142,7 @@ class ExplicitReceiver {
     }
 }
 
-class UpcallReceiver implements Upcall {
+class UpcallReceiver implements MessageUpcall {
     SendPort sport;
 
     Computer c;
@@ -213,7 +213,7 @@ class UpcallReceiver implements Upcall {
     }
 }
 
-class UpcallSender implements Upcall {
+class UpcallSender implements MessageUpcall {
     SendPort sport;
 
     int count, max;
@@ -443,7 +443,7 @@ class Latency implements PredefinedCapabilities {
                     rport = ibis.createReceivePort(t, "test port", sender);
                     rport.enableConnections();
                     sport.connect(remote, "test port");
-                    rport.enableUpcalls();
+                    rport.enableMessageUpcalls();
                     sender.start();
                     sender.finish();
                 }
@@ -461,7 +461,7 @@ class Latency implements PredefinedCapabilities {
                             earlyFinish, delayedFinish, repeat, c);
                     rport = ibis.createReceivePort(t, "test port", receiver);
                     rport.enableConnections();
-                    rport.enableUpcalls();
+                    rport.enableMessageUpcalls();
                     receiver.finish();
                 } else {
                     rport = ibis.createReceivePort(t, "test port");

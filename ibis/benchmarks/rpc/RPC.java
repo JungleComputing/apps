@@ -14,7 +14,7 @@ import ibis.ipl.ReceivePortIdentifier;
 import ibis.ipl.SendPortIdentifier;
 import ibis.ipl.WriteMessage;
 import ibis.ipl.ReadMessage;
-import ibis.ipl.Upcall;
+import ibis.ipl.MessageUpcall;
 import ibis.ipl.CapabilitySet;
 import ibis.ipl.ReceivePortConnectUpcall;
 import ibis.ipl.SendPortDisconnectUpcall;
@@ -68,7 +68,7 @@ class RszHandler implements RegistryEventHandler {
 
 }
 
-class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
+class RPC implements MessageUpcall, Runnable, ReceivePortConnectUpcall,
         SendPortDisconnectUpcall, ibis.ipl.PredefinedCapabilities {
 
     static final TypedProperties tp = new TypedProperties(System.getProperties());
@@ -720,7 +720,7 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
                         (ReceivePortConnectUpcall) this);
             } else {
                 rport = myIbis.createReceivePort(requestPortType, "server port",
-                        (Upcall) this);
+                        (MessageUpcall) this);
             }
         } else {
             if (connectUpcalls) {
@@ -754,7 +754,7 @@ class RPC implements Upcall, Runnable, ReceivePortConnectUpcall,
         System.err.println("Go ahead now!");
 
         if (upcall) {
-            rport.enableUpcalls();
+            rport.enableMessageUpcalls();
         }
         server();
 

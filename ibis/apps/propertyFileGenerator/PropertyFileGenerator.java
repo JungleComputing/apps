@@ -1,4 +1,4 @@
-import ibis.impl.registry.RegistryProperties;
+import ibis.ipl.impl.registry.RegistryProperties;
 import ibis.ipl.IbisProperties;
 
 import java.io.PrintStream;

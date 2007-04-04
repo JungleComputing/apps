@@ -24,7 +24,7 @@ import ibis.ipl.Registry;
 import ibis.ipl.CapabilitySet;
 import ibis.ipl.IbisIdentifier;
 import ibis.ipl.NoMatchingIbisException;
-import ibis.ipl.Upcall;
+import ibis.ipl.MessageUpcall;
 
 import ibis.util.PoolInfo;
 import ibis.util.Timer;
