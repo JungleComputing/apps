@@ -11,7 +11,7 @@ class Main {
         try {
 
             FileOutputStream f = new FileOutputStream("aap");
-            BufferedArrayOutputStream b = new BufferedArrayOutputStream(f);
+            BufferedArrayOutputStream b = new BufferedArrayOutputStream(f, 4096);
             IbisSerializationOutputStream m = new IbisSerializationOutputStream(
                     b);
 
@@ -21,7 +21,7 @@ class Main {
             m.flush();
 
             FileInputStream fi = new FileInputStream("aap");
-            BufferedArrayInputStream bi = new BufferedArrayInputStream(fi);
+            BufferedArrayInputStream bi = new BufferedArrayInputStream(fi, 4096);
             IbisSerializationInputStream mi = new IbisSerializationInputStream(
                     bi);
 

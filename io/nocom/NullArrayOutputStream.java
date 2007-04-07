@@ -9,6 +9,10 @@ final class NullArrayOutputStream extends DataOutputStream {
 
     long len = 0;
 
+    public int bufferSize() {
+        return -1;
+    }
+
     public final long getAndReset() {
         long temp = len;
         len = 0;

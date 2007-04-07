@@ -218,8 +218,8 @@ public class Main {
                             .println("Running SUN serialization read test of "
                                     + obj.id());
                 } else {
-                    out = new BufferedArrayOutputStream(store_out);
-                    in = new BufferedArrayInputStream(store_in);
+                    out = new BufferedArrayOutputStream(store_out, 4096);
+                    in = new BufferedArrayInputStream(store_in, 4096);
                     mout = new IbisSerializationOutputStream(out);
                     min = new IbisSerializationInputStream(in);
                     System.err
@@ -342,7 +342,7 @@ public class Main {
                             .println("Running Sun serialization write test of "
                                     + obj.id());
                 } else {
-                    out = new BufferedArrayOutputStream(os);
+                    out = new BufferedArrayOutputStream(os, 4096);
                     System.err
                             .println("Running Ibis serialization write test of "
                                     + obj.id() + " with conversion");

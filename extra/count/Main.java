@@ -11,7 +11,7 @@ class Main {
         try {
 
             CountingOutputStream c = new CountingOutputStream(null);
-            BufferedArrayOutputStream b = new BufferedArrayOutputStream(c);
+            BufferedArrayOutputStream b = new BufferedArrayOutputStream(c, 4096);
             IbisSerializationOutputStream m = new IbisSerializationOutputStream(
                     b);
 

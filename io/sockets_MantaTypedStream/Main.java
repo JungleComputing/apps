@@ -47,9 +47,9 @@ public class Main {
                 s.setTcpNoDelay(true);
 
                 BufferedArrayInputStream in = new BufferedArrayInputStream(s
-                        .getInputStream());
+                        .getInputStream(), 4096);
                 BufferedArrayOutputStream out = new BufferedArrayOutputStream(s
-                        .getOutputStream());
+                        .getOutputStream(), 4096);
 
                 IbisSerializationInputStream min = new IbisSerializationInputStream(
                         in);
@@ -197,9 +197,9 @@ public class Main {
                 s.setTcpNoDelay(true);
 
                 BufferedArrayInputStream in = new BufferedArrayInputStream(s
-                        .getInputStream());
+                        .getInputStream(), 4096);
                 BufferedArrayOutputStream out = new BufferedArrayOutputStream(s
-                        .getOutputStream());
+                        .getOutputStream(), 4096);
 
                 IbisSerializationInputStream min = new IbisSerializationInputStream(
                         in);

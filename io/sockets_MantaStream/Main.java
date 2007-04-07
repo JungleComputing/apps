@@ -45,11 +45,11 @@ public class Main {
                 InputStream in = s.getInputStream();
                 OutputStream out = s.getOutputStream();
 
-                BufferedArrayInputStream bin = new BufferedArrayInputStream(in);
+                BufferedArrayInputStream bin = new BufferedArrayInputStream(in, 4096);
                 IbisSerializationInputStream min = new IbisSerializationInputStream(
                         bin);
                 BufferedArrayOutputStream bout = new BufferedArrayOutputStream(
-                        out);
+                        out, 4096);
                 IbisSerializationOutputStream mout = new IbisSerializationOutputStream(
                         bout);
 
@@ -140,11 +140,11 @@ public class Main {
                 InputStream in = s.getInputStream();
                 OutputStream out = s.getOutputStream();
 
-                BufferedArrayInputStream bin = new BufferedArrayInputStream(in);
+                BufferedArrayInputStream bin = new BufferedArrayInputStream(in, 4096);
                 IbisSerializationInputStream min = new IbisSerializationInputStream(
                         bin);
                 BufferedArrayOutputStream bout = new BufferedArrayOutputStream(
-                        out);
+                        out, 4096);
                 IbisSerializationOutputStream mout = new IbisSerializationOutputStream(
                         bout);
 

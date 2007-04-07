@@ -10,6 +10,10 @@ final class StoreArrayOutputStream extends DataOutputStream {
 
     StoreBuffer buf;
 
+    public int bufferSize() {
+        return -1;
+    }
+
     public StoreArrayOutputStream(StoreBuffer buf) {
         this.buf = buf;
     }
