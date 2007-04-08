@@ -3,10 +3,13 @@
     default="build"
     basedir=".">
 
-    <description>
-	IO tests build.
-    </description>
+    <property name="srcdir" value="./src"/>
+    <property name="build" location="build"/>
+    <property name="distdir" value="./lib"/>
 
-    <import file="../build-apps.xml"/>
+    <property environment="env"/>
 
+    <property name="ibis"        location="${env.IBIS_HOME}"/>
+
+    <import file="${ibis}/build-files/apps/build-ibis-app.xml"/>
 </project>
