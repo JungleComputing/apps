@@ -3,10 +3,10 @@ package file;
 /* $Id$ */
 
 
-import ibis.io.BufferedArrayInputStream;
-import ibis.io.BufferedArrayOutputStream;
-import ibis.io.IbisSerializationInputStream;
-import ibis.io.IbisSerializationOutputStream;
+import ibis.util.io.BufferedArrayInputStream;
+import ibis.util.io.BufferedArrayOutputStream;
+import ibis.util.io.IbisSerializationInputStream;
+import ibis.util.io.IbisSerializationOutputStream;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
