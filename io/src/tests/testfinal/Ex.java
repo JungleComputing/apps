@@ -2,8 +2,8 @@ package tests.testfinal;
 
 /* $Id: Ex.java 2844 2004-11-24 10:52:27Z ceriel $ */
 
-import ibis.io.IbisSerializationInputStream;
-import ibis.io.IbisSerializationOutputStream;
+import ibis.util.io.IbisSerializationInputStream;
+import ibis.util.io.IbisSerializationOutputStream;
 
 /**
  * A difficult case for Ibis serialization. Testing, testing ...

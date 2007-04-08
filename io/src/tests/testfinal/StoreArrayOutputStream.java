@@ -3,7 +3,7 @@ package tests.testfinal;
 /* $Id: StoreArrayOutputStream.java 5349 2007-04-07 13:59:32Z ceriel $ */
 
 
-import ibis.io.DataOutputStream;
+import ibis.util.io.DataOutputStream;
 
 import java.io.IOException;
 

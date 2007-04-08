@@ -3,7 +3,7 @@ package tests.conversion;
 /* $Id$ */
 
 
-import ibis.io.Conversion;
+import ibis.util.io.Conversion;
 
 import java.util.Random;
 
@@ -340,16 +340,16 @@ public final class Main {
 
         System.out.println("Testing available conversions one-by-one");
 
-        String[] conversions = { "ibis.io.SimpleLittleConversion",
-                "ibis.io.SimpleBigConversion",
-                "ibis.io.nio.NioWrapLittleConversion",
-                "ibis.io.nio.NioWrapBigConversion",
-                "ibis.io.nio.NioChunkLittleConversion",
-                "ibis.io.nio.NioChunkBigConversion",
-                "ibis.io.nio.HybridWrapLittleConversion",
-                "ibis.io.nio.HybridWrapBigConversion",
-                "ibis.io.nio.HybridChunkLittleConversion",
-                "ibis.io.nio.HybridChunkBigConversion" };
+        String[] conversions = { "ibis.util.io.SimpleLittleConversion",
+                "ibis.util.io.SimpleBigConversion",
+                "ibis.util.io.nio.NioWrapLittleConversion",
+                "ibis.util.io.nio.NioWrapBigConversion",
+                "ibis.util.io.nio.NioChunkLittleConversion",
+                "ibis.util.io.nio.NioChunkBigConversion",
+                "ibis.util.io.nio.HybridWrapLittleConversion",
+                "ibis.util.io.nio.HybridWrapBigConversion",
+                "ibis.util.io.nio.HybridChunkLittleConversion",
+                "ibis.util.io.nio.HybridChunkBigConversion" };
 
         for (int i = 0; i < conversions.length; i++) {
 
