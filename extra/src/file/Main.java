@@ -1,8 +1,15 @@
+package file;
+
 /* $Id$ */
 
 
-import ibis.io.*;
-import java.io.*;
+import ibis.io.BufferedArrayInputStream;
+import ibis.io.BufferedArrayOutputStream;
+import ibis.io.IbisSerializationInputStream;
+import ibis.io.IbisSerializationOutputStream;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 
 class Main {
 

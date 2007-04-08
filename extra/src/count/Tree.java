@@ -1,9 +1,16 @@
+package count;
+
 /* $Id$ */
 
 
 import java.io.Serializable;
 
 public final class Tree implements Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     public Tree(int j) {
         int k = j / 2;
         if (k > 0)

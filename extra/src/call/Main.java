@@ -1,7 +1,8 @@
+package call;
+
 /* $Id$ */
 
 
-import java.io.*;
 
 class Main {
 

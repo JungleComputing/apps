@@ -1,3 +1,5 @@
+package file;
+
 /* $Id$ */
 
 // Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
@@ -6,27 +8,26 @@
 // Source File Name:   Tree.java
 
 import java.io.Serializable;
-import java.util.*;
 
 public final class Tree implements Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    public static int count = 0;
 
     public Tree(int j) {
+        i = count++;
+        i1 = i;
+        i2 = i;
+        i3 = i;
+
         int k = j / 2;
         if (k > 0)
             left = new Tree(k);
         if (j - k - 1 > 0)
             right = new Tree(j - k - 1);
-    }
-
-    public final void generated_WriteObject(HashSet<Tree> h)
-            throws java.io.IOException {
-        if (! h.contains(this)) {
-            h.add(this);
-            if (right != null)
-                right.generated_WriteObject(h);
-            if (left != null)
-                left.generated_WriteObject(h);
-        }
     }
 
     public static final int PAYLOAD = 16;

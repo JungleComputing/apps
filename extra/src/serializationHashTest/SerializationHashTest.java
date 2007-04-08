@@ -1,3 +1,5 @@
+package serializationHashTest;
+
 /* $Id$ */
 
 import ibis.io.HandleHash;
@@ -9,6 +11,10 @@ import java.util.Random;
  * Created on Aug 11, 2005 by rob
  */
 class D implements Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     double d;
 }
 

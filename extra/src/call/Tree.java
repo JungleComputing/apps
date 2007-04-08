@@ -1,3 +1,5 @@
+package call;
+
 /* $Id$ */
 
 // Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
@@ -8,6 +10,11 @@
 import java.io.Serializable;
 
 public final class Tree implements Serializable {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
 
     public Tree(int j) {
         int k = j / 2;

@@ -1,3 +1,5 @@
+package convert;
+
 /* $Id$ */
 
 class Bench {

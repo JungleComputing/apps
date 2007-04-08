@@ -1,3 +1,5 @@
+package convert;
+
 /* $Id$ */
 
 class Conversion {
@@ -41,48 +43,6 @@ class Conversion {
     static final int BYTE2FLOAT_THRESHOLD = 25;
 
     static final int BYTE2DOUBLE_THRESHOLD = 13;
-
-    private static final native void n_boolean2byte(boolean[] src, int off,
-            int len, byte[] dst, int off2);
-
-    private static final native void n_char2byte(char[] src, int off, int len,
-            byte[] dst, int off2);
-
-    private static final native void n_short2byte(short[] src, int off,
-            int len, byte[] dst, int off2);
-
-    private static final native void n_int2byte(int[] src, int off, int len,
-            byte[] dst, int off2);
-
-    private static final native void n_long2byte(long[] src, int off, int len,
-            byte[] dst, int off2);
-
-    private static final native void n_float2byte(float[] src, int off,
-            int len, byte[] dst, int off2);
-
-    private static final native void n_double2byte(double[] src, int off,
-            int len, byte[] dst, int off2);
-
-    private static final native void n_byte2boolean(byte[] src, int off2,
-            boolean[] dst, int off, int len);
-
-    private static final native void n_byte2short(byte[] src, int off2,
-            short[] dst, int off, int len);
-
-    private static final native void n_byte2char(byte[] src, int off2,
-            char[] dst, int off, int len);
-
-    private static final native void n_byte2int(byte[] src, int off2,
-            int[] dst, int off, int len);
-
-    private static final native void n_byte2long(byte[] src, int off2,
-            long[] dst, int off, int len);
-
-    private static final native void n_byte2float(byte[] src, int off2,
-            float[] dst, int off, int len);
-
-    private static final native void n_byte2double(byte[] src, int off2,
-            double[] dst, int off, int len);
 
     public static final void boolean2byte(boolean[] src, int off, int len,
             byte[] dst, int off2) {
@@ -393,7 +353,6 @@ class Conversion {
 
         //		if (len < BYTE2DOUBLE_THRESHOLD) {
 
-        long temp = 0;
         int count = index_src;
 
         for (int i = 0; i < len; i++) {

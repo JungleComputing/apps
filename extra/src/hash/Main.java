@@ -1,9 +1,9 @@
+package hash;
+
 /* $Id$ */
 
 
-import ibis.io.*;
-import java.io.*;
-import java.util.*;
+import java.util.HashSet;
 
 class Main {
 
@@ -28,10 +28,6 @@ class Main {
                 long end = System.currentTimeMillis();
 
                 long time = end - start;
-                double per = ((double) time) / count;
-
-                //System.out.println("Single tree traversed in " + per + " ms.");
-
                 double maxtp = (((j * 40) * count) / (1024.0 * 1024.0))
                         / (time / 1000.0);
 

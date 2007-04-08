@@ -1,3 +1,5 @@
+package copy;
+
 /* $Id$ */
 
 public class Main {

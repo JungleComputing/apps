@@ -1,8 +1,12 @@
+package count;
+
 /* $Id$ */
 
 
-import ibis.io.*;
-import java.io.*;
+import ibis.io.BufferedArrayOutputStream;
+import ibis.io.IbisSerializationOutputStream;
+
+import java.io.ObjectOutputStream;
 
 class Main {
 
