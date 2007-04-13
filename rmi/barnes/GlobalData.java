@@ -1,6 +1,6 @@
 /* $Id$ */
 
-import ibis.util.GetLogger;
+import ibis.util.Log;
 
 import java.io.Serializable;
 
@@ -8,7 +8,12 @@ import org.apache.log4j.Logger;
 
 strictfp public class GlobalData implements Cloneable, Serializable {
 
-    static Logger logger = GetLogger.getLogger(GlobalData.class.getName());
+    static Logger logger;
+    
+    static {
+        Log.initLog4J("");
+        logger = Logger.getLogger(GlobalData.class.getName());
+    }
 
     public Body gdBodies[];
 

@@ -2,7 +2,7 @@
 
 
 import ibis.gmi.GroupMember;
-import ibis.util.GetLogger;
+import ibis.util.Log;
 
 import org.apache.log4j.Logger;
 
@@ -12,7 +12,12 @@ class Test extends GroupMember implements myGroup {
 
     Object data;
 
-    static Logger logger = GetLogger.getLogger(Test.class.getName());
+    static Logger logger;
+    
+    static {
+        Log.initLog4J("");
+        logger = Logger.getLogger(Test.class.getName());
+    }
 
     Test() {
         logger.debug(getRank() + ": Test()");
