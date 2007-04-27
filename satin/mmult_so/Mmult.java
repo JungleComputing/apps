@@ -32,11 +32,11 @@ final class Mmult extends ibis.satin.SatinObject implements MmultInterface,
         if (task == 0) {
             // switch to serial recursive part
             // pass instance variables
-            System.out.println("C = " + c);
-            System.out.println("A = " + a);
-            System.out.println("a.m = " + a.m);
-            System.out.println("B = " + b);
-            System.out.println("b.m = " + b.m);
+            // System.out.println("C = " + c);
+            // System.out.println("A = " + a);
+            // System.out.println("a.m = " + a.m);
+            // System.out.println("B = " + b);
+            // System.out.println("b.m = " + b.m);
             c.recMatMul(rec, a.m.getSubMatrix(aPos), b.m.getSubMatrix(bPos));
             return c;
         }
