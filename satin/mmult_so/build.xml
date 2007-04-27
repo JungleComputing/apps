@@ -8,7 +8,7 @@
     <property name="ibis"        location="${env.IBIS_HOME}"/>
     <property name="build"       value="build"/>
 
-    <property name="satinc-flags" value=""/>
+    <property name="satinc-flags" value="-keep"/>
     <property name="satin-classes" value="Mmult,SharedMatrix"/>
 
     <property name="test-par-java-args" value="-Dsatin.closed"/>
