@@ -19,11 +19,11 @@ import ibis.util.TypedProperties;
 public class RMI_init {
 
     static final TypedProperties tp = new TypedProperties(System.getProperties());
-    private final static boolean VERBOSE = tp.booleanProperty(
+    private final static boolean VERBOSE = tp.getBooleanProperty(
             "RMI_init.verbose", false);
 
     private final static boolean USE_IP_MAP_FACTORY = tp
-            .booleanProperty("RMI_init.factory", true);
+            .getBooleanProperty("RMI_init.factory", true);
 
     private final static String FACTORY = tp.getProperty(
             "RMI_init.factory.name", "IPMapSocketFactory");

@@ -8,13 +8,13 @@ import ibis.util.TypedProperties;
 public final class Othello extends ibis.satin.SatinObject implements OthelloInterface {
 
     static final TypedProperties tp = new TypedProperties(System.getProperties());
-    static final boolean BEST_FIRST = tp.booleanProperty(
+    static final boolean BEST_FIRST = tp.getBooleanProperty(
         "othello.bestfirst", true);
 
-    static final boolean DO_ABORT = tp.booleanProperty(
+    static final boolean DO_ABORT = tp.getBooleanProperty(
         "othello.aborts", true);
 
-    static final boolean SUPPORT_TT = tp.booleanProperty(
+    static final boolean SUPPORT_TT = tp.getBooleanProperty(
         "othello.tt", true);
 
     static final int REPLICATED_DEPTH = tp.getIntProperty(
