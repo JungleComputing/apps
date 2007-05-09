@@ -1,7 +1,8 @@
 /* $Id$ */
 
 
-import ibis.util.PoolInfo;
+import ibis.server.poolInfo.PoolInfo;
+
 
 final class Main {
 
@@ -80,7 +81,7 @@ final class Main {
 
         try {
             boolean array = false, tree = false, list = false, dlist = false, oarray = false, one_way = true;
-            PoolInfo info = PoolInfo.createPoolInfo();
+            PoolInfo info = new PoolInfo(null, true);
             int i = 0;
             int len = 1023;
             int arraysize = 16 * 1024;

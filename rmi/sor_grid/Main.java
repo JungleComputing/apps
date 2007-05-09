@@ -13,8 +13,11 @@
 
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.registry.Registry;
+import java.util.Properties;
 
-import ibis.util.PoolInfo;
+import ibis.server.poolInfo.PoolInfo;
+import ibis.server.poolInfo.PoolInfoProperties;
+
 
 class Main {
 
@@ -48,7 +51,7 @@ class Main {
     public static void main(String[] args) {
 
         try {
-            PoolInfo info = PoolInfo.createPoolInfo();
+            PoolInfo info = new PoolInfo(null, true);
 
             SOR local = null;
             i_SOR[] table = null;
@@ -167,7 +170,9 @@ class Main {
             double[] nodeSpeed = null; /* Speed of node[i] */
             double speed = 1.0;
             if (hetero_speed) {
-                PoolInfo seqInfo = PoolInfo.createPoolInfo(true);
+	    	Properties properties = new Properties();
+		properties.setProperty(PoolInfoProperties.POOL_SIZE, "1");
+                PoolInfo seqInfo = new PoolInfo(properties, true);
                 GlobalData seqGlobal = new GlobalData(seqInfo);
                 local = new SOR(1024, 1024, nit, sync, seqGlobal, null,
                         seqInfo, reduceFactor);

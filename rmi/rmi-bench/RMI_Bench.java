@@ -1,6 +1,7 @@
 /* $Id$ */
 
-import ibis.util.PoolInfo;
+import ibis.server.poolInfo.PoolInfo;
+
 
 // import java.rmi.server.RMISocketFactory;
 // import FastSocket.RMI_FSSocketFactory;
@@ -20,7 +21,7 @@ class RMI_Bench {
     public static void main(String[] argv) {
 	PoolInfo dasInfo = null;
 	try {
-	    dasInfo = PoolInfo.createPoolInfo();
+	    dasInfo = new PoolInfo(null, true);
 	} catch(Exception e) {
 	    System.err.println("Oops: " + e);
 	    e.printStackTrace();

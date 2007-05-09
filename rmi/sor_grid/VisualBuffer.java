@@ -4,7 +4,8 @@
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-import ibis.util.PoolInfo;
+import ibis.server.poolInfo.PoolInfo;
+
 
 /**
  * Data buffer class for visualisation tool

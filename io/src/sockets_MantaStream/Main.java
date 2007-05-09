@@ -3,11 +3,12 @@ package sockets_MantaStream;
 /* $Id$ */
 
 
+import ibis.server.poolInfo.PoolInfo;
 import ibis.util.io.BufferedArrayInputStream;
 import ibis.util.io.BufferedArrayOutputStream;
 import ibis.util.io.IbisSerializationInputStream;
 import ibis.util.io.IbisSerializationOutputStream;
-import ibis.util.PoolInfo;
+
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,7 +30,7 @@ public class Main {
 
             int count3 = 10;
 
-            PoolInfo info = PoolInfo.createPoolInfo();
+            PoolInfo info = new PoolInfo(null, true);
 
             if (info.rank() == 0) {
 

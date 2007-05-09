@@ -6,7 +6,8 @@ import java.rmi.registry.*;
 import java.rmi.server.*;
 import java.util.Random;
 
-import ibis.util.PoolInfo;
+import ibis.server.poolInfo.PoolInfo;
+
 import ibis.util.Timer;
 
 final class TranspositionTable extends UnicastRemoteObject implements
@@ -65,7 +66,13 @@ final class TranspositionTable extends UnicastRemoteObject implements
         Random random = new Random();
         Registry r = null;
 
-        PoolInfo info = PoolInfo.createPoolInfo();
+	PoolInfo info = null;
+	try {
+        	info = new PoolInfo(null, true);
+	} catch (Exception e) {
+		System.err.println("could not create pool info " + e);
+		System.exit(1);
+	}
         rank = info.rank();
         poolSize = info.size();
 

@@ -5,7 +5,8 @@ import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
-import ibis.util.PoolInfo;
+import ibis.server.poolInfo.PoolInfo;
+
 
 public class Water {
 
@@ -60,7 +61,7 @@ public class Water {
         PoolInfo info = null;
 
         try {
-            info = PoolInfo.createPoolInfo();
+            info = new PoolInfo(null, true);
         } catch (Exception e) {
             System.err.println("Oops: " + e);
             e.printStackTrace();

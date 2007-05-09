@@ -3,7 +3,8 @@
 
 import java.rmi.registry.Registry;
 import java.util.Date;
-import ibis.util.PoolInfo;
+import ibis.server.poolInfo.PoolInfo;
+
 
 class Server {
 
@@ -105,7 +106,7 @@ class Server {
             System.out.println("Minimum route = " + minimum.get());
             System.out.println("Calculation Time = " + (end - begin)
                     + " ms; Parallel time " + (end - started) + " ms");
-            info.printTime("TSP-RMI", end - begin);
+            System.out.println("TSP-RMI took " +  ((end - begin) / 1000.0) + " seconds");
 
         } catch (Exception e) {
             System.out.println("ERROR: " + e.getMessage());
@@ -127,7 +128,7 @@ class Server {
     public static void main(String argv[]) {
 
         try {
-            PoolInfo info = PoolInfo.createPoolInfo();
+            PoolInfo info = new PoolInfo(null, true);
             int cpu = info.rank();
 
             System.out.println("I am " + info.hostName(cpu));

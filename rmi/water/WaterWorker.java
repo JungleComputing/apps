@@ -3,7 +3,8 @@
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import ibis.util.PoolInfo;
+import ibis.server.poolInfo.PoolInfo;
+
 
 public class WaterWorker extends UnicastRemoteObject implements
         WaterWorkerInterface, ConstInterface {
@@ -393,7 +394,7 @@ public class WaterWorker extends UnicastRemoteObject implements
         }
         end = System.currentTimeMillis();
         if (info.rank() == 0) {
-            info.printTime("Water_" + nmol, end - start);
+            System.out.println("Water_" + nmol + " took " +  ((end - start) / 1000.0) + " seconds");
         }
         if (id == 0) {
             System.out.println("Water " + (end - start) + " ms");

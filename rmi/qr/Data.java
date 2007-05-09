@@ -7,7 +7,8 @@ import java.rmi.server.UnicastRemoteObject;
 
 import java.io.IOException;
 
-import ibis.util.PoolInfo;
+import ibis.server.poolInfo.PoolInfo;
+
 
 class Data extends UnicastRemoteObject implements i_Data {
 

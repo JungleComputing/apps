@@ -6,7 +6,8 @@ import java.rmi.RemoteException;
 import java.io.DataOutputStream;
 import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
-import ibis.util.PoolInfo;
+import ibis.server.poolInfo.PoolInfo;
+
 
 public class Radix {
 
@@ -38,8 +39,8 @@ public class Radix {
 
     String output_file = null;
 
-    Radix() {
-        d = PoolInfo.createPoolInfo();
+    Radix() throws Exception {
+        d = new PoolInfo(null, true);
         nhosts = d.size();
         host = d.rank();
         hostname = d.hostName(host);

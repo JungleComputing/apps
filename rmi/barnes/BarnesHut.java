@@ -1,6 +1,6 @@
 /* $Id$ */
 
-import ibis.util.PoolInfo;
+import ibis.server.poolInfo.PoolInfo;
 
 strictfp public class BarnesHut {
 
@@ -165,7 +165,7 @@ strictfp public class BarnesHut {
         PoolInfo d = null;
 
         try {
-            d = PoolInfo.createPoolInfo();
+            d = new PoolInfo(null, true);
         } catch (Exception e) {
             System.err.println("Oops: " + e);
             e.printStackTrace();

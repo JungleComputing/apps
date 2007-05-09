@@ -1,14 +1,14 @@
 /* $Id$ */
 
 
-import ibis.util.PoolInfo;
+import ibis.server.poolInfo.PoolInfo;
 
 class Main {
 
     public static void main(String[] args) {
 
         try {
-            PoolInfo info = PoolInfo.createPoolInfo();
+            PoolInfo info = new PoolInfo(null, true);
 
             System.out.println("Starting process " + info.rank() + " on "
                     + info.hostName());

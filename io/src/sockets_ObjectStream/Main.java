@@ -3,7 +3,7 @@ package sockets_ObjectStream;
 /* $Id$ */
 
 
-import ibis.util.PoolInfo;
+import ibis.server.poolInfo.PoolInfo;
 
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -27,8 +27,8 @@ public class Main {
 
             int count3 = 10;
 
-            PoolInfo info = PoolInfo.createPoolInfo();
-
+            PoolInfo info = new PoolInfo(null, true);
+            
             if (info.rank() == 0) {
 
                 System.err.println("Main starting");

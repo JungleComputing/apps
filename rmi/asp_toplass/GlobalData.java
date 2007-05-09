@@ -1,7 +1,8 @@
 /* $Id$ */
 
 
-import ibis.util.PoolInfo;
+import ibis.server.poolInfo.PoolInfo;
+
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;

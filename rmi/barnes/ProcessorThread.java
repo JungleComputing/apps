@@ -1,6 +1,6 @@
 /* $Id$ */
 
-import ibis.util.PoolInfo;
+import ibis.server.poolInfo.PoolInfo;
 
 public class ProcessorThread extends Thread {
 

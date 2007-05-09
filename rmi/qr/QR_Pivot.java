@@ -3,7 +3,8 @@
 
 import java.util.Random;
 
-import ibis.util.PoolInfo;
+import ibis.server.poolInfo.PoolInfo;
+
 
 class QR_Pivot {
 

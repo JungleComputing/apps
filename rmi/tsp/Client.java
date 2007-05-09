@@ -2,7 +2,8 @@
 
 
 import java.rmi.RemoteException;
-import ibis.util.PoolInfo;
+import ibis.server.poolInfo.PoolInfo;
+
 
 class Client extends Thread {
     DistanceTable distanceTable;

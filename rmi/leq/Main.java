@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import java.rmi.registry.Registry;
 
-import ibis.util.PoolInfo;
+import ibis.server.poolInfo.PoolInfo;
 
 class Main {
 
@@ -46,7 +46,7 @@ class Main {
 
             offset = n;
 
-            PoolInfo info = PoolInfo.createPoolInfo();
+            PoolInfo info = new PoolInfo(null, true);
             int cpus = info.size();
             int cpu = info.rank();
 

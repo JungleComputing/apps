@@ -5,7 +5,8 @@ import java.util.Random;
 import java.io.*;
 import java.net.*;
 
-import ibis.util.PoolInfo;
+import ibis.server.poolInfo.PoolInfo;
+
 import ibis.util.Timer;
 
 final class TranspositionTable {
@@ -58,7 +59,7 @@ final class TranspositionTable {
 
     Timer bcastHandlerTimer = Timer.createTimer();
 
-    PoolInfo info = PoolInfo.createPoolInfo();
+    PoolInfo info;
 
     int rank = info.rank();
 
@@ -72,6 +73,8 @@ final class TranspositionTable {
         //		System.err.println("hosts = " + poolSize + ", rank = " + rank);
 
         try {
+    	    info = new PoolInfo(null, true);
+
             ServerSocket serv = new ServerSocket(5555);
             Socket[] sockets = new Socket[poolSize];
 

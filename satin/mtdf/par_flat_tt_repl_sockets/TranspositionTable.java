@@ -5,7 +5,8 @@ import java.util.Random;
 import java.io.*;
 import java.net.*;
 
-import ibis.util.PoolInfo;
+import ibis.server.poolInfo.PoolInfo;
+
 import ibis.util.Timer;
 
 final class TranspositionTable {
@@ -70,7 +71,7 @@ final class TranspositionTable {
         Random random = new Random();
 
         try {
-            info = PoolInfo.createPoolInfo();
+            info = new PoolInfo(null, true);
         } catch (Exception e) {
             System.err.println("Error creating pool info: " + e);
             System.exit(1);

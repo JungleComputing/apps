@@ -8,7 +8,7 @@ import ibis.util.io.DataInputStream;
 import ibis.util.io.DataOutputStream;
 import ibis.util.io.IbisSerializationInputStream;
 import ibis.util.io.IbisSerializationOutputStream;
-import ibis.util.PoolInfo;
+import ibis.server.poolInfo.PoolInfo;
 
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -523,7 +523,7 @@ public class Main {
     public static void main(String args[]) {
 
 	try {								
-	    PoolInfo info = PoolInfo.createPoolInfo();
+	    PoolInfo info = new PoolInfo(null, true);
 
 	    if (info.rank() == 0) {
 

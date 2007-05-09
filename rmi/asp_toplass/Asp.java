@@ -9,7 +9,8 @@
  *
  */
 
-import ibis.util.PoolInfo;
+import ibis.server.poolInfo.PoolInfo;
+
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -42,7 +43,7 @@ class Asp extends UnicastRemoteObject implements i_Asp {
         this.n = n;
 
         try {
-            this.info = PoolInfo.createPoolInfo();
+            PoolInfo info = new PoolInfo(null, true);
         } catch (Exception e) {
             throw new Error("Problem in PoolInfo", e);
         }
@@ -285,7 +286,8 @@ class Asp extends UnicastRemoteObject implements i_Asp {
 
             if (print_result)
                 print_table();
-            info.printTime("Asp, " + n + "x" + n, end - start);
+            System.out.println("Application: " + "Asp, " + n + "x" + n + "; Ncpus: " + info.size()
+                    + "; time: " + ((end-start) / 1000.0) + " seconds\n");
         }
     }
 

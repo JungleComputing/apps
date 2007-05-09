@@ -1,8 +1,8 @@
 /* $Id$ */
 
 
-import ibis.util.PoolInfo;
 import java.rmi.registry.Registry;
+import ibis.server.poolInfo.PoolInfo;
 
 class ACP {
 
@@ -271,7 +271,7 @@ class ACP {
     public static void main(String args[]) {
 
         try {
-            PoolInfo info = PoolInfo.createPoolInfo();
+            PoolInfo info = new PoolInfo(null, true);
             int numVariables;
             int numValues;
             int numConnections;

@@ -2,13 +2,14 @@ package more.tree.testfinal;
 
 /* $Id: Main.java 5349 2007-04-07 13:59:32Z ceriel $ */
 
+import ibis.server.poolInfo.PoolInfo;
 import ibis.util.io.BufferedArrayInputStream;
 import ibis.util.io.BufferedArrayOutputStream;
 import ibis.util.io.DataInputStream;
 import ibis.util.io.DataOutputStream;
 import ibis.util.io.IbisSerializationInputStream;
 import ibis.util.io.IbisSerializationOutputStream;
-import ibis.util.PoolInfo;
+
 
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -31,7 +32,7 @@ public class Main {
 	    int count = COUNT;
 	    int len = LEN;
 
-	    PoolInfo info = PoolInfo.createPoolInfo();
+            PoolInfo info = new PoolInfo(null, true);
 
 	    if (info.rank() == 0) {
 

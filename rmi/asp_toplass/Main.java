@@ -1,7 +1,7 @@
 /* $Id$ */
 
 
-import ibis.util.PoolInfo;
+import ibis.server.poolInfo.PoolInfo;
 
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.registry.Registry;
@@ -10,7 +10,7 @@ class Main {
 
     public static void main(String[] argv) {
         try {
-            PoolInfo info = PoolInfo.createPoolInfo();
+            PoolInfo info = new PoolInfo(null, true);
 
             int n = 4000;
 

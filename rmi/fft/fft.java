@@ -10,7 +10,7 @@
 import java.rmi.registry.Registry;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import ibis.util.PoolInfo;
+import ibis.server.poolInfo.PoolInfo;
 
 class fft {
 
@@ -32,7 +32,7 @@ class fft {
         int rounds = 1;
         PoolInfo d = null;
         try {
-            d = PoolInfo.createPoolInfo();
+            d = new PoolInfo(null, true);
         } catch (Exception e) {
             System.err.println("Oops: " + e);
             e.printStackTrace();

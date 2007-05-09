@@ -3,7 +3,8 @@
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import ibis.util.PoolInfo;
+import ibis.server.poolInfo.PoolInfo;
+
 
 public class RadixMaster extends UnicastRemoteObject implements
         RadixMasterInterface, Runnable {
@@ -263,7 +264,7 @@ public class RadixMaster extends UnicastRemoteObject implements
                 + minSort + "\t\t  " + minMerge + "\t\t  " + minPermute);
         System.out.println("Max\t" + maxt + "\t  " + maxHistogram + "\t\t  "
                 + maxSort + "\t\t  " + maxMerge + "\t\t  " + maxPermute);
-        d.printTime("Radix, #keys = " + num_Keys, (mint + maxt) / 2);
+        System.out.println("Radix, #keys = " + num_Keys + (( (mint + maxt) / 2) / 1000.0) + "seconds");
     }
 
     void print(int[] data) {
