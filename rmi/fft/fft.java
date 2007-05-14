@@ -41,7 +41,7 @@ class fft {
 
         host = d.rank();
         cpus = d.size();
-        masterName = d.hostName(0);
+        masterName = d.getIPAddress(0);
         int options = 0;
         M = 16;
         for (int i = 0; i < argv.length; i++) {

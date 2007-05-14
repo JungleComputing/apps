@@ -78,9 +78,9 @@ public class Water {
         }
         hostNr = info.rank();
         nHosts = info.size();
-        hostName = info.hostName(hostNr);
+        hostName = info.getIPAddress(hostNr);
         startRMI();
-        masterName = info.hostName(0);
+        masterName = info.getIPAddress(0);
         if (hostNr == 0)
             createMaster();
 

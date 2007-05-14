@@ -63,9 +63,9 @@ class Client extends Thread {
 
     public void run() {
         try {
-            this.jobQueue = (JobQueue) RMI_init.lookup("//" + info.hostName(0)
+            this.jobQueue = (JobQueue) RMI_init.lookup("//" + info.getIPAddress(0)
                     + "/JobQueue");
-            this.minimum = (Minimum) RMI_init.lookup("//" + info.hostName(0)
+            this.minimum = (Minimum) RMI_init.lookup("//" + info.getIPAddress(0)
                     + "/Minimum");
         } catch (java.io.IOException e) {
             System.err.println("Lookup fails " + e);

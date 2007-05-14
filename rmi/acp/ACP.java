@@ -286,7 +286,7 @@ class ACP {
             int cpus = info.size();
             int cpu = info.rank();
 
-            Registry reg = RMI_init.getRegistry(info.hostName(cpu));
+            Registry reg = RMI_init.getRegistry(info.getIPAddress(cpu));
 
             if (args.length != 1) {
                 System.out.println("Usage : ACP <inputfile>");
@@ -326,10 +326,10 @@ class ACP {
                 RMI_init.bind("Work", w);
             }
 
-            matrix = (i_Matrix) RMI_init.lookup("//" + info.hostName(0)
+            matrix = (i_Matrix) RMI_init.lookup("//" + info.getIPAddress(0)
                     + "/Matrix");
-            data = (i_Data) RMI_init.lookup("//" + info.hostName(0) + "/Data");
-            work = (i_Work) RMI_init.lookup("//" + info.hostName(0) + "/Work");
+            data = (i_Data) RMI_init.lookup("//" + info.getIPAddress(0) + "/Data");
+            work = (i_Work) RMI_init.lookup("//" + info.getIPAddress(0) + "/Work");
 
             new ACP(info.rank(), numVariables, numValues, numConnections,
                     numRelations, numRelationPairs, seed, data, work, matrix)

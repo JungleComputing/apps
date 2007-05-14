@@ -183,7 +183,7 @@ strictfp public class BarnesHut {
 
         //    System.out.println("Initialized!" );
 
-        doProcInfo(d.rank(), d.size(), d.hostName(0));
+        doProcInfo(d.rank(), d.size(), d.getIPAddress(0));
 
         p = new ProcessorThread(bhGd, d, g);
 

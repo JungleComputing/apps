@@ -56,13 +56,13 @@ class Main {
             }
 
             // Start the registry.    
-            reg = RMI_init.getRegistry(info.hostName(0));
+            reg = RMI_init.getRegistry(info.getIPAddress(0));
 
             if (info.rank() == 0) {
                 global = new GlobalData(info);
                 RMI_init.bind("GlobalData", global);
             } else {
-                global = (i_GlobalData) RMI_init.lookup("//" + info.hostName(0)
+                global = (i_GlobalData) RMI_init.lookup("//" + info.getIPAddress(0)
                         + "/GlobalData");
             }
 

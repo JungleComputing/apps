@@ -29,7 +29,7 @@ class RMI_Bench {
 	}
 	int	my_cpu = dasInfo.rank();
 	int	ncpus  = dasInfo.size();
-	String	masterName = dasInfo.hostName(REGISTRY_HOST);
+	String	masterName = dasInfo.getIPAddress(REGISTRY_HOST);
 	Registry local = null;
 
 	// System.runFinalizersOnExit(true); 

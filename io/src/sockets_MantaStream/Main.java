@@ -130,7 +130,7 @@ public class Main {
                 while (s == null) {
                     try {
                         Thread.sleep(1000);
-                        s = new Socket(info.hostName(0), 1234);
+                        s = new Socket(info.getIPAddress(0), 1234);
                     } catch (Exception e) {
                         // ignore
                     }

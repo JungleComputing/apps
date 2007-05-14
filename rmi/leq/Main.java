@@ -18,7 +18,7 @@ class Main {
         int i = 0;
         boolean done = false;
         i_BroadcastObject temp = (i_BroadcastObject) RMI_init.lookup("//"
-                + info.hostName(num) + "/BCAST" + num);
+                + info.getIPAddress(num) + "/BCAST" + num);
 
         return temp;
     }
@@ -50,7 +50,7 @@ class Main {
             int cpus = info.size();
             int cpu = info.rank();
 
-            Registry reg = RMI_init.getRegistry(info.hostName(cpu));
+            Registry reg = RMI_init.getRegistry(info.getIPAddress(cpu));
 
             int size = n / cpus;
             int leftover = n % cpus;
@@ -73,7 +73,7 @@ class Main {
                 System.out.println(cpu + " bound " + "CENTRAL");
                 //central = c;
             } //else { 
-            central = (i_Central) RMI_init.lookup("//" + info.hostName(0)
+            central = (i_Central) RMI_init.lookup("//" + info.getIPAddress(0)
                     + "/CENTRAL");
             //			}
 

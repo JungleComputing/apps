@@ -131,12 +131,12 @@ class Server {
             PoolInfo info = new PoolInfo(null, true);
             int cpu = info.rank();
 
-            System.out.println("I am " + info.hostName(cpu));
-            System.out.println("Getting registry on " + info.hostName(0));
+            System.out.println("I am " + info.getIPAddress(cpu));
+            System.out.println("Getting registry on " + info.getIPAddress(0));
 
-            local = RMI_init.getRegistry(info.hostName(0));
+            local = RMI_init.getRegistry(info.getIPAddress(0));
 
-            System.out.println("Got registry on " + info.hostName(0));
+            System.out.println("Got registry on " + info.getIPAddress(0));
 
             Client c = new Client(info, argv);
 

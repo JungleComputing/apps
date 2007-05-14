@@ -22,7 +22,7 @@ class Main {
 
             // parse paremeters here.
 
-            Registry reg = RMI_init.getRegistry(info.hostName(cpu));
+            Registry reg = RMI_init.getRegistry(info.getIPAddress(cpu));
             Data real_data = null;
 
             if (args.length > 0) {
@@ -44,10 +44,10 @@ class Main {
             BroadcastObject bcast = new BroadcastObject(cpu, ncpus, n);
             RMI_init.bind("BCAST" + cpu, bcast);
 
-            i_Data data = (i_Data) RMI_init.lookup("//" + info.hostName(0)
+            i_Data data = (i_Data) RMI_init.lookup("//" + info.getIPAddress(0)
                     + "/Data");
             i_Reduce reduce = (i_Reduce) RMI_init.lookup("//"
-                    + info.hostName(0) + "/Reduce");
+                    + info.getIPAddress(0) + "/Reduce");
 
             Remote[] temp = data.signup(cpu, "BCAST" + cpu);
 

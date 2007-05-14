@@ -125,7 +125,7 @@ class Main {
             }
 
             // Start the registry.    
-            reg = RMI_init.getRegistry(info.hostName(0));
+            reg = RMI_init.getRegistry(info.getIPAddress(0));
 
             VisualBuffer visual = null;
 
@@ -153,9 +153,9 @@ class Main {
 
                 global = new GlobalData(info);
                 RMI_init.bind("GlobalData", global);
-                System.err.println("I am the master: " + info.hostName(0));
+                System.err.println("I am the master: " + info.getIPAddress(0));
             } else {
-                global = (i_GlobalData) RMI_init.lookup("//" + info.hostName(0)
+                global = (i_GlobalData) RMI_init.lookup("//" + info.getIPAddress(0)
                         + "/GlobalData");
 
             }
