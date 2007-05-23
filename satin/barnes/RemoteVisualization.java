@@ -107,6 +107,13 @@ public class RemoteVisualization extends Thread {
             System.err.println("port connected");
             haveClient = true;
         } catch (Exception e) {
+            if(sport != null) {
+                try {
+                    sport.close();
+                } catch (IOException x) {
+                    // ignore
+                }
+            }
             System.err.println("failed connect: " + e);
             e.printStackTrace();
         }
@@ -117,6 +124,14 @@ public class RemoteVisualization extends Thread {
             if(out != null) out.close();
         } catch (Throwable e) {
             // ignore            
+        }
+
+        if(sport != null) {
+            try {
+                sport.close();
+            } catch (IOException x) {
+                // ignore
+            }
         }
 
         haveClient = false;
@@ -224,6 +239,13 @@ public class RemoteVisualization extends Thread {
 
         } catch (Exception e) {
             System.out.println("Lost connection during send!");
+            if(sport != null) {
+                try {
+                    sport.close();
+                } catch (IOException x) {
+                    // ignore
+                }
+            }
             haveClient = false;
         }
         long time = System.currentTimeMillis() - start;
