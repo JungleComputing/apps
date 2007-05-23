@@ -1,10 +1,18 @@
+import ibis.ipl.Ibis;
+import ibis.ipl.IbisCapabilities;
+import ibis.ipl.IbisFactory;
+import ibis.ipl.IbisIdentifier;
+import ibis.ipl.PortType;
+import ibis.ipl.Registry;
+import ibis.ipl.SendPort;
+import ibis.ipl.WriteMessage;
+
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.LinkedList;
+import java.util.Properties;
 
 class BodyList {
 
@@ -13,7 +21,7 @@ class BodyList {
     int iteration;
 
     long runTime;
-    
+
     BodyList(float[] bodies, int iteration, long runTime) {
         this.bodies = bodies;
         this.iteration = iteration;
@@ -43,87 +51,75 @@ public class RemoteVisualization extends Thread {
 
     private int port;
 
-    private ServerSocket server;
+    private Ibis ibis;
+
+    private PortType t;
 
     private boolean haveClient = false;
 
-    private Socket client;
+    private SendPort sport;
 
     private DataOutputStream out;
 
     private LinkedList<BodyList> list = new LinkedList<BodyList>();
 
     public RemoteVisualization() {
-        getProperties();
-        createServerSocket();
+        init();
         start();
     }
 
     public RemoteVisualization(String file) throws IOException {
         haveClient = true;
         out = new DataOutputStream(new BufferedOutputStream(
-                new FileOutputStream(file), 128 * 1024));
+            new FileOutputStream(file), 128 * 1024));
         start();
     }
 
-    private void getProperties() {
+    private void init() {
         try {
-            port = Integer.parseInt(System.getProperty("nbody.port", "9889"));
+            IbisCapabilities s = new IbisCapabilities(
+                IbisCapabilities.ELECTIONS);
+            t = new PortType(PortType.SERIALIZATION_OBJECT,
+                PortType.COMMUNICATION_RELIABLE,
+                PortType.CONNECTION_ONE_TO_ONE, PortType.RECEIVE_EXPLICIT);
+
+            Properties p = new Properties();
+            p.setProperty("ibis.serialization", "ibis");
+            p.setProperty("ibis.pool.name", "barnes-viz");
+
+            ibis = IbisFactory.createIbis(s, p, true, null, t);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to find host properties");
+            System.err.println("failed to init ibis: " + e);
+            e.printStackTrace();
+            System.exit(1);
         }
     }
 
-    private void createServerSocket() {
-
-        while (server == null) {
-            try {
-                server = new ServerSocket(port);
-            } catch (Exception e) {
-                System.out.println("Failed to create server socket, retry");
-
-                try {
-                    Thread.sleep(1000);
-                } catch (Exception x) {
-                    // ignore
-                }
-            }
+    private void connect() {
+        try {
+            System.err.println("connecting...");
+            Registry registry = ibis.registry();
+            System.err.println("got reg");
+            IbisIdentifier vizHost = registry.elect("barnesViz");
+            System.err.println("got election res: " + vizHost);
+            sport = ibis.createSendPort(t, "barnes-viz-port");
+            sport.connect(vizHost, "barnes-viz-port", 10*1000);
+            System.err.println("port connected");
+            haveClient = true;
+        } catch (Exception e) {
+            System.err.println("failed connect: " + e);
+            e.printStackTrace();
         }
     }
 
     private void close() {
         try {
-            out.close();
+            if(out != null) out.close();
         } catch (Throwable e) {
             // ignore            
         }
 
-        try {
-            client.close();
-        } catch (Throwable e) {
-            // ignore
-        }
-
         haveClient = false;
-    }
-
-    private void accept() {
-
-        while (!haveClient) {
-            try {
-                client = server.accept();
-                client.setSendBufferSize(128 * 1024);
-                client.setTcpNoDelay(true);
-
-                out = new DataOutputStream(new BufferedOutputStream(client
-                    .getOutputStream(), 128 * 1024));
-
-                haveClient = true;
-            } catch (Exception e) {
-                System.out.println("Failed to accept client, retry");
-                close();
-            }
-        }
     }
 
     public void showBodies(Body[] bodies, int iteration, long runtime) {
@@ -166,7 +162,7 @@ public class RemoteVisualization extends Thread {
         return list.removeFirst();
     }
 
-    private void doSend() {
+    private void writeToFile() {
         long start = 0;
         try {
             //  System.out.println("Sending");
@@ -199,12 +195,55 @@ public class RemoteVisualization extends Thread {
         System.err.println("send took " + time + " ms");
     }
 
+    private void send() {
+        long start = 0;
+        try {
+            System.out.println("Sending");
+
+            BodyList bodies = getBodies();
+
+            start = System.currentTimeMillis();
+
+            WriteMessage m = sport.newMessage();
+            
+            m.writeInt(bodies.getBodies().length / 3);
+            m.writeInt(bodies.getIteration());
+            m.writeLong(bodies.getRunTime());
+
+            float[] b = bodies.getBodies();
+            for (int i = 0; i < b.length; i++) {
+                m.writeFloat(b[i]);
+            }
+            m.finish();
+            
+            long time = System.currentTimeMillis() - start;
+            System.err.println("writes took " + time + " ms");
+
+
+            System.out.println("Sending Done");
+
+        } catch (Exception e) {
+            System.out.println("Lost connection during send!");
+            haveClient = false;
+        }
+        long time = System.currentTimeMillis() - start;
+        System.err.println("send took " + time + " ms");
+    }
+
+    private void doSend() {
+        if(out != null) {
+            writeToFile();
+        } else {
+            send();
+        }
+    }
+    
     public void run() {
 
         while (true) {
 
             if (!haveClient) {
-                accept();
+                connect();
             }
 
             doSend();

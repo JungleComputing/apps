@@ -15,7 +15,7 @@ import java.util.Arrays;
 /* strictfp */final class BarnesHut extends SatinObject implements BarnesHutInterface {
 
     static boolean remoteViz = false;
-
+    
     static String dumpViz = null;
 
     static boolean viz = false;
