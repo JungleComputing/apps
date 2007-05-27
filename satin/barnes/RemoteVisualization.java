@@ -101,8 +101,8 @@ public class RemoteVisualization extends Thread {
             Registry registry = ibis.registry();
             System.err.println("got reg");
 
-            // TODO @@@ should be getRes!
-            IbisIdentifier vizHost = registry.elect("barnesViz");
+//            IbisIdentifier vizHost = registry.elect("barnesViz");
+            IbisIdentifier vizHost = registry.getElectionResult("barnesViz");
             System.err.println("got election res: " + vizHost);
             sport = ibis.createSendPort(t, "barnes-viz-port");
             sport.connect(vizHost, "barnes-viz-port", 10*1000);
