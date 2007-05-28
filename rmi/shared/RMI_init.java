@@ -75,6 +75,10 @@ public class RMI_init {
         }
     }
 
+    public static Registry getRegistry(InetAddress owner) throws IOException {
+    	return getRegistry(owner.getHostAddress());
+    }
+
     public static Registry getRegistry(String registryOwner) throws IOException {
 
         // System.out.println("In RMI_init.getRegistry");

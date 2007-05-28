@@ -88,7 +88,7 @@ final class Main {
             int count = 10000;
             int retries = 10;
 
-            String server = info.getIPAddress(1);
+            String server = info.getInetAddress(1).getHostAddress();
 
             while (i < args.length) {
                 if (false) {

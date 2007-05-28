@@ -98,7 +98,7 @@ public class Main {
 
 		while (s == null) {
 		    try {
-			s = new Socket(info.getIPAddress(0), 1234);
+			s = new Socket(info.getInetAddress(0), 1234);
 		    } catch (Exception e) {
 			Thread.sleep(1000);
 			// ignore

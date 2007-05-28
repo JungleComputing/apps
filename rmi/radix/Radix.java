@@ -43,8 +43,8 @@ public class Radix {
         d = new PoolInfo(null, true);
         nhosts = d.size();
         host = d.rank();
-        hostname = d.getIPAddress(host);
-        mastername = d.getIPAddress(0);
+        hostname = d.getInetAddress(host).getHostAddress();
+        mastername = d.getInetAddress(0).getHostAddress();
         registry = null;
         master = null;
         radix = DEFAULT_RADIX;

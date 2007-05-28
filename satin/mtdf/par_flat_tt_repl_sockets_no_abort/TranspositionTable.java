@@ -138,7 +138,7 @@ final class TranspositionTable {
         while (true) {
             try {
                 //				System.err.println(rank + ": connecting to " + dest);
-                s = new Socket(info.getIPAddress(dest), 5555);
+                s = new Socket(info.getInetAddress(dest), 5555);
                 //				System.err.println(rank + ": connecting to " + dest + " succ");
                 s.setTcpNoDelay(true);
 

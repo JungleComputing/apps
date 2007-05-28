@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.ServerSocket;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import java.rmi.server.RMISocketFactory;
 
@@ -17,9 +18,11 @@ public class IPMapSocketFactory extends RMISocketFactory {
 
     static Logger logger = Logger.getLogger(IPMapSocketFactory.class.getName());
 
-    private InetAddress myAddr = IPUtils.getLocalHostAddress();
+    private InetAddress myAddr;
+    
 
-    public IPMapSocketFactory() {
+    public IPMapSocketFactory() throws UnknownHostException {
+	    myAddr = IPUtils.getLocalHostAddress();
         logger.debug("My local hostaddr " + myAddr);
         try {
             logger.debug("My default hostaddr "

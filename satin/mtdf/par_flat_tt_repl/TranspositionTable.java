@@ -112,7 +112,7 @@ final class TranspositionTable extends UnicastRemoteObject implements
                 while (true) {
                     try {
                         others[index] = (TranspositionTableIntr) Naming
-                                .lookup("//" + info.getIPAddress(i) + ":5555/TT");
+                                .lookup("//" + info.getInetAddress(i) + ":5555/TT");
                         index++;
                         break;
                     } catch (Exception e) {

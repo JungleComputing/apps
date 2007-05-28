@@ -1,12 +1,19 @@
 /* $Id$ */
 
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+
 import ibis.server.poolInfo.PoolInfo;
 
 strictfp public class BarnesHut {
 
+    public static final int TRIES = 4;
+
     private GlobalData bhGd;
 
     private boolean bhDistributed;
+
+    private Registry registry;
 
     Procs g;
 
@@ -30,14 +37,16 @@ strictfp public class BarnesHut {
                 bhGd.gdComputeAccelerationsDirect = true;
                 break;
             case 'M':
-                bhGd.gdMaxBodiesPerNode = Integer.valueOf(args[i].substring(2))
-                    .intValue();
-                //	    System.out.println("Using " + bhGd.gdMaxBodiesPerNode + " bodies per leaf node");
+                bhGd.gdMaxBodiesPerNode =
+                        Integer.valueOf(args[i].substring(2)).intValue();
+                // System.out.println("Using " + bhGd.gdMaxBodiesPerNode + "
+                // bodies per leaf node");
                 break;
             case 'N':
-                bhGd.gdTotNumBodies = Integer.valueOf(args[i].substring(2))
-                    .intValue();
-                //	    System.out.println("Using " + bhGd.gdTotNumBodies + " bodies");
+                bhGd.gdTotNumBodies =
+                        Integer.valueOf(args[i].substring(2)).intValue();
+                // System.out.println("Using " + bhGd.gdTotNumBodies + "
+                // bodies");
                 break;
             default:
                 foundArg = false;
@@ -46,35 +55,40 @@ strictfp public class BarnesHut {
                     foundArg = true;
                     bhGd.gdNumProcs = Integer.valueOf(args[i + 1]).intValue();
                     i++;
-                    //	      System.out.println("Using " + bhGd.gdNumProcs + " Processors ");
+                    // System.out.println("Using " + bhGd.gdNumProcs + "
+                    // Processors ");
                 }
 
                 if (args[i].equals("-tstop")) {
                     foundArg = true;
                     bhGd.gdEndTime = Double.valueOf(args[i + 1]).doubleValue();
                     i++;
-                    //	      System.out.println("Using " + bhGd.gdEndTime + " as endtime");
+                    // System.out.println("Using " + bhGd.gdEndTime + " as
+                    // endtime");
                 }
 
                 if (args[i].equals("-theta")) {
                     foundArg = true;
                     bhGd.gdTheta = Double.valueOf(args[i + 1]).doubleValue();
                     i++;
-                    //	      System.out.println("Using " + bhGd.gdTheta + " as theta");
+                    // System.out.println("Using " + bhGd.gdTheta + " as
+                    // theta");
                 }
 
                 if (args[i].equals("-dtime")) {
                     foundArg = true;
                     bhGd.gdDt = Double.valueOf(args[i + 1]).doubleValue();
                     i++;
-                    //	      System.out.println("Using " + bhGd.gdDt + " as time delta");
+                    // System.out.println("Using " + bhGd.gdDt + " as time
+                    // delta");
                 }
 
                 if (args[i].equals("-eps")) {
                     foundArg = true;
                     bhGd.gdSoft = Double.valueOf(args[i + 1]).doubleValue();
                     i++;
-                    //	      System.out.println("Using " + bhGd.gdSoft + " as epsilon");
+                    // System.out.println("Using " + bhGd.gdSoft + " as
+                    // epsilon");
                 }
 
                 if (args[i].equals("-das") || args[i].equals("-distributed")) {
@@ -109,18 +123,37 @@ strictfp public class BarnesHut {
     }
 
     void doProcInfo(int hostno, int nhosts, String hostname0) {
-        try {
-            if (hostno == 0) {
-                RMI_init.getRegistry(hostname0);
+        if (hostno == 0) {
+            try {
+                registry =
+                        LocateRegistry.createRegistry(Registry.REGISTRY_PORT);
                 g = new ProcsImpl(nhosts);
-                RMI_init.bind("ProcsInfo", g);
-            } else {
-                g = (Procs) RMI_init.lookup("//" + hostname0 + "/ProcsInfo");
+                registry.bind("ProcsInfo", g);
+                return;
+            } catch (Exception e) {
+                System.err.println("Caught exception! " + e.getMessage());
+                e.printStackTrace(System.err);
             }
-        } catch (Exception e) {
-            System.err.println("Caught exception! " + e.getMessage());
-            e.printStackTrace(System.err);
+        } else {
+            for (int i = 0; i < TRIES; i++) {
+                try {
+                    registry =
+                            LocateRegistry.getRegistry(hostname0,
+                                    Registry.REGISTRY_PORT);
+                    g = (Procs) registry.lookup("ProcsInfo");
+                    return;
+                } catch (Exception e) {
+                    System.err.println("warn: remote object not found: " + e);
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e2) {
+                        // IGNORE
+                    }
+                }
+            }
         }
+        System.err.println("failed to bind/lookup remote object");
+        System.exit(1);
     }
 
     void runMultiThreaded() {
@@ -132,13 +165,13 @@ strictfp public class BarnesHut {
         doProcInfo(0, 1, "");
 
         System.out.println("Running multithreaded (" + bhGd.gdNumProcs
-            + " threads)");
+                + " threads)");
 
         // Start all ProcessorThreads.
 
         for (int i = 0; i < procs; i++) {
-            Processor[i] = new ProcessorThread(bhGd.GenerateClone(), procs, i,
-                g);
+            Processor[i] =
+                    new ProcessorThread(bhGd.GenerateClone(), procs, i, g);
             Processor[i].start();
         }
 
@@ -177,13 +210,13 @@ strictfp public class BarnesHut {
 
         bhGd.gdNumProcs = d.size();
 
-        //    System.out.println("Initializing!" );
+        // System.out.println("Initializing!" );
 
         bhGd.Initialize();
 
-        //    System.out.println("Initialized!" );
+        // System.out.println("Initialized!" );
 
-        doProcInfo(d.rank(), d.size(), d.getIPAddress(0));
+        doProcInfo(d.rank(), d.size(), d.getInetAddress(0).getHostAddress());
 
         p = new ProcessorThread(bhGd, d, g);
 
@@ -200,7 +233,7 @@ strictfp public class BarnesHut {
 
         if (d.rank() == 0) {
             try {
-                RMI_init.unbind("ProcsInfo");
+                registry.unbind("ProcsInfo");
             } catch (Exception e) {
             }
             System.out.println("Finished!");

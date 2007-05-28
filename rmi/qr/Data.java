@@ -47,7 +47,7 @@ class Data extends UnicastRemoteObject implements i_Data {
             throws RemoteException {
 
         try {
-            bco[cpu] = RMI_init.lookup("//" + info.getIPAddress(cpu) + "/" + name);
+            bco[cpu] = RMI_init.lookup("//" + info.getInetAddress(cpu) + "/" + name);
 
         } catch (java.io.IOException eM) {
             throw new RemoteException("Naming.lookup fails", eM);
