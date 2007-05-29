@@ -49,8 +49,6 @@ public class RemoteVisualization extends Thread {
 
     private int maxLen = 10;
 
-    private int port;
-
     private Ibis ibis;
 
     private PortType t;
@@ -136,6 +134,14 @@ public class RemoteVisualization extends Thread {
             }
         }
 
+        if(ibis != null) {
+            try {
+                ibis.end();
+            } catch (IOException x) {
+                // ignore
+            }
+        }
+
         haveClient = false;
     }
 
@@ -215,7 +221,7 @@ public class RemoteVisualization extends Thread {
     private void send() {
         long start = 0;
         try {
-            System.out.println("Sending");
+//            System.out.println("Sending");
 
             BodyList bodies = getBodies();
 
@@ -237,7 +243,7 @@ public class RemoteVisualization extends Thread {
             System.err.println("writes took " + time + " ms");
 
 
-            System.out.println("Sending Done");
+//            System.out.println("Sending Done");
 
         } catch (Exception e) {
             System.out.println("Lost connection during send!");
