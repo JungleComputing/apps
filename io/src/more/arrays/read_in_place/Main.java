@@ -2,12 +2,12 @@ package more.arrays.read_in_place;
 
 /* $Id: Main.java 5349 2007-04-07 13:59:32Z ceriel $ */
 
-import ibis.util.io.BufferedArrayInputStream;
-import ibis.util.io.BufferedArrayOutputStream;
-import ibis.util.io.DataInputStream;
-import ibis.util.io.DataOutputStream;
-import ibis.util.io.IbisSerializationInputStream;
-import ibis.util.io.IbisSerializationOutputStream;
+import ibis.io.BufferedArrayInputStream;
+import ibis.io.BufferedArrayOutputStream;
+import ibis.io.DataInputStream;
+import ibis.io.DataOutputStream;
+import ibis.io.IbisSerializationInputStream;
+import ibis.io.IbisSerializationOutputStream;
 import ibis.server.poolInfo.PoolInfo;
 
 import java.net.ServerSocket;

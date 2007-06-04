@@ -3,16 +3,16 @@ package nocom;
 /* $Id$ */
 
 
-import ibis.util.io.BufferedArrayInputStream;
-import ibis.util.io.BufferedArrayOutputStream;
-import ibis.util.io.DataInputStream;
-import ibis.util.io.DataOutputStream;
-import ibis.util.io.IbisSerializationInputStream;
-import ibis.util.io.IbisSerializationOutputStream;
-import ibis.util.io.SerializationInput;
-import ibis.util.io.SerializationOutput;
-import ibis.util.io.SunSerializationInputStream;
-import ibis.util.io.SunSerializationOutputStream;
+import ibis.io.BufferedArrayInputStream;
+import ibis.io.BufferedArrayOutputStream;
+import ibis.io.DataInputStream;
+import ibis.io.DataOutputStream;
+import ibis.io.IbisSerializationInputStream;
+import ibis.io.IbisSerializationOutputStream;
+import ibis.io.SerializationInput;
+import ibis.io.SerializationOutput;
+import ibis.io.SunSerializationInputStream;
+import ibis.io.SunSerializationOutputStream;
 
 import java.util.ArrayList;
 

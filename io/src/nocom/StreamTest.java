@@ -2,12 +2,12 @@ package nocom;
 
 /* $Id$ */
 
-import ibis.util.io.DataInputStream;
-import ibis.util.io.DataOutputStream;
-import ibis.util.io.IbisSerializationInputStream;
-import ibis.util.io.IbisSerializationOutputStream;
-import ibis.util.io.SerializationInput;
-import ibis.util.io.SerializationOutput;
+import ibis.io.DataInputStream;
+import ibis.io.DataOutputStream;
+import ibis.io.IbisSerializationInputStream;
+import ibis.io.IbisSerializationOutputStream;
+import ibis.io.SerializationInput;
+import ibis.io.SerializationOutput;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

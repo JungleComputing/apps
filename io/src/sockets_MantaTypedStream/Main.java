@@ -4,10 +4,10 @@ package sockets_MantaTypedStream;
 
 
 import ibis.server.poolInfo.PoolInfo;
-import ibis.util.io.BufferedArrayInputStream;
-import ibis.util.io.BufferedArrayOutputStream;
-import ibis.util.io.IbisSerializationInputStream;
-import ibis.util.io.IbisSerializationOutputStream;
+import ibis.io.BufferedArrayInputStream;
+import ibis.io.BufferedArrayOutputStream;
+import ibis.io.IbisSerializationInputStream;
+import ibis.io.IbisSerializationOutputStream;
 
 import java.net.ServerSocket;
 import java.net.Socket;

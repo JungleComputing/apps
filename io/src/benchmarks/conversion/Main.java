@@ -3,7 +3,7 @@ package benchmarks.conversion;
 /* $Id$ */
 
 
-import ibis.util.io.Conversion;
+import ibis.io.Conversion;
 import ibis.util.Timer;
 
 import java.util.Random;
@@ -180,7 +180,7 @@ public final class Main {
 
         if (args.length == 0 || args[0] == null) {
             System.err
-                    .println("Usage: Main CONVERSION_NAME, e.g Main ibis.util.io.nio.HybridChunkLittleConversion");
+                    .println("Usage: Main CONVERSION_NAME, e.g Main ibis.io.nio.HybridChunkLittleConversion");
             System.exit(1);
         }
 
