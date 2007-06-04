@@ -3,7 +3,7 @@ benchmarks, organized into a number of sub-directories:
 
 asp             All pairs shortest path
 jgfBenchsuite   Java Grande Forum Benchsuite: low-level, kernel and applications
-latency			Benchmark measuring the round-trip latency
+latency		Benchmark measuring the round-trip latency
 ObjectPingPong  Benchmark measuring the round-trip time of objects
 sor             Successive overrelaxation
 tests           Pragrams testing the MPJ/Ibis implemenation
