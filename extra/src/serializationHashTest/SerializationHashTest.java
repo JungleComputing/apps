@@ -2,7 +2,7 @@ package serializationHashTest;
 
 /* $Id$ */
 
-import ibis.util.io.HandleHash;
+import ibis.io.HandleHash;
 
 import java.io.Serializable;
 import java.util.Random;

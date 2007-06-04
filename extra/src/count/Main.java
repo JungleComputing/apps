@@ -3,8 +3,8 @@ package count;
 /* $Id$ */
 
 
-import ibis.util.io.BufferedArrayOutputStream;
-import ibis.util.io.IbisSerializationOutputStream;
+import ibis.io.BufferedArrayOutputStream;
+import ibis.io.IbisSerializationOutputStream;
 
 import java.io.ObjectOutputStream;
 
