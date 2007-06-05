@@ -103,7 +103,7 @@ public class RemoteVisualization extends Thread {
             IbisIdentifier vizHost = registry.getElectionResult("barnesViz");
             System.err.println("got election res: " + vizHost);
             sport = ibis.createSendPort(t, "barnes-viz-port");
-            sport.connect(vizHost, "barnes-viz-port", 10*1000);
+            sport.connect(vizHost, "barnes-viz-port", 10*1000, false);
             System.err.println("port connected");
             haveClient = true;
         } catch (Exception e) {
