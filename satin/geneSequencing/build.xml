@@ -1,19 +1,57 @@
-<project
-    name="ibis.apps.satin.geneSequencing.dataDistribution"
-    default="build"
-    basedir=".">
+<project name="geneSequencing" default="build" basedir=".">
+	<description>
+      Build file for gene sequencing application
+    </description>
 
-    <property environment="env"/>
+	<!-- Global properties -->
+	<property environment="env"/>
+	<property name="env.IBIS_HOME" location=".." /> 
+    <property name="ibis_lib" location="${env.IBIS_HOME}/lib" />
+	<property name="neobio_lib" location="neobio/lib" />
 
-    <property name="ibis"        location="${env.IBIS_HOME}"/>
-    <property name="build"       value="build"/>
+	<property name="src" location="src" />
+	<property name="tmp" location="tmp" />
+	<property name="lib" location="lib" />
+	<property name="java.debug.value" value="true" />
 
-    <property name="satinc-flags" value="-keep"/>
+	<path id="external_jars">
+		<fileset dir="${ibis_lib}">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${neobio_lib}">
+			<include name="neobio.jar" />
+		</fileset>
+	</path>
 
-    <property name="main-class"  value="DsearchDC"/>
+	<target name="init">
+		<!-- Create the time stamp -->
+		<tstamp />
 
-    <property name="satin-classes" value="DsearchDC,DivCon"/>
+		<!-- Create the build directory structure used by compile -->
+		<mkdir dir="${lib}" />
+		<mkdir dir="${tmp}" />
+	</target>
 
-    <import file="${ibis}/build-files/apps/build-satin-app.xml"/>
+	<target name="compile" depends="init" description="compile the source ">
+		<!-- Compile the java code from ${src} into ${tmp} -->
+		<javac srcdir="${src}" destdir="${tmp}" debug="on" >
+			<classpath refid="external_jars" />
+		</javac>
+	</target>
 
+	<target name="geneSequencing" depends="clean,compile" description="build the JAR file">
+		<!-- Create the distribution directory -->
+		<mkdir dir="${lib}" />
+
+		<jar jarfile="${lib}/geneSequencing.jar" basedir="${tmp}" />
+		<delete dir="${tmp}" />
+	</target>
+
+	<target name="build" description="build everything" depends="geneSequencing">
+	</target>
+
+	<target name="clean" description="clean up">
+		<delete dir="${tmp}" />
+		<delete dir="${lib}" />
+	</target>
 </project>
