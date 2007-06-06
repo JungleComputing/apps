@@ -1,0 +1,21 @@
+The File Reading Version
+
+Database searching is one of the most fundamental tasks in bioinformatics. Within
+this search two DNA sequences are compared with each other to identify similarities
+and differences between them.
+
+In this version we use the standard data approach for spawning of jobs.
+However, the data distribution is different. There are two vectors with file
+pointers which are created before spawning of jobs. A pointer points to a position of a
+sequence in a file from a problem set. These pointers are distributed to the leaf nodes.
+The input data of a job consists of parameters for the search algorithm and two vectors
+with the file pointers. When the calculation starts, the sequence is read out from a file
+with usage of a file pointer.
+
+How to compile the prgram:
+
+Just run 'ant' with the delivered build.xml file.
+
+How to run the program (a sample of a run command):
+
+prun -v /home/eapikoul/ibis/bin/ibis-prun 10 DsearchDCf

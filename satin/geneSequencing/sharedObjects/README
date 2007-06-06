@@ -1,0 +1,23 @@
+The Shared Object version
+
+Database searching is one of the most fundamental tasks in bioinformatics. Within
+this search two DNA sequences are compared with each other to identify similarities
+and differences between them.
+
+In this version we use the divide-and-share model: the divide-and-conquer model
+extended by a shared data abstraction – shared objects.
+In this version the query sequences file and the database sequences file are read out on
+the root node and processed into two vectors. Vector pointers are created as well.
+They point to an index of a sequence in the vector. The vectors are placed into a
+shared object. The shared object is broadcasted to every node involved in the
+computation. The input data of a job consists of parameters for the search algorithm
+and two vectors with vector pointers. When the calculation starts, the sequence is read
+out from shared object using a vector pointer.
+
+How to compile the program:
+
+Just run 'ant' with the delivered build.xml file.
+
+How to run the program (a sample of a run command):
+
+prun -v /home/eapikoul/ibis/bin/ibis-prun 10 -Dsatin.so DsearchDC_so

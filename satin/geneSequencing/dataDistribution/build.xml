@@ -1,0 +1,19 @@
+<project
+    name="ibis.apps.satin.geneSequencing.dataDistribution"
+    default="build"
+    basedir=".">
+
+    <property environment="env"/>
+
+    <property name="ibis"        location="${env.IBIS_HOME}"/>
+    <property name="build"       value="build"/>
+
+    <property name="satinc-flags" value="-keep"/>
+
+    <property name="main-class"  value="DsearchDC"/>
+
+    <property name="satin-classes" value="DsearchDC,DivCon"/>
+
+    <import file="${ibis}/build-files/apps/build-satin-app.xml"/>
+
+</project>

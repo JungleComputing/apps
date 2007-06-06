@@ -1,0 +1,16 @@
+<project
+    name="ibis.apps.satin.geneSequencing.sharedObjects"
+    default="build"
+    basedir=".">
+
+    <property environment="env"/>
+
+    <property name="ibis"        location="${env.IBIS_HOME}"/>
+    <property name="build"       value="build"/>
+
+    <property name="satinc-flags" value="-keep"/>
+    <property name="satin-classes" value="DivCon_so,SharedData"/>
+
+    <import file="${ibis}/build-files/apps/build-satin-app.xml"/>
+
+</project>
