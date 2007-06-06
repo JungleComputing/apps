@@ -8,6 +8,17 @@
     <property name="ibis"        location="${env.IBIS_HOME}"/>
     <property name="build"       value="build"/>
 
+    <path id="classpath">
+	<fileset dir="../lib">
+	    <include name="*.jar"/>
+	</fileset>
+	<fileset dir="../neobio/lib">
+	    <include name="*.jar"/>
+	</fileset>
+    </path>
+
+    <property name="user-classpath" refid="classpath"/>
+
     <property name="satinc-flags" value="-keep"/>
     <property name="satin-classes" value="DivCon_so,SharedData"/>
 
