@@ -48,7 +48,7 @@ public class DsearchDC {
     private void createResultFile() {
         try {
             File PD = new File(System.getProperty("user.dir"));
-            File r = new File(PD, args[0] + "_result.txt");
+            File r = new File(PD, "result_" + args[0]);
             FileOutputStream fos = new FileOutputStream(r);
             psRes = new PrintStream(new BufferedOutputStream(fos));
         } catch (Exception e) {
