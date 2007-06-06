@@ -33,21 +33,20 @@
 	</target>
 
 	<target name="compile" depends="init" description="compile the source ">
+		<ant dir="neobio" inheritall="false" />
+
 		<!-- Compile the java code from ${src} into ${tmp} -->
 		<javac srcdir="${src}" destdir="${tmp}" debug="on" >
 			<classpath refid="external_jars" />
 		</javac>
 	</target>
 
-	<target name="geneSequencing" depends="clean,compile" description="build the JAR file">
+	<target name="build" depends="clean,compile" description="build the JAR file">
 		<!-- Create the distribution directory -->
 		<mkdir dir="${lib}" />
 
 		<jar jarfile="${lib}/geneSequencing.jar" basedir="${tmp}" />
 		<delete dir="${tmp}" />
-	</target>
-
-	<target name="build" description="build everything" depends="geneSequencing">
 	</target>
 
 	<target name="clean" description="clean up">
