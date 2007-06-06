@@ -18,7 +18,10 @@ public class DsearchDC {
 
     private boolean dump = false;
     
+    String[] args;
+    
     public DsearchDC(String[] args) {
+        this.args = args;
         theResult = new ArrayList<ResSeq>();
 
         if(args.length < 1) {
@@ -45,7 +48,7 @@ public class DsearchDC {
     private void createResultFile() {
         try {
             File PD = new File(System.getProperty("user.dir"));
-            File r = new File(PD, "result.txt");
+            File r = new File(PD, args[0] + "_result.txt");
             FileOutputStream fos = new FileOutputStream(r);
             psRes = new PrintStream(new BufferedOutputStream(fos));
         } catch (Exception e) {
