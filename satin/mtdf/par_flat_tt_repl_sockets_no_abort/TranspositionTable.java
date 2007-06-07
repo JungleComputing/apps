@@ -61,19 +61,21 @@ final class TranspositionTable {
 
     PoolInfo info;
 
-    int rank = info.rank();
+    int rank;
 
-    int poolSize = info.size();
+    int poolSize;
 
-    TTReceiver[] receiverThreads = new TTReceiver[poolSize];
+    TTReceiver[] receiverThreads;
 
     TranspositionTable() {
         Random random = new Random();
 
-        //		System.err.println("hosts = " + poolSize + ", rank = " + rank);
-
         try {
     	    info = new PoolInfo(null, true);
+            rank = info.rank();
+            poolSize = info.size();
+            receiverThreads = new TTReceiver[poolSize];
+            //		System.err.println("hosts = " + poolSize + ", rank = " + rank);
 
             ServerSocket serv = new ServerSocket(5555);
             Socket[] sockets = new Socket[poolSize];
