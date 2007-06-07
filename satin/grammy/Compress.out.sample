@@ -4,7 +4,7 @@ STDOUT:
 Java 1.4.2 (Sun Microsystems Inc.) on Linux 2.4.21-20.ELcustomsmp (i386)
 Compressing ../sample1.txt
 ExecutionTime: 3.925
-In: 4837 bytes, out: 4016 bytes.
+In: 4943 bytes, out: 4102 bytes.
 -------------------------------SATIN STATISTICS--------------------------------
 SATIN: SPAWN:       673 spawns, 673 executed, 337 syncs
 SATIN: ABORT:       0 aborts, 0 abort msgs, 0 aborted jobs
