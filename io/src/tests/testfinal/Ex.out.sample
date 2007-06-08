@@ -5,9 +5,5 @@ Object read
 Test1 succeeds
 Test2 succeeds
 Test3 succeeds
-Object read
-Test1 succeeds
-Test2 succeeds
-Test3 succeeds
 
 STDERR:

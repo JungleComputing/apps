@@ -1,1 +1,1 @@
-2 Main
+CLASSPATH=../../../build 1 tests.conversion.Main
