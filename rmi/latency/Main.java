@@ -11,7 +11,7 @@ class Main {
             PoolInfo info = new PoolInfo(null, true);
 
             System.out.println("Starting process " + info.rank() + " on "
-                    + info.getInetAddress());
+                    + info.getInetAddress().getHostAddress());
 
             if (info.rank() == 0) {
                 Client.doClient("bimbambom", 0, "bla");
