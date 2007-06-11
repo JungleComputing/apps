@@ -43,7 +43,7 @@ class Asp extends UnicastRemoteObject implements i_Asp {
         this.n = n;
 
         try {
-            PoolInfo info = new PoolInfo(null, true);
+            info = new PoolInfo(null, true);
         } catch (Exception e) {
             throw new Error("Problem in PoolInfo", e);
         }
