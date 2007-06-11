@@ -13,10 +13,11 @@ class Main {
             System.out.println("Starting process " + info.rank() + " on "
                     + info.getInetAddress().getHostAddress());
 
+            String regHost = info.getInetAddress(1).getHostAddress();
             if (info.rank() == 0) {
-                Client.doClient("bimbambom", 0, "bla");
+                Client.doClient(regHost, 0, "bla");
             } else {
-                Server.doServer("bimbambom", 0, "bla");
+                Server.doServer(regHost, 0, "bla");
             }
         } catch (Exception e) {
             System.out.println("OOPS");

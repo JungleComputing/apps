@@ -29,11 +29,11 @@ class Server {
     public static void doServer(String server, int port, String name) {
         try {
             String objname = "//" + server;
-            if (port != 0) {
-                Registry reg = LocateRegistry.createRegistry(port);
-                objname = objname + ":" + port;
+            if (port == 0) {
+                port = Registry.REGISTRY_PORT;
             }
-            objname = objname + "/" + name;
+            Registry reg = LocateRegistry.createRegistry(port);
+            objname = objname + ":" + port + "/" + name;
 
             System.out.println("creating new test");
 
