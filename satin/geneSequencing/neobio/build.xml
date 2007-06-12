@@ -43,6 +43,9 @@
 	<target name="build" description="build everything" depends="neobio">
 	</target>
 
+	<target name="test" description="test">
+	</target>
+
 	<target name="clean" description="clean up">
 		<delete dir="${tmp}" />
 		<delete dir="${lib}" />
