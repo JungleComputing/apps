@@ -5,6 +5,7 @@ import geneSequencing.ResSeq;
 import ibis.satin.impl.Satin;
 
 import java.util.*;
+import java.util.zip.GZIPOutputStream;
 import java.io.*;
 
 public class DsearchDC {
@@ -45,19 +46,6 @@ public class DsearchDC {
         dC = new DivCon();
     }
 
-    private void createResultFile() {
-        try {
-            File PD = new File(System.getProperty("user.dir"));
-            File tmp = new File(args[0]);
-            File r = new File(PD, "result_" + tmp.getName());
-            FileOutputStream fos = new FileOutputStream(r);
-            psRes = new PrintStream(new BufferedOutputStream(fos));
-        } catch (Exception e) {
-            System.out.println("Exception in createResultFile(): "
-                + e.toString());
-        }
-    }
-
     private void generateResultDivCon(double startTime) {
         System.out.println();
         System.out.println("query sequences    = "
@@ -76,7 +64,7 @@ public class DsearchDC {
         theResult = dC.getTheResult();
 
         if(dump) {
-        Satin.pause();
+            Satin.pause();
             double start1 = System.currentTimeMillis();
             printTheResultInFile();
             double end1 = System.currentTimeMillis() - start1;
@@ -91,12 +79,22 @@ public class DsearchDC {
     }
 
     private void printTheResultInFile() {
-        createResultFile();
+            try {
+                File tmp = new File(args[0]);
+                FileOutputStream fos = new FileOutputStream("result_" + tmp.getName() + ".gz");
+                BufferedOutputStream buf = new BufferedOutputStream(fos);
+                GZIPOutputStream zip = new GZIPOutputStream(buf);
+                psRes = new PrintStream(zip);
 
-        for (int i = 0; i < theResult.size(); i++) {
-            psRes.println((theResult.get(i)).toString() + "\n\n");
-        }
-        psRes.close();
+                for (int i = 0; i < theResult.size(); i++) {
+                    psRes.println((theResult.get(i)).toString() + "\n\n");
+                }
+                
+                psRes.close();
+            } catch (Exception e) {
+                System.out.println("Exception in createResultFile(): "
+                    + e.toString());
+            }
     }
 
     private void processArgumentsAndSetValues() {
