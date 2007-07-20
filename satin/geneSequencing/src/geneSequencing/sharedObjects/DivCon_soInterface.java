@@ -1,7 +1,7 @@
 package geneSequencing.sharedObjects;
 
 import geneSequencing.ResSeq;
-import geneSequencing.divideAndConquer.WorkUnit;
+import geneSequencing.WorkUnit;
 
 import java.util.ArrayList;
 

@@ -1,9 +1,7 @@
-package geneSequencing.divideAndConquer;
+package geneSequencing;
 
-import geneSequencing.Dsearch_AlgorithmV1;
-import geneSequencing.FileSequences;
-import geneSequencing.InputReader;
-import geneSequencing.ResSeq;
+import geneSequencing.divideAndConquer.DivCon;
+import geneSequencing.masterWorker.MasterWorker;
 import geneSequencing.sharedObjects.DivCon_so;
 import geneSequencing.sharedObjects.SharedData;
 import ibis.satin.impl.Satin;
@@ -14,7 +12,7 @@ import java.io.*;
 
 import neobio.alignment.ScoringScheme;
 
-public class DsearchDC {
+public class Dsearch {
     private PrintStream psRes;
 
     private boolean dump = false;
@@ -39,7 +37,7 @@ public class DsearchDC {
 
     private String implementationName = "none";
 
-    public DsearchDC(String[] args) {
+    public Dsearch(String[] args) {
         Satin.pause();
         this.args = args;
 
@@ -103,8 +101,7 @@ public class DsearchDC {
 
         try {
             ArrayList<ResSeq> resultUnit =
-                    dA
-                            .processUnit(workUnit.querySequences,
+                    dA.processUnit(workUnit.querySequences,
                                     workUnit.databaseSequences,
                                     workUnit.scoresOrAlignments,
                                     workUnit.scoringScheme,
@@ -118,7 +115,7 @@ public class DsearchDC {
         return subResult;
     }
 
-    public static ArrayList<ResSeq> processResultUnit(
+    private static ArrayList<ResSeq> processResultUnit(
             ArrayList<ResSeq> resultUnit, int maxScores) {
         ArrayList<ResSeq> subResult = new ArrayList<ResSeq>();
 
@@ -149,8 +146,12 @@ public class DsearchDC {
             DivCon_so so = new DivCon_so();
             result = so.spawn_splitQuerySequences(workUnit, sharedData);
             so.sync();
+        } else if (implementationName.equals("mw")) {
+            System.out.println("using master worker implementation");
+            MasterWorker mw = new MasterWorker();
+            result = mw.generateResult(workUnit);
         } else {
-            throw new Error("illeal implementation name");
+            throw new Error("illegal implementation name");
         }
     }
 
@@ -159,15 +160,13 @@ public class DsearchDC {
         ArrayList<ResSeq> main = subResult1;
         ArrayList<ResSeq> additional = subResult2;
 
-        for (int i = 0; i < additional.size(); i++)
+        for (int i = 0; i < additional.size(); i++) {
             main = processSubResults(additional.get(i), main);
-
-        ArrayList<ResSeq> res = new ArrayList<ResSeq>(main);
-
-        return res;
+        }
+        return main;
     }
 
-    public static ArrayList<ResSeq> processSubResults(ResSeq resSeq,
+    private static ArrayList<ResSeq> processSubResults(ResSeq resSeq,
             ArrayList<ResSeq> main) {
         boolean flag = false;
         for (int i = 0; i < main.size(); i++) {
@@ -223,6 +222,6 @@ public class DsearchDC {
     }
 
     public static void main(String[] args) {
-        new DsearchDC(args).start();
+        new Dsearch(args).start();
     }
 }

@@ -1,6 +1,8 @@
 package geneSequencing.divideAndConquer;
 
+import geneSequencing.Dsearch;
 import geneSequencing.ResSeq;
+import geneSequencing.WorkUnit;
 
 import java.util.ArrayList;
 
@@ -27,7 +29,7 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface {
 
             sync();
 
-            result = DsearchDC.combineSubResults(subRes1, subRes2);
+            result = Dsearch.combineSubResults(subRes1, subRes2);
         }
 
         return result;
@@ -38,7 +40,7 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface {
         int newSplitSize;
 
         if (workUnit.databaseSequences.size() <= workUnit.threshold) {
-            result = DsearchDC.createTrivialResult(workUnit);
+            result = Dsearch.createTrivialResult(workUnit);
         } else {
             newSplitSize = workUnit.databaseSequences.size() / 2;
 
@@ -52,7 +54,7 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface {
 
             sync();
 
-            result = DsearchDC.combineSubResults(subResult1, subResult2);
+            result = Dsearch.combineSubResults(subResult1, subResult2);
         }
 
         return result;

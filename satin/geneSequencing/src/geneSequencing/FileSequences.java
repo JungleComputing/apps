@@ -1,16 +1,16 @@
 package geneSequencing;
 
-import java.util.Vector;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.ArrayList;
 
 public class FileSequences implements java.io.Serializable {
-    private Vector sequences;
+    private ArrayList<Sequence> sequences;
 
     private String fileName;
 
     public FileSequences(String fileName) {
-        sequences = new Vector();
+        sequences = new ArrayList<Sequence>();
         this.fileName = fileName;
         createFileSequences();
     }
@@ -26,7 +26,7 @@ public class FileSequences implements java.io.Serializable {
                     Sequence seq = new Sequence();
                     seq.setSequenceName(line);
 
-                    Vector tail = new Vector();
+                    ArrayList<String> tail = new ArrayList<String>();
                     while ((line = bf.readLine()) != null
                         && line.charAt(0) != '>') {
                         tail.add(line);
@@ -41,7 +41,7 @@ public class FileSequences implements java.io.Serializable {
         }
     }
 
-    public Vector getSequences() {
+    public ArrayList<Sequence> getSequences() {
         return sequences;
     }
 
