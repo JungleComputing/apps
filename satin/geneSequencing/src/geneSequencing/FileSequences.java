@@ -12,9 +12,10 @@ public class FileSequences implements java.io.Serializable {
     public FileSequences(String fileName) {
         sequences = new Vector();
         this.fileName = fileName;
+        createFileSequences();
     }
 
-    public void createFileSequnces() {
+    private void createFileSequences() {
         try {
             BufferedReader bf = new BufferedReader(new FileReader(fileName));
 
@@ -36,7 +37,7 @@ public class FileSequences implements java.io.Serializable {
                 }
             }
         } catch (Exception e) {
-            System.out.println("MyException in processFile: " + e.toString());
+            throw new Error("Exception in processFile: " + e.toString());
         }
     }
 
@@ -46,5 +47,9 @@ public class FileSequences implements java.io.Serializable {
 
     public void zero() {
         sequences = null;
+    }
+    
+    public int size() {
+        return sequences.size();
     }
 }

@@ -11,15 +11,9 @@ public class SharedData extends ibis.satin.SharedObject implements
 
     private FileSequences databaseSequences;
 
-    public SharedData() {
-    }
-
-    public void updateQuerySeqs(FileSequences querySeqs) {
-        querySequences = querySeqs;
-    }
-
-    public void updateDatabaseSeqs(FileSequences databaseSeqs) {
-        databaseSequences = databaseSeqs;
+    public SharedData(FileSequences querySequences, FileSequences databaseSequences) {
+        this.querySequences = querySequences;
+        this.databaseSequences = databaseSequences;
     }
 
     public Vector getQuerySeqs(Vector seqsPointers) {
