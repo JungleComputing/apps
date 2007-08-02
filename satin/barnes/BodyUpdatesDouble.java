@@ -128,9 +128,20 @@ public final class BodyUpdatesDouble extends BodyUpdates {
         String res = "";
 
         res += "BodyUpdatesDouble, size = " + acc_x.length;
-        res += ", bodyNrs.size = " + bodyNumbers.length;
+
+        if(bodyNumbers != null) {
+            res += ", bodyNrs.size = " + bodyNumbers.length;
+        } else {
+            res += ", no bodyNrs";
+        }
+        
         res += ", index = " + index;
-        res += ", more size = " + more.length;
+        
+        if(more != null) {
+            res += ", more size = " + more.length;
+        } else {
+            res += ", no more";  
+        }
         
         return res;
     }
