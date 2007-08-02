@@ -367,7 +367,7 @@ import java.util.Arrays;
                 break;
             }
 
-            ibis.satin.SatinObject.pause(); //killall divide-and-conquer stuff
+            ibis.satin.SatinObject.pause(); // pause divide-and-conquer stuff
 
             forceCalcTimeTmp = System.currentTimeMillis() - phaseStart;
             forceCalcTime += forceCalcTimeTmp;
@@ -376,6 +376,8 @@ import java.util.Arrays;
 
             result.prepareForUpdate();
 
+            System.err.println("update: " + result);
+            
             if (iteration < iterations-1) {
                 bodies.updateBodies(result, iteration);
             } else {

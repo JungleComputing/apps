@@ -123,4 +123,15 @@ public final class BodyUpdatesDouble extends BodyUpdates {
                     acc_z[i], params);
         }
     }
+    
+    public String toString() {
+        String res = "";
+
+        res += "BodyUpdatesDouble, size = " + acc_x.length;
+        res += ", bodyNrs.size = " + bodyNumbers.length;
+        res += ", index = " + index;
+        res += ", more size = " + more.length;
+        
+        return res;
+    }
 }

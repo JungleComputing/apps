@@ -19,9 +19,9 @@ final public class BodiesSO extends SharedObject implements BodiesInterface, Bod
         bodyTreeRoot.computeCentersOfMass();
     }
 
-    /*write method*/
+    // write method 
     public void updateBodies(BodyUpdates b, int iteration) {
-        // Oops: when a node joins while node 0 broadcasts the update,
+        // when a node joins while node 0 broadcasts the update,
         // and the node obtains an already updated object while it has
         // not received the update yet, when it receives the update, it will
         // update again, which is wrong.
