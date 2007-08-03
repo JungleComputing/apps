@@ -376,7 +376,7 @@ import java.util.Arrays;
 
             result.prepareForUpdate();
 
-            System.err.println("update: " + result);
+//            System.err.println("update: " + result);
             
             if (iteration < iterations-1) {
                 bodies.updateBodies(result, iteration);
