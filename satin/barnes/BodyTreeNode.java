@@ -24,20 +24,30 @@ import java.util.ArrayList;
 
 /*strictfp*/final class BodyTreeNode implements java.io.Serializable {
 
-    private static ArrayList<BodyTreeNode> treeNodeIds
-            = new ArrayList<BodyTreeNode>();
+    private static final boolean BODY_TIMING = false;
 
-    static Timer intTimer = Timer.createTimer();
-    static Timer barnesBodyTimer = Timer.createTimer();
-    static long bodyInteractions = 0;
+    private static ArrayList<BodyTreeNode> treeNodeIds =
+            new ArrayList<BodyTreeNode>();
+
+    private static Timer intTimer = Timer.createTimer();
+
+    private static Timer barnesBodyTimer = Timer.createTimer();
+
+    private static long bodyInteractions = 0;
+    
     static {
-        Runtime.getRuntime().addShutdownHook(
-            new Thread("xxx") {
+        if (BODY_TIMING) {
+            Runtime.getRuntime().addShutdownHook(new Thread("xxx") {
                 public void run() {
-                    System.out.println("intTimer: total = " + intTimer.totalTime() + ", body interactions = " +  bodyInteractions);
-                    System.out.println("barnesBodyTimer: total = " + barnesBodyTimer.totalTime() + ", count = " +  barnesBodyTimer.nrTimes());
+                    System.out.println("intTimer: total = "
+                            + intTimer.totalTime() + ", body interactions = "
+                            + bodyInteractions);
+                    System.out.println("barnesBodyTimer: total = "
+                            + barnesBodyTimer.totalTime() + ", count = "
+                            + barnesBodyTimer.nrTimes());
                 }
             });
+        }
     }
 
     BodyTreeNode children[];
@@ -96,7 +106,8 @@ import java.util.ArrayList;
      *            the minimum point the tree should represent
      */
     private void initCenterSizeMaxtheta(double max_x, double max_y,
-        double max_z, double min_x, double min_y, double min_z, RunParameters params) {
+            double max_z, double min_x, double min_y, double min_z,
+            RunParameters params) {
 
         double size;
 
@@ -123,8 +134,8 @@ import java.util.ArrayList;
     }
 
     //constructor to create an empty tree, used during tree contruction
-    private BodyTreeNode(double centerX, double centerY,
-            double centerZ, double halfSize, double maxTheta) {
+    private BodyTreeNode(double centerX, double centerY, double centerZ,
+            double halfSize, double maxTheta) {
         //children = null and bodies = null by default
         this.center_x = centerX;
         this.center_y = centerY;
@@ -145,7 +156,8 @@ import java.util.ArrayList;
      *            The run parameters
      */
     public BodyTreeNode(Body[] bodyArray, RunParameters params) {
-        double max_x = -1000000.0, max_y = -1000000.0, max_z = -1000000.0, min_x = 1000000.0, min_y = 1000000.0, min_z = 1000000.0;
+        double max_x = -1000000.0, max_y = -1000000.0, max_z = -1000000.0, min_x =
+                1000000.0, min_y = 1000000.0, min_z = 1000000.0;
 
         treeNodeIds.clear();
         treeNodeId = 0;
@@ -213,7 +225,8 @@ import java.util.ArrayList;
         distsq += calcSquare(com_y, job.center_y, job.halfSize);
         distsq += calcSquare(com_z, job.center_z, job.halfSize);
 
-        if (distsq >= maxTheta) return; // cutoff IS possible, don't copy the original 
+        if (distsq >= maxTheta)
+            return; // cutoff IS possible, don't copy the original 
 
         // no cutoff possible, copy the necessary parts of original
 
@@ -229,8 +242,8 @@ import java.util.ArrayList;
                         // don't copy job, as it is fully necessary ;-)
                         children[i] = job;
                     } else {
-                        children[i] = new BodyTreeNode(original.children[i],
-                            job);
+                        children[i] =
+                                new BodyTreeNode(original.children[i], job);
                     }
                     bodyCount += children[i].bodyCount;
                 }
@@ -243,8 +256,8 @@ import java.util.ArrayList;
      */
     private boolean outOfRange(double pos_x, double pos_y, double pos_z) {
         if (Math.abs(pos_x - center_x) > halfSize
-            || Math.abs(pos_y - center_y) > halfSize
-            || Math.abs(pos_z - center_z) > halfSize) {
+                || Math.abs(pos_y - center_y) > halfSize
+                || Math.abs(pos_z - center_z) > halfSize) {
             return true;
         } else {
             return false;
@@ -252,15 +265,19 @@ import java.util.ArrayList;
     }
 
     private void printOutOfRange(java.io.PrintStream out, double pos_x,
-        double pos_y, double pos_z) {
+            double pos_y, double pos_z) {
         double xdiff = Math.abs(pos_x - center_x) - halfSize;
         double ydiff = Math.abs(pos_y - center_y) - halfSize;
         double zdiff = Math.abs(pos_z - center_z) - halfSize;
-        if (xdiff > 0.0) out.println("x : " + xdiff);
-        if (ydiff > 0.0) out.println("y : " + ydiff);
-        if (zdiff > 0.0) out.println("z : " + zdiff);
+        if (xdiff > 0.0)
+            out.println("x : " + xdiff);
+        if (ydiff > 0.0)
+            out.println("y : " + ydiff);
+        if (zdiff > 0.0)
+            out.println("z : " + zdiff);
     }
 
+    @SuppressWarnings("unused")
     private double[] computeChildCenter(int childIndex, double[] newCenter) {
         double newHalfSize = halfSize / 2.0;
 
@@ -296,17 +313,18 @@ import java.util.ArrayList;
         // leaf node
         if (BarnesHut.ASSERTS && outOfRange(b.pos_x, b.pos_y, b.pos_z)) {
             System.err.println("EEK! Adding out-of-range body! "
-                + "Body position: " + b.pos_x + ", " + b.pos_y + ", " + b.pos_z
-                + " id: " + b.number);
+                    + "Body position: " + b.pos_x + ", " + b.pos_y + ", "
+                    + b.pos_z + " id: " + b.number);
 
             System.err.println("     Center: " + center_x + ", " + center_y
-                + ", " + center_z + " halfSize: " + halfSize);
+                    + ", " + center_z + " halfSize: " + halfSize);
             printOutOfRange(System.err, b.pos_x, b.pos_y, b.pos_z);
             throw new IndexOutOfBoundsException("Out-of-range body!");
         }
 
         if (bodyCount < maxLeafBodies) { // we have room left
-            if (bodyCount == 0) bodies = new Body[maxLeafBodies];
+            if (bodyCount == 0)
+                bodies = new Body[maxLeafBodies];
             bodies[bodyCount] = b;
             bodyCount++;
             totalMass += b.mass;
@@ -330,9 +348,12 @@ import java.util.ArrayList;
     private void addBody2Cell(Body b, int maxLeafBodies) {
         int child = 0;
 
-        if (b.pos_x - center_x >= 0.0) child |= 1;
-        if (b.pos_y - center_y >= 0.0) child |= 2;
-        if (b.pos_z - center_z >= 0.0) child |= 4;
+        if (b.pos_x - center_x >= 0.0)
+            child |= 1;
+        if (b.pos_y - center_y >= 0.0)
+            child |= 2;
+        if (b.pos_z - center_z >= 0.0)
+            child |= 4;
 
         if (children[child] != null) {
             children[child].addBody(b, maxLeafBodies);
@@ -363,8 +384,9 @@ import java.util.ArrayList;
             newCenterZ = center_z - newHalfSize;
         }
 
-        children[child] = new BodyTreeNode(newCenterX, newCenterY,
-                newCenterZ, halfSize / 2.0, maxTheta / 4.0);
+        children[child] =
+                new BodyTreeNode(newCenterX, newCenterY, newCenterZ,
+                        halfSize / 2.0, maxTheta / 4.0);
         children[child].bodies = new Body[maxLeafBodies];
         children[child].bodies[0] = b;
         children[child].bodyCount = 1;
@@ -389,7 +411,8 @@ import java.util.ArrayList;
         } else {
             //cell node, process all children
             for (int i = 0; i < 8; i++) {
-                if (children[i] != null) children[i].trim();
+                if (children[i] != null)
+                    children[i].trim();
             }
         }
     }
@@ -485,8 +508,10 @@ import java.util.ArrayList;
                 System.exit(1);
             }
 
-            intTimer.start();
-
+            if(BODY_TIMING) {
+                intTimer.start();
+            }
+            
             double dx = 0;
             double dy = 0;
             double dz = 0;
@@ -496,8 +521,9 @@ import java.util.ArrayList;
                 diff_y = bodies[i].pos_y - pos_y;
                 diff_z = bodies[i].pos_z - pos_z;
 
-                distsq = diff_x * diff_x + diff_y * diff_y + diff_z * diff_z
-                    + params.SOFT_SQ;
+                distsq =
+                        diff_x * diff_x + diff_y * diff_y + diff_z * diff_z
+                                + params.SOFT_SQ;
 
                 double factor = bodies[i].mass / (distsq * Math.sqrt(distsq));
 
@@ -510,8 +536,10 @@ import java.util.ArrayList;
             totalAcc[1] += dy;
             totalAcc[2] += dz;
 
-            bodyInteractions += bodies.length;
-            intTimer.stop();
+            if(BODY_TIMING) {
+                bodyInteractions += bodies.length;
+                intTimer.stop();
+            }
             return;
         }
 
@@ -526,8 +554,9 @@ import java.util.ArrayList;
     /**
      * debug version of barnesBody.
      */
-    private void barnesBodyDbg(Body body, double[] totalAcc,
-        boolean debug, RunParameters params) {
+    @SuppressWarnings("unused")
+    private void barnesBodyDbg(Body body, double[] totalAcc, boolean debug,
+            RunParameters params) {
         double diff_x, diff_y, diff_z;
         double dist, distsq, factor;
         int i;
@@ -542,13 +571,13 @@ import java.util.ArrayList;
             System.out.println();
             System.out.println("Barnes: new level:");
             System.out.println(" CoM pos = (" + com_x + ", " + com_y + ", "
-                + com_z + ")");
-            System.out.println(" pos = (" + body.pos_x + ", "
-                    + body.pos_y + ", " + body.pos_z + ")");
+                    + com_z + ")");
+            System.out.println(" pos = (" + body.pos_x + ", " + body.pos_y
+                    + ", " + body.pos_z + ")");
             System.out.println(" diff = (" + diff_x + ", " + diff_y + ", "
-                + diff_z + ")");
+                    + diff_z + ")");
             System.out.println(" distsq = " + distsq + " maxTheta = "
-                + maxTheta);
+                    + maxTheta);
         }
 
         if (distsq >= maxTheta) {
@@ -567,7 +596,7 @@ import java.util.ArrayList;
             if (debug) {
                 System.out.println("  CoM interaction:");
                 System.out.println("  added (" + totalAcc[0] + ", "
-                    + totalAcc[1] + ", " + totalAcc[2] + ")");
+                        + totalAcc[1] + ", " + totalAcc[2] + ")");
             }
             return;
         }
@@ -578,14 +607,14 @@ import java.util.ArrayList;
             // Leaf node, compute interactions with all my bodies
             if (BarnesHut.ASSERTS && (bodies == null || bodies.length == 0)) {
                 System.err.println("EEK! invalid cutoff in "
-                    + "barnes(vec3)(debug version)");
+                        + "barnes(vec3)(debug version)");
                 System.exit(1);
             }
 
             for (i = 0; i < bodies.length; i++) {
                 if (debug) {
                     System.out
-                        .println("  Interaction with " + bodies[i].number);
+                            .println("  Interaction with " + bodies[i].number);
                 }
 
                 diff_x = bodies[i].pos_x - body.pos_x;
@@ -604,9 +633,9 @@ import java.util.ArrayList;
 
                 if (debug) {
                     System.out.println("  distsq, dist, factor: " + distsq
-                        + ", " + dist + ", " + factor);
+                            + ", " + dist + ", " + factor);
                     System.out.println("  added (" + diff_x * factor + ", "
-                        + diff_y * factor + ", " + diff_z * factor + ")");
+                            + diff_y * factor + ", " + diff_z * factor + ")");
                 }
             }
         } else { // Cell node
@@ -624,8 +653,8 @@ import java.util.ArrayList;
      * interactTree.barnes(bodies[i].pos) for all the bodies when 'this' is a
      * leaf node.
      */
-    public void barnesSequential(BodyTreeNode interactTree, BodyUpdates results,
-            RunParameters params) {
+    public void barnesSequential(BodyTreeNode interactTree,
+            BodyUpdates results, RunParameters params) {
         if (children != null) { // cell node -> call children[].barnes()
             for (int i = 0; i < 8; i++) {
                 if (children[i] != null) {
@@ -640,17 +669,23 @@ import java.util.ArrayList;
 
         if (BarnesHut.ASSERTS && (bodies == null || bodies.length == 0)) {
             System.err.println("barnes(interactTree): "
-                + "found empty leafnode!");
+                    + "found empty leafnode!");
             return;
         }
 
         double[] acc = new double[3];
 
         for (int i = 0; i < bodies.length; i++) {
-            acc[0] = 0; acc[1] = 0; acc[2] = 0;
-            barnesBodyTimer.start();
+            acc[0] = 0;
+            acc[1] = 0;
+            acc[2] = 0;
+            if(BODY_TIMING) {
+                barnesBodyTimer.start();
+            }
             interactTree.barnesBody(bodies[i], acc, params);
-            barnesBodyTimer.stop();
+            if(BODY_TIMING) {
+                barnesBodyTimer.stop();
+            }
             results.addAccels(bodies[i].number, acc[0], acc[1], acc[2]);
         }
     }
@@ -680,8 +715,8 @@ import java.util.ArrayList;
                         out.print(" ");
                     if (bodies[j] != null) {
                         out.println("body #" + bodies[j].number + " at "
-                            + bodies[j].pos_x + ", " + bodies[j].pos_y + ", "
-                            + bodies[j].pos_z);
+                                + bodies[j].pos_x + ", " + bodies[j].pos_y
+                                + ", " + bodies[j].pos_z);
                     } else {
                         out.println("body: null");
                     }
