@@ -407,7 +407,7 @@ import java.util.Arrays;
 
             long total = updateTimeTmp + forceCalcTimeTmp + vizTimeTmp;
 
-            System.err.println("Iteration " + iteration
+            System.out.println("Iteration " + iteration
                 + " done"
                 + ", update = "
                 + updateTimeTmp + ", force = " + forceCalcTimeTmp + ", viz = "
