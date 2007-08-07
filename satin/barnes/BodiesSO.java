@@ -28,6 +28,8 @@ final public class BodiesSO extends SharedObject implements BodiesInterface, Bod
         if (iteration == this.iteration+1) {
             updateBodiesLocally(b, iteration);
         }
+        
+        System.gc();
     }
 
     public void updateBodiesLocally(BodyUpdates b, int iteration) {
