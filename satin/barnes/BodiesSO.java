@@ -29,7 +29,7 @@ final public class BodiesSO extends SharedObject implements BodiesInterface, Bod
             updateBodiesLocally(b, iteration);
         }
         
-        System.gc();
+        System.gc(); //FIXME remove
     }
 
     public void updateBodiesLocally(BodyUpdates b, int iteration) {

@@ -49,7 +49,7 @@ public final class BodyUpdatesDouble extends BodyUpdates {
 
     public final void addAccels(int bodyno, double x, double y, double z) {
         if (index >= bodyNumbers.length) {
-            System.out.println("Should not happen 1");
+            System.err.println("Should not happen: bodyUpdates too small");
             grow(2 * index + 1);
         }
         bodyNumbers[index] = bodyno;

@@ -2,7 +2,7 @@
 
 import java.io.*;
 
-strictfp public final class Body implements Cloneable, Comparable, Serializable {
+/*strictfp*/ public final class Body implements Cloneable, Comparable, Serializable {
 
     public int number;
 

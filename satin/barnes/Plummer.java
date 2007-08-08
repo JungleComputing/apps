@@ -127,6 +127,15 @@ class Plummer {
 
         }
 
+        // Plummer should make sure that a body with number x also has index x
+        for (i = 0; i < numBodies; i++) {
+            if (BarnesHut.ASSERTS && bodies[i].number != i) {
+                System.err.println("EEK! Plummer generated an "
+                    + "inconsistent body number");
+                System.exit(1);
+            }
+        }
+
         return bodies;
     }
 

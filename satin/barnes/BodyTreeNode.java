@@ -78,14 +78,6 @@ import java.util.ArrayList;
 
     private double totalMass; //set during CoM computation
 
-    //usual potential softening value, copied from splash2-barnes
-    //	static final double SOFT = 0.05;
-
-    // this value is copied from Suel --Rob
-    static final double SOFT = 0.0000025;
-
-    static final double SOFT_SQ = SOFT * SOFT;
-
     // Extra margin of space used around the bodies.
     private static final double DIM_SLACK = 0.00001;
 

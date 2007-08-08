@@ -12,10 +12,11 @@ import java.io.FileWriter;
 
 import java.util.Arrays;
 
-/* strictfp */final class BarnesHut extends SatinObject implements BarnesHutInterface {
+/* strictfp */final class BarnesHut extends SatinObject implements
+        BarnesHutInterface {
 
     static boolean remoteViz = false;
-    
+
     static String dumpViz = null;
 
     static boolean viz = false;
@@ -34,96 +35,28 @@ import java.util.Arrays;
 
     static int impl = IMPL_NTC;
 
-    //number of bodies at which the ntc impl work sequentially
+    // number of bodies at which the ntc impl work sequentially
     private static int spawn_min = 500; //use -min <threshold> to modify
 
-    private static long totalTime = 0,
-            updateTime = 0, forceCalcTime = 0, vizTime = 0;
-
-    //Parameters for the BarnesHut algorithm / simulation
-    private static final double THETA = 2.0; // cell subdivision tolerance
-
-    private static final double DT = 0.025; // default integration time-step
-    private static final double DT_HALF = DT / 2.0; // default integration time-step
-
-    //we do 7 iterations (first one isn't measured)
-    private static double START_TIME = 0.0;
-
-    private static double END_TIME = 0.175;
-
-    static int iterations = -1;
+    private static long totalTime = 0, updateTime = 0, forceCalcTime = 0,
+            vizTime = 0;
 
     static Body[] bodyArray;
 
-    //Indicates if we are the root divide-and-conquer node
-    
     private transient RunParameters params;
 
     private static String dump_file = null;
+
     private static int dump_iters = 100;
 
     BarnesHut(int n, RunParameters params) {
-
         this.params = params;
-
-        initialize(n);
-
-        /*
-         * The RMI version contained magic code equivalent to this: (the
-         * DEFAULT_* variables were different)
-         * 
-         * double scale = Math.pow( nBodies / 16384.0, -0.25 ); DT = DEFAULT_DT *
-         * scale; END_TIME = DEFAULT_END_TIME * scale; THETA = DEFAULT_THETA /
-         * scale;
-         * 
-         * Since Rutger didn't know where it came from, and barnes from splash2
-         * also doesn't include this code, I will omit it. - Maik.
-         */
-
-        if (iterations == -1) {
-            iterations = (int) ((END_TIME + 0.1 * params.DT - START_TIME) / params.DT);
-        }
-    }
-
-    private double readDouble(StreamTokenizer tk, String err)
-        throws IOException {
-        int tok = tk.nextToken();
-        if (tok != StreamTokenizer.TT_WORD) {
-            throw new IOException(err);
-        }
-        return Double.parseDouble(tk.sval);
-    }
-
-    private void dump(int iteration) {
-        try {
-            BufferedWriter w = new BufferedWriter(new FileWriter(dump_file));
-            w.write("" + bodyArray.length + "\n");
-            w.write("3\n");
-            w.write("" + (START_TIME + iteration * params.DT)  + "\n");
-            for (int i = 0; i < bodyArray.length; i++) {
-                w.write("" + bodyArray[i].mass + "\n");
-            }
-            for (int i = 0; i < bodyArray.length; i++) {
-                w.write("" + bodyArray[i].pos_x
-                        + " " + bodyArray[i].pos_y
-                        + " " + bodyArray[i].pos_z + "\n");
-            }
-            for (int i = 0; i < bodyArray.length; i++) {
-                w.write("" + bodyArray[i].vel_x
-                        + " " + bodyArray[i].vel_y
-                        + " " + bodyArray[i].vel_z + "\n");
-            }
-            w.close();
-        } catch(Exception e) {
-            throw new Error(e.toString(), e);
-        }
+        bodyArray = new Plummer().generate(n);
     }
 
     BarnesHut(Reader r, RunParameters params) throws IOException {
         BufferedReader br = new BufferedReader(r);
         StreamTokenizer tokenizer = new StreamTokenizer(br);
-
-        this.params = params;
 
         tokenizer.resetSyntax();
         tokenizer.wordChars('0', '9');
@@ -140,7 +73,12 @@ import java.util.Arrays;
         // Ignore number of dimensions.
         readDouble(tokenizer, "number expected for dimensions");
 
-        START_TIME = readDouble(tokenizer, "number expected for start time");
+        double startTtime = readDouble(tokenizer,
+            "number expected for start time");
+
+        this.params = new RunParameters(params.THETA, params.DT, params.SOFT,
+            params.MAX_BODIES_PER_LEAF, params.THRESHOLD,
+            params.USE_DOUBLE_UPDATES, startTtime, params.END_TIME, params.ITERATIONS);
 
         // Allocate bodies and read mass.
         bodyArray = new Body[nBodies];
@@ -167,37 +105,52 @@ import java.util.Arrays;
             body.vel_y = readDouble(tokenizer, "y velocity expected for body");
             body.vel_z = readDouble(tokenizer, "z velocity expected for body");
         }
-
-        if (iterations == -1) {
-            iterations = (int) ((END_TIME + 0.1 * params.DT - START_TIME) / params.DT);
-        }
     }
 
-    static void initialize(int nBodies) {
-        bodyArray = new Plummer().generate(nBodies);
+    private double readDouble(StreamTokenizer tk, String err)
+        throws IOException {
+        int tok = tk.nextToken();
+        if (tok != StreamTokenizer.TT_WORD) {
+            throw new IOException(err);
+        }
+        return Double.parseDouble(tk.sval);
+    }
 
-        // Plummer should make sure that a body with number x also has index x
-        for (int i = 0; i < nBodies; i++) {
-            if (ASSERTS && bodyArray[i].number != i) {
-                System.err.println("EEK! Plummer generated an "
-                    + "inconsistent body number");
-                System.exit(1);
+    private void dump(int iteration) {
+        try {
+            BufferedWriter w = new BufferedWriter(new FileWriter(dump_file));
+            w.write("" + bodyArray.length + "\n");
+            w.write("3\n");
+            w.write("" + (params.START_TIME + iteration * params.DT) + "\n");
+            for (int i = 0; i < bodyArray.length; i++) {
+                w.write("" + bodyArray[i].mass + "\n");
             }
+            for (int i = 0; i < bodyArray.length; i++) {
+                w.write("" + bodyArray[i].pos_x + " " + bodyArray[i].pos_y
+                    + " " + bodyArray[i].pos_z + "\n");
+            }
+            for (int i = 0; i < bodyArray.length; i++) {
+                w.write("" + bodyArray[i].vel_x + " " + bodyArray[i].vel_y
+                    + " " + bodyArray[i].vel_z + "\n");
+            }
+            w.close();
+        } catch (Exception e) {
+            throw new Error(e.toString(), e);
         }
     }
 
-    public boolean guard_BarnesSO(int nodeId, int iteration,
-				       BodiesSO bodies) {
-        // System.out.println("guard: iteration = " + iteration
-        //         + ", bodies.iteration = " + bodies.iteration);
-        return bodies.iteration+1 == iteration;
-    }
-    
     public BodyUpdates getBodyUpdates(int n, RunParameters params) {
-        if (params.useDoubleUpdates) {
+        if (params.USE_DOUBLE_UPDATES) {
             return new BodyUpdatesDouble(n);
         }
         return new BodyUpdatesFloat(n);
+    }
+
+    /* guard method for the spawn below */
+    public boolean guard_BarnesSO(int nodeId, int iteration, BodiesSO bodies) {
+        // System.out.println("guard: iteration = " + iteration
+        //         + ", bodies.iteration = " + bodies.iteration);
+        return bodies.iteration + 1 == iteration;
     }
 
     /* spawnable */
@@ -207,22 +160,22 @@ import java.util.Arrays;
 
     public BodyUpdates doBarnesSO(int nodeId, int iteration, BodiesSO bodies) {
         RunParameters params = bodies.params;
-	BodyTreeNode me = BodyTreeNode.getTreeNode(nodeId);
+        BodyTreeNode me = BodyTreeNode.getTreeNode(nodeId);
 
-	if (me.children == null || me.bodyCount < params.THRESHOLD) {
-	    /* it is a leaf node, do sequential computation */
+        if (me.children == null || me.bodyCount < params.THRESHOLD) {
+            /* it is a leaf node, do sequential computation */
             // System.out.println("LEAF: bodycount = " + me.bodyCount);
             BodyUpdates res = getBodyUpdates(me.bodyCount, params);
             // Experiment:
             // BodyTreeNode necessaryTree = new BodyTreeNode(bodies.bodyTreeRoot, me);
-	    // me.barnesSequential(necessaryTree, res, params);
-	    me.barnesSequential(bodies.bodyTreeRoot, res, params);
+            // me.barnesSequential(necessaryTree, res, params);
+            me.barnesSequential(bodies.bodyTreeRoot, res, params);
             return res;
-	} 
+        }
 
         int childcount = 0;
-	for (int i = 0; i < 8; i++) {
-	    if (me.children[i] != null) {
+        for (int i = 0; i < 8; i++) {
+            if (me.children[i] != null) {
                 childcount++;
             }
         }
@@ -230,23 +183,23 @@ import java.util.Arrays;
         childcount = 0;
         BodyUpdates result = getBodyUpdates(0, params);
 
-	for (int i = 0; i < 8; i++) {
-	    BodyTreeNode ch = me.children[i];
-	    if (ch != null) {
+        for (int i = 0; i < 8; i++) {
+            BodyTreeNode ch = me.children[i];
+            if (ch != null) {
                 // System.out.println("SPAWN ... bodycount = " + ch.bodyCount);
                 /* spawn child jobs */
-                res[childcount] = /* spawn */ BarnesSO(ch.getId(),
-                        iteration, bodies);
+                res[childcount] = /* spawn */BarnesSO(ch.getId(), iteration,
+                    bodies);
                 childcount++;
-	    }
+            }
         }
 
         sync();
         return result.combineResults(res);
-    }	
+    }
 
     public BodyUpdates doBarnesNTC(BodyTreeNode me, BodyTreeNode tree,
-	    RunParameters params) {
+        RunParameters params) {
         if (me.children == null || me.bodyCount < params.THRESHOLD) {
             // leaf node, let barnesSequential handle this
             BodyUpdates res = getBodyUpdates(me.bodyCount, params);
@@ -255,8 +208,8 @@ import java.util.Arrays;
         }
 
         int childcount = 0;
-	for (int i = 0; i < 8; i++) {
-	    if (me.children[i] != null) {
+        for (int i = 0; i < 8; i++) {
+            if (me.children[i] != null) {
                 childcount++;
             }
         }
@@ -268,8 +221,8 @@ import java.util.Arrays;
             BodyTreeNode ch = me.children[i];
             if (ch != null) {
                 //necessaryTree creation
-                BodyTreeNode necessaryTree = ch == tree
-                    ? tree : new BodyTreeNode(tree, ch);
+                BodyTreeNode necessaryTree = ch == tree ? tree
+                    : new BodyTreeNode(tree, ch);
                 res[childcount] = barnesNTC(ch, necessaryTree, params); // spawn
                 //alternative: copy whole tree
                 //res[childcount] = barnesNTC(ch, tree, params);
@@ -287,7 +240,7 @@ import java.util.Arrays;
      * subjob is created to be passed to the subjob.
      */
     public BodyUpdates barnesNTC(BodyTreeNode me, BodyTreeNode interactTree,
-	    RunParameters params) {
+        RunParameters params) {
         return doBarnesNTC(me, interactTree, params);
     }
 
@@ -300,11 +253,10 @@ import java.util.Arrays;
 
         RemoteVisualization rv = null;
 
-        System.out.println("BarnesHut: simulating "
-                + bodyArray.length + " bodies, "
-                + params.MAX_BODIES_PER_LEAF + " bodies/leaf node, "
-                + "theta = " + params.THETA
-                + ", spawn-min-threshold = " + spawn_min);
+        System.out.println("BarnesHut: simulating " + bodyArray.length
+            + " bodies, " + params.MAX_BODIES_PER_LEAF + " bodies/leaf node, "
+            + "theta = " + params.THETA + ", spawn-min-threshold = "
+            + spawn_min);
 
         // print the starting problem
         if (verbose) {
@@ -320,9 +272,9 @@ import java.util.Arrays;
         } else if (dumpViz != null) {
             try {
                 rv = new RemoteVisualization(dumpViz);
-            } catch(IOException e) {
+            } catch (IOException e) {
                 System.out.println("Warning: could not open " + dumpViz
-                        + ", got " + e);
+                    + ", got " + e);
             }
         }
 
@@ -333,14 +285,14 @@ import java.util.Arrays;
 
         if (impl == IMPL_SO) {
             bodies = new BodiesSO(bodyArray, params);
-            ((BodiesSO)bodies).exportObject();
+            ((BodiesSO) bodies).exportObject();
         } else {
             bodies = new Bodies(bodyArray, params);
         }
 
         start = System.currentTimeMillis();
 
-        for (int iteration = 0; iteration < iterations; iteration++) {
+        for (int iteration = 0; iteration <params.ITERATIONS; iteration++) {
             long updateTimeTmp = 0, forceCalcTimeTmp = 0, vizTimeTmp = 0;
 
             // System.out.println("Starting iteration " + iteration);
@@ -353,8 +305,7 @@ import java.util.Arrays;
 
             switch (impl) {
             case IMPL_NTC:
-                result = doBarnesNTC(bodies.getRoot(), bodies.getRoot(),
-                        params);
+                result = doBarnesNTC(bodies.getRoot(), bodies.getRoot(), params);
                 break;
             case IMPL_SO:
                 result = doBarnesSO(0, iteration, (BodiesSO) bodies);
@@ -363,7 +314,7 @@ import java.util.Arrays;
             case IMPL_SEQ:
                 result = getBodyUpdates(bodies.getRoot().bodyCount, params);
                 bodies.getRoot().barnesSequential(bodies.getRoot(), result,
-                        params);
+                    params);
                 break;
             }
 
@@ -376,9 +327,9 @@ import java.util.Arrays;
 
             result.prepareForUpdate();
 
-//            System.err.println("update: " + result);
-            
-            if (iteration < iterations-1) {
+            //            System.err.println("update: " + result);
+
+            if (iteration < params.ITERATIONS - 1) {
                 bodies.updateBodies(result, iteration);
             } else {
                 bodies.updateBodiesLocally(result, iteration);
@@ -389,8 +340,8 @@ import java.util.Arrays;
 
             phaseStart = System.currentTimeMillis();
 
-            if (dump_file != null
-                    && iteration != 0 && (iteration % dump_iters) == 0) {
+            if (dump_file != null && iteration != 0
+                && (iteration % dump_iters) == 0) {
                 dump(iteration);
             }
 
@@ -399,7 +350,8 @@ import java.util.Arrays;
             }
 
             if (rv != null) {
-                rv.showBodies(bodyArray, iteration, updateTimeTmp + forceCalcTimeTmp);
+                rv.showBodies(bodyArray, iteration, updateTimeTmp
+                    + forceCalcTimeTmp);
             }
 
             vizTimeTmp = System.currentTimeMillis() - phaseStart;
@@ -407,11 +359,10 @@ import java.util.Arrays;
 
             long total = updateTimeTmp + forceCalcTimeTmp + vizTimeTmp;
 
-            System.out.println("Iteration " + iteration
-                + " done"
-                + ", update = "
-                + updateTimeTmp + ", force = " + forceCalcTimeTmp + ", viz = "
-                + vizTimeTmp + ", total = " + total);
+            System.out.println("Iteration " + iteration + " done"
+                + ", update = " + updateTimeTmp + ", force = "
+                + forceCalcTimeTmp + ", viz = " + vizTimeTmp + ", total = "
+                + total);
         }
 
         end = System.currentTimeMillis();
@@ -441,7 +392,7 @@ import java.util.Arrays;
     }
 
     void run() {
-        System.out.println("Iterations: " + iterations + " (timings DO "
+        System.out.println("Iterations: " + params.ITERATIONS + " (timings DO "
             + "include the first iteration!)");
 
         switch (impl) {
@@ -466,8 +417,8 @@ import java.util.Arrays;
             + " s");
         System.out.println("Force calculation took  " + forceCalcTime / 1000.0
             + " s");
-        System.out.println("visualization took      " + vizTime / 1000.0
-            + " s");
+        System.out
+            .println("visualization took      " + vizTime / 1000.0 + " s");
         System.out.println("application barnes took "
             + (double) (totalTime / 1000.0) + " s");
 
@@ -478,22 +429,22 @@ import java.util.Arrays;
     }
 
     public static void main(String argv[]) {
-        int nBodies = 0, mlb = 3;
+        int nBodies = 0;
         boolean nBodiesSeen = false;
-        boolean mlbSeen = false;
+        boolean maxBodiesPerLeafSeen = false;
         FileReader rdr = null;
-        int i;
 
-        RunParameters params = new RunParameters();
-        params.THETA = THETA;
-        params.DT = DT;
-        params.DT_HALF = DT_HALF;
-        params.SOFT = BodyTreeNode.SOFT;
-        params.SOFT_SQ = BodyTreeNode.SOFT_SQ;
-        params.useDoubleUpdates = true;
-
+        int maxBodiesPerLeaf = 100;
+        double theta = 2.0;
+        double dt = 0.025;
+        double soft = 0.0000025; // this value is copied from Suel, splash-2 uses 0.05
+        boolean useDoubleUpdates = true;
+        double startTime = 0.0;
+        double endTime = 0.175;
+        int iterations = -1;
+        
         //parse arguments
-        for (i = 0; i < argv.length; i++) {
+        for (int i = 0; i < argv.length; i++) {
             //options
             if (argv[i].equals("-debug")) {
                 debug = true;
@@ -510,9 +461,9 @@ import java.util.Arrays;
             } else if (argv[i].equals("-dump-viz")) {
                 dumpViz = argv[++i];
             } else if (argv[i].equals("-float")) {
-                params.useDoubleUpdates = false;
+                useDoubleUpdates = false;
             } else if (argv[i].equals("-double")) {
-                params.useDoubleUpdates = true;
+                useDoubleUpdates = true;
             } else if (argv[i].equals("-no-viz")) {
                 viz = false;
             } else if (argv[i].equals("-ntc")) {
@@ -534,17 +485,15 @@ import java.util.Arrays;
                         "Illegal argument to -dump-iter: number of iterations must be > 0 !");
                 }
             } else if (argv[i].equals("-theta")) {
-                params.THETA = Double.parseDouble(argv[++i]);
+                theta = Double.parseDouble(argv[++i]);
             } else if (argv[i].equals("-starttime")) {
-                START_TIME = Double.parseDouble(argv[++i]);
+                startTime = Double.parseDouble(argv[++i]);
             } else if (argv[i].equals("-endtime")) {
-                END_TIME = Double.parseDouble(argv[++i]);
+                endTime = Double.parseDouble(argv[++i]);
             } else if (argv[i].equals("-dt")) {
-                params.DT = Double.parseDouble(argv[++i]);
-                params.DT_HALF = params.DT / 2.0;
+                dt = Double.parseDouble(argv[++i]);
             } else if (argv[i].equals("-eps")) {
-                params.SOFT = Double.parseDouble(argv[++i]);
-                params.SOFT_SQ = params.SOFT * params.SOFT;
+                soft = Double.parseDouble(argv[++i]);
             } else if (argv[i].equals("-input")) {
                 try {
                     rdr = new FileReader(argv[++i]);
@@ -569,10 +518,10 @@ import java.util.Arrays;
                     System.err.println("Illegal argument: " + argv[i]);
                     System.exit(1);
                 }
-            } else if (!mlbSeen) {
+            } else if (!maxBodiesPerLeafSeen) {
                 try {
-                    mlb = Integer.parseInt(argv[i]); //max bodies per leaf node
-                    mlbSeen = true;
+                    maxBodiesPerLeaf = Integer.parseInt(argv[i]); //max bodies per leaf node
+                    maxBodiesPerLeafSeen = true;
                 } catch (NumberFormatException e) {
                     System.err.println("Illegal argument: " + argv[i]);
                     System.exit(1);
@@ -585,11 +534,11 @@ import java.util.Arrays;
 
         if (nBodies < 1 && rdr == null) {
             System.err.println("Invalid body count, generating 300 bodies...");
-            nBodies = 300;
+            nBodies = 3000;
         }
 
-        params.MAX_BODIES_PER_LEAF = mlb;
-        params.THRESHOLD = spawn_min;
+        RunParameters params = new RunParameters(theta, dt, soft, maxBodiesPerLeaf,
+            spawn_min, useDoubleUpdates, startTime, endTime, iterations);
 
         if (rdr != null) {
             if (nBodiesSeen) {
