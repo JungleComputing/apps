@@ -123,15 +123,6 @@ strictfp public class GlobalData implements Cloneable, Serializable {
 
         gdBodies = new Body[gdMaxBodies];
 
-        // Scale ?
-/* @@@ this scale stuff is very strange. It is not there in the original suel code. --Rob
-
-        double scale = Math.pow(gdTotNumBodies / 16384.0, -0.25);
-
-        gdDt *= scale;
-        gdEndTime *= scale;
-        gdTheta *= 1.0 / scale;
-*/
         if (logger.isDebugEnabled()) {
             logger.debug("theta: " + gdTheta);
         }
