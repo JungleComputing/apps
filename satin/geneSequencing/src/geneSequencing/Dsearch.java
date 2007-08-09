@@ -205,7 +205,7 @@ public class Dsearch {
 
         generateResult(workUnit);
 
-        System.out.println("The result has been generated in "
+        System.out.println("application genesequencing_" + implementationName + " took "
                 + (System.currentTimeMillis() - startTime) / 1000.0 + " sec");
 
         if (dump) {
