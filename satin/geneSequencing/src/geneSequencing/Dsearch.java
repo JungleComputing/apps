@@ -42,7 +42,7 @@ public class Dsearch {
         this.args = args;
 
         if (args.length < 2) {
-            throw new Error("Usage: java DsearchDC <input file> <implementation name (dc, so, ...)> [-dump]");
+            throw new Error("Usage: java Dsearch <input file> <implementation name (dc, so, ...)> [-dump]");
         }
 
         implementationName = args[1];
