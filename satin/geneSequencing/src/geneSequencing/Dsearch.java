@@ -219,13 +219,10 @@ public class Dsearch {
 
         Satin.resume();
 
-        System.out.println("\n---> START <---");
-
-        System.out.println();
-        System.out.println("query sequences    = " + querySequences.size());
-        System.out.println("database sequences = " + databaseSequences.size());
-        System.out.println("threshold          = " + threshold);
-        System.out.println();
+        System.out.println(databaseSequences.size() + " database Sequences, "
+            + querySequences.size() + " query sequences, "
+            + "threshold " + threshold
+            + ", implementation: " + implementationName);
 
         double startTime = System.currentTimeMillis();
 
@@ -248,8 +245,6 @@ public class Dsearch {
                 / 1000.0 + " sec");
             Satin.resume();
         }
-
-        System.out.println("\n---> FINISH <---");
     }
 
     public static void main(String[] args) {
