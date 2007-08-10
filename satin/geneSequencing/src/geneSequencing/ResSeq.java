@@ -16,33 +16,23 @@ public class ResSeq implements Serializable {
     }
 
     public void updateDatabaseSequences(ArrayList<Sequence> newDatabaseSequences) {
-        for (int i = 0; i < newDatabaseSequences.size(); i++) {
-            Sequence sequence = (Sequence) newDatabaseSequences.get(i);
-            databaseSequences.add(sequence);
-        }
-
-        sortDatabaseSequnces();
-        getMaximumElements();
+        databaseSequences.addAll(newDatabaseSequences);
+        processDatabaseSeqs();
     }
 
     private void getMaximumElements() {
-        ArrayList<Sequence> newDatabaseSequences = new ArrayList<Sequence>();
-        
-        if (databaseSequences.size() >= maxScores) {
-            for (int i = 0; i < maxScores; i++)
-                newDatabaseSequences.add(databaseSequences.get(i));
-
-            databaseSequences = newDatabaseSequences;
+        while (databaseSequences.size() > maxScores) {
+            databaseSequences.remove(databaseSequences.size() - 1);
         }
     }
 
-    private void sortDatabaseSequnces() {
+    private void sortDatabaseSequences() {
         for (int i = 0; i < databaseSequences.size(); i++) {
             for (int j = 0; j < i; j++) {
-                if (compareSeqs((Sequence) databaseSequences.get(i),
-                        (Sequence) databaseSequences.get(j)) > 0) {
-                    Sequence elementI = (Sequence) databaseSequences.get(i);
-                    Sequence elementJ = (Sequence) databaseSequences.get(j);
+                if (compareSeqs(databaseSequences.get(i), databaseSequences
+                    .get(j)) > 0) {
+                    Sequence elementI = databaseSequences.get(i);
+                    Sequence elementJ = databaseSequences.get(j);
 
                     databaseSequences.set(j, elementI);
                     databaseSequences.set(i, elementJ);
@@ -52,7 +42,7 @@ public class ResSeq implements Serializable {
     }
 
     public void processDatabaseSeqs() {
-        sortDatabaseSequnces();
+        sortDatabaseSequences();
         getMaximumElements();
     }
 
@@ -60,8 +50,7 @@ public class ResSeq implements Serializable {
         int first_i_score = i.getSequenceScore();
         int first_j_score = j.getSequenceScore();
 
-        if (first_i_score > first_j_score)
-            return 1;
+        if (first_i_score > first_j_score) return 1;
 
         return first_i_score != first_j_score ? -1 : 0;
     }
@@ -71,19 +60,17 @@ public class ResSeq implements Serializable {
         str = str + querySequence.getSequenceName() + "\n\n";
 
         for (int i = 0; i < databaseSequences.size(); i++) {
-            Sequence sequence = (Sequence) databaseSequences.get(i);
+            Sequence sequence = databaseSequences.get(i);
             int sequenceScore = sequence.getSequenceScore();
             String sequenceName = sequence.getSequenceName();
             String sequenceAlignment = sequence.getSequenceAlignment();
 
-            if (sequenceAlignment.equals("not calculated"))
-                str =
-                        str + "   " + "[" + (i + 1) + "] : " + sequenceScore
-                                + " : " + sequenceName + "\n";
-            else {
-                str =
-                        str + "   " + "[" + (i + 1) + "] : " + sequenceName
-                                + "\n";
+            if (sequenceAlignment.equals("not calculated")) {
+                str = str + "   " + "[" + (i + 1) + "] : " + sequenceScore
+                    + " : " + sequenceName + "\n";
+            } else {
+                str = str + "   " + "[" + (i + 1) + "] : " + sequenceName
+                    + "\n";
                 str = str + "\n" + sequenceAlignment + "\n\n";
             }
         }
@@ -100,11 +87,11 @@ public class ResSeq implements Serializable {
     }
 
     public void addDatabaseSequences(Sequence databaseSequence) {
-        databaseSequences.add(new Sequence(databaseSequence));
+        databaseSequences.add(new Sequence(databaseSequence)); // this copy is needed for correctness
     }
 
     public void setQuerySequence(Sequence querySequence) {
-        this.querySequence = new Sequence(querySequence);
+        this.querySequence = querySequence;
     }
 
     public void setMaximumScores(int maxScores) {

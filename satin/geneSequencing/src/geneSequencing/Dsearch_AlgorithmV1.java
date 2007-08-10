@@ -24,7 +24,7 @@ public class Dsearch_AlgorithmV1 {
 
             // create an array to record the scores
             ResSeq resSeq = new ResSeq();
-            resSeq.setQuerySequence(querySequence); //add the name of the current query sequence
+            resSeq.setQuerySequence(querySequence); // add the name of the current query sequence
 
             for (int j = 0; j < databaseSequences.size(); j++) {
                 Sequence databaseSequence = databaseSequences.get(j);
