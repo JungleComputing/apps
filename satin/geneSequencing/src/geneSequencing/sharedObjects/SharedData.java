@@ -1,46 +1,32 @@
 package geneSequencing.sharedObjects;
 
-import geneSequencing.FileSequences;
 import geneSequencing.Sequence;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 public class SharedData extends ibis.satin.SharedObject implements
         SharedDataInterface {
-    private FileSequences querySequences;
 
-    private FileSequences databaseSequences;
+    private ArrayList<Sequence> querySequences;
 
-    public SharedData(FileSequences querySequences, FileSequences databaseSequences) {
+    private ArrayList<Sequence> databaseSequences;
+
+    public SharedData(ArrayList<Sequence> querySequences, ArrayList<Sequence> databaseSequences) {
         this.querySequences = querySequences;
         this.databaseSequences = databaseSequences;
     }
 
-    public Vector getQuerySeqs(Vector seqsPointers) {
-        Vector qS = new Vector();
-
-        for (int i = 0; i < seqsPointers.size(); i++) {
-            int position = (Integer) seqsPointers.get(i);
-            Sequence currentSeq =
-                    (Sequence) querySequences.getSequences().get(position);
-
-            qS.add(currentSeq);
-        }
-
-        return qS;
+    /**
+     * @return the databaseSequences
+     */
+    public ArrayList<Sequence> getDatabaseSequences() {
+        return databaseSequences;
     }
 
-    public Vector getDatabaseSeqs(Vector seqsPointers) {
-        Vector dbS = new Vector();
-
-        for (int i = 0; i < seqsPointers.size(); i++) {
-            int position = (Integer) seqsPointers.get(i);
-            Sequence currentSeq =
-                    (Sequence) databaseSequences.getSequences().get(position);
-
-            dbS.add(currentSeq);
-        }
-
-        return dbS;
+    /**
+     * @return the querySequences
+     */
+    public ArrayList<Sequence> getQuerySequences() {
+        return querySequences;
     }
 }

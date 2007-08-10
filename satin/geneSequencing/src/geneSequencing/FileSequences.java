@@ -7,15 +7,12 @@ import java.util.ArrayList;
 public class FileSequences implements java.io.Serializable {
     private ArrayList<Sequence> sequences;
 
-    private String fileName;
-
     public FileSequences(String fileName) {
         sequences = new ArrayList<Sequence>();
-        this.fileName = fileName;
-        createFileSequences();
+        createFileSequences(fileName);
     }
 
-    private void createFileSequences() {
+    private void createFileSequences(String fileName) {
         try {
             BufferedReader bf = new BufferedReader(new FileReader(fileName));
 

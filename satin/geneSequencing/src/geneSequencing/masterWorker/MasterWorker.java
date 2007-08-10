@@ -24,6 +24,7 @@ public class MasterWorker extends ibis.satin.SatinObject implements
         return processResultUnits(resultUnits);
     }
 
+    @SuppressWarnings("unchecked")
     private ArrayList<ResSeq>[] generateResultUnits(
             ArrayList<WorkUnit> workUnits) {
         ArrayList<ResSeq> resultUnitsArray[] = new ArrayList[workUnits.size()];

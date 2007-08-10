@@ -1,22 +1,21 @@
 package geneSequencing;
 
-import java.util.Vector;
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class ResSeq implements Serializable {
     private int maxScores;
 
     private Sequence querySequence;
 
-    private Vector databaseSequences;
+    private ArrayList<Sequence> databaseSequences;
 
     public ResSeq() {
         querySequence = new Sequence();
-        databaseSequences = new Vector();
-        this.maxScores = 0;
+        databaseSequences = new ArrayList<Sequence>();
     }
 
-    public void updateDatabaseSequences(Vector newDatabaseSequences) {
+    public void updateDatabaseSequences(ArrayList<Sequence> newDatabaseSequences) {
         for (int i = 0; i < newDatabaseSequences.size(); i++) {
             Sequence sequence = (Sequence) newDatabaseSequences.get(i);
             databaseSequences.add(sequence);
@@ -27,8 +26,8 @@ public class ResSeq implements Serializable {
     }
 
     private void getMaximumElements() {
-        Vector newDatabaseSequences = new Vector();
-
+        ArrayList<Sequence> newDatabaseSequences = new ArrayList<Sequence>();
+        
         if (databaseSequences.size() >= maxScores) {
             for (int i = 0; i < maxScores; i++)
                 newDatabaseSequences.add(databaseSequences.get(i));
@@ -45,8 +44,8 @@ public class ResSeq implements Serializable {
                     Sequence elementI = (Sequence) databaseSequences.get(i);
                     Sequence elementJ = (Sequence) databaseSequences.get(j);
 
-                    databaseSequences.setElementAt(elementI, j);
-                    databaseSequences.setElementAt(elementJ, i);
+                    databaseSequences.set(j, elementI);
+                    databaseSequences.set(i, elementJ);
                 }
             }
         }
@@ -96,7 +95,7 @@ public class ResSeq implements Serializable {
         return querySequence;
     }
 
-    public Vector getDatabaseSequences() {
+    public ArrayList<Sequence> getDatabaseSequences() {
         return databaseSequences;
     }
 
