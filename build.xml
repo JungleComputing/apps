@@ -1,6 +1,6 @@
 <project
     name="ibis applications"
-    default="build"
+    default="jar"
     basedir=".">
 
     <description>

@@ -1,6 +1,6 @@
 <project
     name="Ibis applications build"
-    default="build"
+    default="jar"
     basedir=".">
 
     <description>
@@ -68,6 +68,17 @@
 	    description="Build Ibis applications">
 	<antcall target="-do-list">
 	    <param name="do-target" value="build"/>
+	</antcall>
+    </target>
+
+    <!--
+	Jar
+    -->
+    <target name="jar"
+	    depends="-list-build-files"
+	    description="Build Ibis applications">
+	<antcall target="-do-list">
+	    <param name="do-target" value="jar"/>
 	</antcall>
     </target>
 

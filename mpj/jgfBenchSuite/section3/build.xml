@@ -1,6 +1,6 @@
 <project
     name="ibis.apps.mpj.bench.section3"
-    default="build"
+    default="jar"
     basedir=".">
 
     <description>
@@ -10,7 +10,6 @@
     <property environment="env"/>
 
     <property name="ibis"        location="${env.IBIS_HOME}"/>
-    <property name="build"       location="build"/>
 
     <import file="${ibis}/build-files/apps/build-mpj-app.xml"/>
 

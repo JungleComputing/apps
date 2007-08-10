@@ -1,11 +1,7 @@
 <project
     name="misc tests"
-    default="build"
+    default="jar"
     basedir=".">
-
-    <property name="srcdir" value="./src"/>
-    <property name="build" location="build"/>
-    <property name="distdir" value="./lib"/>
 
     <property environment="env"/>
 

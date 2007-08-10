@@ -1,12 +1,11 @@
 <project
     name="ibis.apps.satin.nqueens.simple_exception"
-    default="build"
+    default="jar"
     basedir=".">
 
     <property environment="env"/>
 
     <property name="ibis"        location="${env.IBIS_HOME}"/>
-    <property name="build"       value="build"/>
 
     <property name="satinc-flags" value="-keep"/>
     <property name="satin-classes" value="NQueens"/>
