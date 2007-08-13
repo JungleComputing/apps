@@ -164,10 +164,7 @@ public class Dsearch {
     }
 
     public static ArrayList<ResSeq> combineSubResults(
-        ArrayList<ResSeq> subResult1, ArrayList<ResSeq> subResult2) {
-        ArrayList<ResSeq> main = subResult1;
-        ArrayList<ResSeq> additional = subResult2;
-
+            ArrayList<ResSeq> main, ArrayList<ResSeq> additional) {
         for (int i = 0; i < additional.size(); i++) {
             main = processSubResults(additional.get(i), main);
         }
@@ -189,7 +186,9 @@ public class Dsearch {
                 resSeqMain.updateDatabaseSequences(newDatabaseSeqs);
             }
         }
-        if (!flag) main.add(resSeq);
+        if (!flag) {
+            main.add(resSeq);
+        }
 
         return main;
     }
