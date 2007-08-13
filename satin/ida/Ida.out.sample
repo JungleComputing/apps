@@ -1,16 +1,16 @@
 CODE:
 0
 STDOUT:
-Running ida on ../inputs/2
+Running ida on inputs/2
 distance: 58, bound: 0, board:
 15 10  2  3 
 14  0  6  7 
  8 11  9  4 
 12 13  5  1 
 Try bound 58 60 62 64 66 68 
-application time ida (../inputs/2,68) took 36.202 s
+application time ida (inputs/2,68) took 36.202 s
 
-application result ida (../inputs/2,68) = 0 solutions of 68 steps
+application result ida (inputs/2,68) = 0 solutions of 68 steps
 -------------------------------SATIN STATISTICS--------------------------------
 SATIN: SPAWN:       151,781 spawns, 151,781 executed, 74,120 syncs
 SATIN: ABORT:       0 aborts, 0 abort msgs, 0 aborted jobs

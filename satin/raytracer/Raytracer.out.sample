@@ -1,9 +1,9 @@
 CODE:
 0
 STDOUT:
-Raytracer started, input file = ../pics/balls2.nff
-application time raytrace (../pics/balls2.nff) took 66.223 s
-application result raytrace (../pics/balls2.nff) = OK
+Raytracer started, input file = pics/balls2.nff
+application time raytrace (pics/balls2.nff) took 66.223 s
+application result raytrace (pics/balls2.nff) = OK
 -------------------------------SATIN STATISTICS--------------------------------
 SATIN: SPAWN:       349,525 spawns, 349,525 executed, 87,382 syncs
 SATIN: ABORT:       0 aborts, 0 abort msgs, 0 aborted jobs
