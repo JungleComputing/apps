@@ -97,29 +97,36 @@ public class Dsearch {
         ScoringScheme scoringScheme, ArrayList<Sequence> querySequences,
         ArrayList<Sequence> databaseSequences, int maxScores) {
         Dsearch_AlgorithmV1 dA = new Dsearch_AlgorithmV1();
-        ArrayList<ResSeq> subResult = null;
 
         try {
             ArrayList<ResSeq> resultUnit = dA.processUnit(querySequences,
                 databaseSequences, scoresOrAlignments, scoringScheme,
                 alignmentAlgorithm);
-            subResult = processResultUnit(resultUnit, maxScores);
+            processResultUnit(resultUnit, maxScores);
+            return resultUnit;
         } catch (Throwable thr) {
             System.out.println("Exception in createTrivialResult: "
                 + thr.toString());
+            throw new Error(thr);
         }
-
-        return subResult;
     }
 
+    private static void processResultUnit(
+            ArrayList<ResSeq> resultUnit, int maxScores) {
+            
+            for (int i = 0; i < resultUnit.size(); i++) {
+                ResSeq resSeq = resultUnit.get(i);
+                resSeq.setMaximumScores(maxScores);
+                resSeq.processDatabaseSeqs();
+            }
+        }
+/*
     private static ArrayList<ResSeq> processResultUnit(
         ArrayList<ResSeq> resultUnit, int maxScores) {
         ArrayList<ResSeq> subResult = new ArrayList<ResSeq>();
-
+// TODO remove copy
         for (int i = 0; i < resultUnit.size(); i++) {
-            ResSeq resSeq;
-
-            resSeq = resultUnit.get(i);
+            ResSeq resSeq = resultUnit.get(i);
             resSeq.setMaximumScores(maxScores);
             resSeq.processDatabaseSeqs();
 
@@ -128,7 +135,7 @@ public class Dsearch {
 
         return subResult;
     }
-
+*/
     public ArrayList<ResSeq> generateResult(WorkUnit workUnit) {
         ArrayList<ResSeq> result;
         
