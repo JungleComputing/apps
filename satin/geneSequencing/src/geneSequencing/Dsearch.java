@@ -98,17 +98,11 @@ public class Dsearch {
         ArrayList<Sequence> databaseSequences, int maxScores) {
         Dsearch_AlgorithmV1 dA = new Dsearch_AlgorithmV1();
 
-        try {
             ArrayList<ResSeq> resultUnit = dA.processUnit(querySequences,
                 databaseSequences, scoresOrAlignments, scoringScheme,
                 alignmentAlgorithm);
             processResultUnit(resultUnit, maxScores);
             return resultUnit;
-        } catch (Throwable thr) {
-            System.out.println("Exception in createTrivialResult: "
-                + thr.toString());
-            throw new Error(thr);
-        }
     }
 
     private static void processResultUnit(
@@ -119,23 +113,8 @@ public class Dsearch {
                 resSeq.setMaximumScores(maxScores);
                 resSeq.processDatabaseSeqs();
             }
-        }
-/*
-    private static ArrayList<ResSeq> processResultUnit(
-        ArrayList<ResSeq> resultUnit, int maxScores) {
-        ArrayList<ResSeq> subResult = new ArrayList<ResSeq>();
-// TODO remove copy
-        for (int i = 0; i < resultUnit.size(); i++) {
-            ResSeq resSeq = resultUnit.get(i);
-            resSeq.setMaximumScores(maxScores);
-            resSeq.processDatabaseSeqs();
-
-            subResult.add(resSeq);
-        }
-
-        return subResult;
     }
-*/
+
     public ArrayList<ResSeq> generateResult(WorkUnit workUnit) {
         ArrayList<ResSeq> result;
         
