@@ -12,7 +12,7 @@ public class Dsearch_AlgorithmV1 {
 
     public ArrayList<ResSeq> processUnit(ArrayList<Sequence> querySequences,
             ArrayList<Sequence> databaseSequences, int scoresOrAlignments,
-            ScoringScheme scoringScheme, String alignmentAlgorithm) {
+            ScoringScheme scoringScheme, String alignmentAlgorithm, int maxScores) {
         ArrayList<ResSeq> results = new ArrayList<ResSeq>();
 
         for (int i = 0; i < querySequences.size(); i++) {
@@ -65,6 +65,8 @@ public class Dsearch_AlgorithmV1 {
                     resSeq.addDatabaseSequences(databaseSequence);
                 }
             }
+            resSeq.setMaximumScores(maxScores);
+            resSeq.processDatabaseSeqs();
             results.add(resSeq);
         }
         return results;

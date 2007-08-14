@@ -100,19 +100,8 @@ public class Dsearch {
 
             ArrayList<ResSeq> resultUnit = dA.processUnit(querySequences,
                 databaseSequences, scoresOrAlignments, scoringScheme,
-                alignmentAlgorithm);
-            processResultUnit(resultUnit, maxScores);
+                alignmentAlgorithm, maxScores);
             return resultUnit;
-    }
-
-    private static void processResultUnit(
-            ArrayList<ResSeq> resultUnit, int maxScores) {
-            
-            for (int i = 0; i < resultUnit.size(); i++) {
-                ResSeq resSeq = resultUnit.get(i);
-                resSeq.setMaximumScores(maxScores);
-                resSeq.processDatabaseSeqs();
-            }
     }
 
     public ArrayList<ResSeq> generateResult(WorkUnit workUnit) {
@@ -160,15 +149,15 @@ public class Dsearch {
     private static ArrayList<ResSeq> processSubResults(ResSeq resSeq,
         ArrayList<ResSeq> main) {
         boolean flag = false;
+        String name = resSeq.getQuerySequence().getSequenceName();
+        ArrayList<Sequence> newDatabaseSeqs = resSeq.getDatabaseSequences();
+        
         for (int i = 0; i < main.size(); i++) {
             ResSeq resSeqMain = main.get(i);
-
-            String name = resSeq.getQuerySequence().getSequenceName();
             String nameMain = resSeqMain.getQuerySequence().getSequenceName();
 
             if (nameMain.equals(name)) {
                 flag = true;
-                ArrayList<Sequence> newDatabaseSeqs = resSeq.getDatabaseSequences();
                 resSeqMain.updateDatabaseSequences(newDatabaseSeqs);
             }
         }
