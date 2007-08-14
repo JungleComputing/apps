@@ -58,6 +58,10 @@ public class Dsearch_AlgorithmV1 {
                             + e.toString());
                 }
 
+                // TODO possible optimization:
+                // in the add, check if there are not more than maxScores
+                // entries. If so, remove worst one.
+                
                 if (score > 0) {
                     databaseSequence.setSequenceScore(score);
                     databaseSequence.setSequenceAlignment(alignment);
