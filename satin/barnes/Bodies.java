@@ -31,7 +31,7 @@ public final class Bodies implements BodiesInterface {
         return bodyTreeRoot;
     }
     
-    public void cleanup() {
+    public void cleanup(int dummy) {
         bodyTreeRoot.cleanup(); // clean the static cache of node IDs
         bodyTreeRoot = null; // allow the gc to throw away the entire tree
     }

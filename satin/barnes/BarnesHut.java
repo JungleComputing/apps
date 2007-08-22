@@ -327,7 +327,7 @@ import java.util.Arrays;
             
             ibis.satin.SatinObject.pause(); // pause divide-and-conquer stuff
 
-            bodies.cleanup(); // throw away the tree, we only need the body array now
+            bodies.cleanup(0); // throw away the tree, we only need the body array now
             // we do this to avoid out of memory problems
 
             printMemStats("post force " + iteration);

@@ -98,13 +98,9 @@ final public class BodiesSO extends SharedObject implements BodiesInterface, Bod
         return bodyTreeRoot;
     }
     
-    public void cleanup() {
+    public void cleanup(int dummy) { // TODO remove dummy
         BodyTreeNode.cleanup(); // clean the static cache of node IDs
         bodyTreeRoot = null; // allow the gc to throw away the entire tree
-    }
-    
-    public void cleanup(int dummy) { // TODO remove dummy
-        cleanup();
     }
 
     /**

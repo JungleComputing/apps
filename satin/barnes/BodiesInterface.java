@@ -9,5 +9,5 @@ public interface BodiesInterface {
     public BodyTreeNode getRoot();
     
     // clean the body tree
-    public void cleanup();
+    public void cleanup(int dummy); // TODO remove dummy
 }
