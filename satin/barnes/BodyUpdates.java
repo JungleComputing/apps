@@ -43,14 +43,14 @@ public abstract class BodyUpdates implements java.io.Serializable {
      * (and its nested structures) has updates.
      * @return the number of updates.
      */
-    protected final int computeSz() {
-        int sz = index;
+    protected final int computeSize() {
+        int size = index;
         if (more != null) {
             for (int i = 0; i < more.length; i++) {
-                sz += more[i].computeSz();
+                size += more[i].computeSize();
             }
         }
-        return sz;
+        return size;
     }
 
     /**
@@ -60,7 +60,7 @@ public abstract class BodyUpdates implements java.io.Serializable {
     protected final void optimizeAndTrim() {
         if (bodyNumbers != null) {
             if (more != null || index < bodyNumbers.length) {
-                int newsz = computeSz();
+                int newsz = computeSize();
                 grow(newsz);
                 if (more != null) {
                     for (int i = 0; i < more.length; i++) {

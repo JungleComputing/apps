@@ -93,7 +93,7 @@ public final class BodyUpdatesDouble extends BodyUpdates {
     }
 
     public final void prepareForUpdate() {
-        int sz = computeSz();
+        int sz = computeSize();
         double[] acc_x_tmp = new double[sz];
         double[] acc_y_tmp = new double[sz];
         double[] acc_z_tmp = new double[sz];

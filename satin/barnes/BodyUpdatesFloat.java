@@ -93,7 +93,7 @@ public final class BodyUpdatesFloat extends BodyUpdates {
     }
 
     public final void prepareForUpdate() {
-        int sz = computeSz();
+        int sz = computeSize();
         float[] acc_x_tmp = new float[sz];
         float[] acc_y_tmp = new float[sz];
         float[] acc_z_tmp = new float[sz];
