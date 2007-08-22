@@ -325,8 +325,6 @@ import java.util.Arrays;
                 break;
             }
 
-            bodies.cleanup(); // throw away the tree, we only need the body array now
-                              // we do this to avoid out of memory problems
             
             ibis.satin.SatinObject.pause(); // pause divide-and-conquer stuff
 
@@ -338,6 +336,9 @@ import java.util.Arrays;
             phaseStart = System.currentTimeMillis();
 
             result.prepareForUpdate();
+
+            bodies.cleanup(); // throw away the tree, we only need the body array now
+            // we do this to avoid out of memory problems
 
             printMemStats("post prepare for update " + iteration);
 
