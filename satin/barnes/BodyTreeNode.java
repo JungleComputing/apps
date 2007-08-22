@@ -152,6 +152,10 @@ import java.util.ArrayList;
         double max_x = -1000000.0, max_y = -1000000.0, max_z = -1000000.0, min_x =
                 1000000.0, min_y = 1000000.0, min_z = 1000000.0;
 
+        if(treeNodeIds.size() != 0) {
+            System.err.println("node id list is not empty!");
+        }
+        
         treeNodeId = 0;
         treeNodeIds.add(this);
         for (int i = 0; i < bodyArray.length; i++) {
