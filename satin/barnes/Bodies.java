@@ -2,11 +2,11 @@
 
 public final class Bodies implements BodiesInterface {
 
-    Body[] bodyArray;
+    private Body[] bodyArray;
     
-    BodyTreeNode bodyTreeRoot;
+    private BodyTreeNode bodyTreeRoot;
 
-    RunParameters params;
+    private RunParameters params;
 
     public Bodies(Body[] bodyArray, RunParameters params) {
         this.bodyArray = bodyArray;
@@ -14,7 +14,6 @@ public final class Bodies implements BodiesInterface {
 	bodyTreeRoot = new BodyTreeNode(bodyArray, params);
         bodyTreeRoot.computeCentersOfMass();
     }
-    
     
     public void updateBodies(BodyUpdates b, int iteration) {
         updateBodiesLocally(b, iteration);

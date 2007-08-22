@@ -4,13 +4,13 @@ import ibis.satin.SharedObject;
 
 final public class BodiesSO extends SharedObject implements BodiesInterface, BodiesSOInterface, java.io.Serializable {
 
-    Body[] bodyArray;
+    private Body[] bodyArray;
 
-    transient BodyTreeNode bodyTreeRoot;
+    private transient BodyTreeNode bodyTreeRoot;
 
-    RunParameters params;
+    private RunParameters params;
 
-    int iteration = -1;
+    private int iteration = -1;
 
     public BodiesSO(Body[] bodyArray, RunParameters params) {
         this.bodyArray = bodyArray;
@@ -101,5 +101,19 @@ final public class BodiesSO extends SharedObject implements BodiesInterface, Bod
     public void cleanup() {
         bodyTreeRoot.cleanup(); // clean the static cache of node IDs
         bodyTreeRoot = null; // allow the gc to throw away the entire tree
+    }
+
+    /**
+     * @return the iteration
+     */
+    public int getIteration() {
+        return iteration;
+    }
+
+    /**
+     * @return the params
+     */
+    public RunParameters getParams() {
+        return params;
     }
 }

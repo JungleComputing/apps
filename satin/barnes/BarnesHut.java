@@ -151,7 +151,7 @@ import java.util.Arrays;
     public boolean guard_BarnesSO(int nodeId, int iteration, BodiesSO bodies) {
         // System.out.println("guard: iteration = " + iteration
         //         + ", bodies.iteration = " + bodies.iteration);
-        return bodies.iteration + 1 == iteration;
+        return bodies.getIteration() + 1 == iteration;
     }
 
     /* spawnable */
@@ -160,7 +160,7 @@ import java.util.Arrays;
     }
 
     public BodyUpdates doBarnesSO(int nodeId, int iteration, BodiesSO bodies) {
-        RunParameters params = bodies.params;
+        RunParameters params = bodies.getParams();
         BodyTreeNode me = BodyTreeNode.getTreeNode(nodeId);
 
         if (me.children == null || me.bodyCount < params.THRESHOLD) {
@@ -170,7 +170,7 @@ import java.util.Arrays;
             // Experiment:
             // BodyTreeNode necessaryTree = new BodyTreeNode(bodies.bodyTreeRoot, me);
             // me.barnesSequential(necessaryTree, res, params);
-            me.barnesSequential(bodies.bodyTreeRoot, res, params);
+            me.barnesSequential(bodies.getRoot(), res, params);
             return res;
         }
 
@@ -324,9 +324,11 @@ import java.util.Arrays;
                     params);
                 break;
             }
-
             
             ibis.satin.SatinObject.pause(); // pause divide-and-conquer stuff
+
+            bodies.cleanup(); // throw away the tree, we only need the body array now
+            // we do this to avoid out of memory problems
 
             printMemStats("post force " + iteration);
 
@@ -336,9 +338,6 @@ import java.util.Arrays;
             phaseStart = System.currentTimeMillis();
 
             result.prepareForUpdate();
-
-            bodies.cleanup(); // throw away the tree, we only need the body array now
-            // we do this to avoid out of memory problems
 
             printMemStats("post prepare for update " + iteration);
 
