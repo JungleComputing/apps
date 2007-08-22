@@ -447,6 +447,7 @@ import java.util.Arrays;
     }
 
     public static void printMemStats(String prefix) {
+        if(false) {
         Runtime r = Runtime.getRuntime();
 
         System.gc();
@@ -455,6 +456,7 @@ import java.util.Arrays;
         long total = r.totalMemory() / (1024*1024);
         System.err.println(prefix + ": free = " + free + " max = " + max
             + " total = " + total);
+        }
     }
 
     public static void main(String argv[]) {
