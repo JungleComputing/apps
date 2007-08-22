@@ -7,4 +7,7 @@ public interface BodiesInterface {
     public void updateBodiesLocally(BodyUpdates b, int iteration);
 
     public BodyTreeNode getRoot();
+    
+    // clean the body tree
+    public void cleanup();
 }

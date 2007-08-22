@@ -26,6 +26,7 @@ import java.util.ArrayList;
 
     private static final boolean BODY_TIMING = false;
 
+    /* needed for SO. We need to get the node for the current job */
     private static ArrayList<BodyTreeNode> treeNodeIds =
             new ArrayList<BodyTreeNode>();
 
@@ -151,7 +152,6 @@ import java.util.ArrayList;
         double max_x = -1000000.0, max_y = -1000000.0, max_z = -1000000.0, min_x =
                 1000000.0, min_y = 1000000.0, min_z = 1000000.0;
 
-        treeNodeIds.clear();
         treeNodeId = 0;
         treeNodeIds.add(this);
         for (int i = 0; i < bodyArray.length; i++) {
@@ -726,5 +726,9 @@ import java.util.ArrayList;
                 }
             }
         }
+    }
+
+    public void cleanup() {
+        treeNodeIds.clear(); // clean the static cache of node IDs
     }
 }

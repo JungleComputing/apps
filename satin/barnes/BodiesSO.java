@@ -31,10 +31,8 @@ final public class BodiesSO extends SharedObject implements BodiesInterface, Bod
     }
 
     public void updateBodiesLocally(BodyUpdates b, int iteration) {
-
         b.updateBodies(bodyArray, iteration, params);
 
-	bodyTreeRoot = null; /*to prevent OutOfMemoryError (maik)*/
 	bodyTreeRoot = new BodyTreeNode(bodyArray, params);
 	bodyTreeRoot.computeCentersOfMass();
         this.iteration = iteration;
@@ -98,5 +96,10 @@ final public class BodiesSO extends SharedObject implements BodiesInterface, Bod
 
     public BodyTreeNode getRoot() {
         return bodyTreeRoot;
+    }
+    
+    public void cleanup() {
+        bodyTreeRoot.cleanup(); // clean the static cache of node IDs
+        bodyTreeRoot = null; // allow the gc to throw away the entire tree
     }
 }
