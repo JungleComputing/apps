@@ -447,11 +447,11 @@ import java.util.Arrays;
         Runtime r = Runtime.getRuntime();
 
         System.gc();
-        long free = r.freeMemory();
-        long max = r.maxMemory();
-        long total = r.totalMemory();
-        System.err.println(prefix + " free = " + free + " max = " + max
-            + " total = " + total);
+        long free = r.freeMemory() / (1024*1024);
+        long max = r.maxMemory() / (1024*1024);
+        long total = r.totalMemory() / (1024*1024);
+        System.err.println("free = " + free + " max = " + max
+            + " total = " + total + "(" + prefix + ")");
     }
 
     public static void main(String argv[]) {
