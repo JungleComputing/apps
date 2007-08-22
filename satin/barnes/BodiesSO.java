@@ -99,7 +99,7 @@ final public class BodiesSO extends SharedObject implements BodiesInterface, Bod
     }
     
     public void cleanup() {
-        bodyTreeRoot.cleanup(); // clean the static cache of node IDs
+        BodyTreeNode.cleanup(); // clean the static cache of node IDs
         bodyTreeRoot = null; // allow the gc to throw away the entire tree
     }
 

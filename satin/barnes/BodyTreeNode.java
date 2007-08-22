@@ -732,7 +732,7 @@ import java.util.ArrayList;
         }
     }
 
-    public void cleanup() {
+    public static void cleanup() {
         treeNodeIds.clear(); // clean the static cache of node IDs
     }
 }
