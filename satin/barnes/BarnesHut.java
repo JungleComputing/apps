@@ -325,7 +325,8 @@ import java.util.Arrays;
                 break;
             }
 
-            bodies.cleanup(); // throw away the tree, we only need the body array now
+//            bodies.cleanup(); // throw away the tree, we only need the body array now
+                              // we do this to avoid out of memory problems
             
             ibis.satin.SatinObject.pause(); // pause divide-and-conquer stuff
 
