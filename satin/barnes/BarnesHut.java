@@ -78,7 +78,8 @@ import java.util.Arrays;
 
         this.params = new RunParameters(params.THETA, params.DT, params.SOFT,
             params.MAX_BODIES_PER_LEAF, params.THRESHOLD,
-            params.USE_DOUBLE_UPDATES, startTtime, params.END_TIME, params.ITERATIONS);
+            params.USE_DOUBLE_UPDATES, startTtime, params.END_TIME,
+            params.ITERATIONS);
 
         // Allocate bodies and read mass.
         bodyArray = new Body[nBodies];
@@ -283,6 +284,8 @@ import java.util.Arrays;
 
         BodiesInterface bodies;
 
+        printMemStats("pre bodies");
+        
         if (impl == IMPL_SO) {
             bodies = new BodiesSO(bodyArray, params);
             ((BodiesSO) bodies).exportObject();
@@ -290,9 +293,13 @@ import java.util.Arrays;
             bodies = new Bodies(bodyArray, params);
         }
 
+        printMemStats("post bodies");
+
         start = System.currentTimeMillis();
 
-        for (int iteration = 0; iteration <params.ITERATIONS; iteration++) {
+        for (int iteration = 0; iteration < params.ITERATIONS; iteration++) {
+            printMemStats("begin iter " + iteration);
+            
             long updateTimeTmp = 0, forceCalcTimeTmp = 0, vizTimeTmp = 0;
 
             // System.out.println("Starting iteration " + iteration);
@@ -320,12 +327,16 @@ import java.util.Arrays;
 
             ibis.satin.SatinObject.pause(); // pause divide-and-conquer stuff
 
+            printMemStats("post force " + iteration);
+
             forceCalcTimeTmp = System.currentTimeMillis() - phaseStart;
             forceCalcTime += forceCalcTimeTmp;
 
             phaseStart = System.currentTimeMillis();
 
             result.prepareForUpdate();
+
+            printMemStats("post prepare for update " + iteration);
 
             //            System.err.println("update: " + result);
 
@@ -337,6 +348,8 @@ import java.util.Arrays;
 
             updateTimeTmp = System.currentTimeMillis() - phaseStart;
             updateTime += updateTimeTmp;
+
+            printMemStats("post update " + iteration);
 
             phaseStart = System.currentTimeMillis();
 
@@ -422,10 +435,23 @@ import java.util.Arrays;
         System.out.println("application barnes took "
             + (double) (totalTime / 1000.0) + " s");
 
+        printMemStats("done");
+
         if (verbose) {
             System.out.println();
             printBodies(bodyArray);
         }
+    }
+
+    public static void printMemStats(String prefix) {
+        Runtime r = Runtime.getRuntime();
+
+        System.gc();
+        long free = r.freeMemory();
+        long max = r.maxMemory();
+        long total = r.totalMemory();
+        System.err.println(prefix + " free = " + free + " max = " + max
+            + " total = " + total);
     }
 
     public static void main(String argv[]) {
@@ -442,6 +468,8 @@ import java.util.Arrays;
         double startTime = 0.0;
         double endTime = 0.175;
         int iterations = -1;
+
+        printMemStats("start");
         
         //parse arguments
         for (int i = 0; i < argv.length; i++) {
@@ -537,8 +565,9 @@ import java.util.Arrays;
             nBodies = 3000;
         }
 
-        RunParameters params = new RunParameters(theta, dt, soft, maxBodiesPerLeaf,
-            spawn_min, useDoubleUpdates, startTime, endTime, iterations);
+        RunParameters params = new RunParameters(theta, dt, soft,
+            maxBodiesPerLeaf, spawn_min, useDoubleUpdates, startTime, endTime,
+            iterations);
 
         if (rdr != null) {
             if (nBodiesSeen) {
