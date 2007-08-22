@@ -450,8 +450,8 @@ import java.util.Arrays;
         long free = r.freeMemory() / (1024*1024);
         long max = r.maxMemory() / (1024*1024);
         long total = r.totalMemory() / (1024*1024);
-        System.err.println("free = " + free + " max = " + max
-            + " total = " + total + "(" + prefix + ")");
+        System.err.println(prefix + ": free = " + free + " max = " + max
+            + " total = " + total);
     }
 
     public static void main(String argv[]) {
