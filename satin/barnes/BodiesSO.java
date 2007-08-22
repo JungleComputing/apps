@@ -32,7 +32,8 @@ final public class BodiesSO extends SharedObject implements BodiesInterface, Bod
 
     public void updateBodiesLocally(BodyUpdates b, int iteration) {
         // just to be sure, cleanup again (in case we missed the call)
-        cleanup(0);
+        BodyTreeNode.cleanup(); // clean the static cache of node IDs
+        bodyTreeRoot = null; // allow the gc to throw away the entire tree
         
         b.updateBodies(bodyArray, iteration, params);
 
