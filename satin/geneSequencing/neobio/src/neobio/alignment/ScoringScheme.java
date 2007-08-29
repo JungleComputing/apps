@@ -39,7 +39,7 @@ package neobio.alignment;
  * @author Sergio A. de Carvalho Jr.
  * @see PairwiseAlignmentAlgorithm
  */
-public abstract class ScoringScheme
+public abstract class ScoringScheme implements  java.io.Serializable
 {
 	/**
 	 * Determines whether this scoring scheme ignores the case of characters when

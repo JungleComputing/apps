@@ -44,7 +44,7 @@ package neobio.alignment;
  *
  * @author Sergio A. de Carvalho Jr.
  */
-public class BasicScoringScheme extends ScoringScheme implements  java.io.Serializable
+public class BasicScoringScheme extends ScoringScheme
 {
 	/**
 	 * The reward for a match (a substitution of equal characters).
