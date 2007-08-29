@@ -12,7 +12,7 @@ public class Sequence implements java.io.Serializable {
     private String alignment;
 
     public Sequence() {
-        sequenceName = new String();
+        sequenceName = "";
         sequenceBody = new ArrayList<String>();
         score = 0;
         alignment = "not calculated";
@@ -26,10 +26,10 @@ public class Sequence implements java.io.Serializable {
     }
 
     public Sequence(Sequence seq) {
-        sequenceName = new String(seq.getSequenceName());
+        sequenceName = seq.getSequenceName();
         sequenceBody = new ArrayList<String>(seq.getSequenceBody());
-        score = new Integer(seq.getSequenceScore());
-        alignment = new String(seq.getSequenceAlignment());
+        score = seq.getSequenceScore();
+        alignment = seq.getSequenceAlignment();
     }
 
     public String getSequenceName() {
@@ -61,11 +61,11 @@ public class Sequence implements java.io.Serializable {
     }
 
     public void setSequenceAlignment(String alignment) {
-        this.alignment = new String(alignment);
+        this.alignment = alignment;
     }
 
     public String createSequenceBody() {
-        String body = new String();
+        String body = "";
         for (int i = 0; i < sequenceBody.size(); i++) {
             body += sequenceBody.get(i);
         }

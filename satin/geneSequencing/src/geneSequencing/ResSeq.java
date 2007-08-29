@@ -56,7 +56,7 @@ public class ResSeq implements Serializable {
     }
 
     public String toString() {
-        String str = new String();
+        String str = "";
         str = str + querySequence.getSequenceName() + "\n\n";
 
         for (int i = 0; i < databaseSequences.size(); i++) {

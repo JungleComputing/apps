@@ -112,7 +112,7 @@ public class InputReader implements AlignmentAlgorithms {
             throw new Exception("Could not determine alignment algorithm");
         }
 
-        alignmentAlgorithm = new String(property.toLowerCase());
+        alignmentAlgorithm = property.toLowerCase();
         if (!alignmentAlgorithm.equals(NEEDLEMAN_WUNSCH)
             && !alignmentAlgorithm.equals(SMITH_WATERMAN)
             && !alignmentAlgorithm.equals(CROCHEMORE_GLOBAL)
