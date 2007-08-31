@@ -40,6 +40,19 @@ public class Dsearch {
         }
     }
 
+    public static void printMemStats(String prefix) {
+        if(true) {
+        Runtime r = Runtime.getRuntime();
+
+        System.gc();
+        long free = r.freeMemory() / (1024*1024);
+        long max = r.maxMemory() / (1024*1024);
+        long total = r.totalMemory() / (1024*1024);
+        System.err.println(prefix + ": free = " + free + " max = " + max
+            + " total = " + total);
+        }
+    }
+
     private void saveResult(ArrayList<ResSeq> result) {
         try {
             File tmp = new File(inputFileName);
@@ -172,7 +185,7 @@ public class Dsearch {
         Satin.pause();
 
         InputReader iR = null;
-
+        printMemStats("start");
         try {
             iR = new InputReader(inputFileName);
         } catch (Throwable e) {
@@ -187,9 +200,11 @@ public class Dsearch {
 
         String queryFile = iR.getQueryFile();
         FileSequences querySequences = new FileSequences(queryFile);
+        printMemStats("query loaded");
 
         String databaseFile = iR.getDatabaseFile();
         FileSequences databaseSequences = new FileSequences(databaseFile);
+        printMemStats("database loaded");
 
         Satin.resume();
 
@@ -205,6 +220,7 @@ public class Dsearch {
             databaseSequences.getSequences(), maxScores, threshold);
 
         ArrayList<ResSeq> result = generateResult(workUnit);
+        printMemStats("done");
 
         System.out.println("application genesequencing_" + implementationName
             + " took " + (System.currentTimeMillis() - startTime) / 1000.0
