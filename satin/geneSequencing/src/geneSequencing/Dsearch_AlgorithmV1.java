@@ -17,7 +17,7 @@ public class Dsearch_AlgorithmV1 {
 
         for (int i = 0; i < querySequences.size(); i++) {
             Sequence querySequence = querySequences.get(i);
-            String querySequenceBody = querySequence.createSequenceBody();
+            String querySequenceBody = querySequence.getSequenceBody();
 
             char[] currentQuerySeq = querySequenceBody.toCharArray();
 
@@ -28,7 +28,7 @@ public class Dsearch_AlgorithmV1 {
             for (int j = 0; j < databaseSequences.size(); j++) {
                 Sequence databaseSequence = databaseSequences.get(j);
                 String databaseSequenceBody =
-                        databaseSequence.createSequenceBody();
+                        databaseSequence.getSequenceBody();
 
                 char[] currentDatabaseSeq = databaseSequenceBody.toCharArray();
 

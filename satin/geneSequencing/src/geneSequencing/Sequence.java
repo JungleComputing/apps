@@ -2,10 +2,10 @@ package geneSequencing;
 
 import java.util.ArrayList;
 
-public class Sequence implements java.io.Serializable {
+public final class Sequence implements java.io.Serializable {
     private String sequenceName;
 
-    private ArrayList<String> sequenceBody;
+    private String sequenceBody;
 
     private int score;
 
@@ -13,21 +13,21 @@ public class Sequence implements java.io.Serializable {
 
     public Sequence() {
         sequenceName = "";
-        sequenceBody = new ArrayList<String>();
+        sequenceBody = "";
         score = 0;
         alignment = "not calculated";
     }
 
     public Sequence(String name, ArrayList<String> body) {
         sequenceName = name;
-        sequenceBody = body;
+        sequenceBody = createBody(body);
         score = 0;
         alignment = "not calculated";
     }
 
     public Sequence(Sequence seq) {
         sequenceName = seq.getSequenceName();
-        sequenceBody = new ArrayList<String>(seq.getSequenceBody());
+        sequenceBody = seq.getSequenceBody();
         score = seq.getSequenceScore();
         alignment = seq.getSequenceAlignment();
     }
@@ -36,7 +36,7 @@ public class Sequence implements java.io.Serializable {
         return sequenceName;
     }
 
-    public ArrayList<String> getSequenceBody() {
+    public String getSequenceBody() {
         return sequenceBody;
     }
 
@@ -48,14 +48,6 @@ public class Sequence implements java.io.Serializable {
         return alignment;
     }
 
-    public void setSequenceName(String name) {
-        sequenceName = name;
-    }
-
-    public void setSequenceBody(ArrayList<String> body) {
-        sequenceBody = body;
-    }
-
     public void setSequenceScore(int score) {
         this.score = score;
     }
@@ -64,12 +56,12 @@ public class Sequence implements java.io.Serializable {
         this.alignment = alignment;
     }
 
-    public String createSequenceBody() {
-        String body = "";
-        for (int i = 0; i < sequenceBody.size(); i++) {
-            body += sequenceBody.get(i);
+    private String createBody(ArrayList<String> parts) {
+        StringBuffer body = new StringBuffer();
+        for (int i = 0; i < parts.size(); i++) {
+            body.append(parts.get(i));
         }
 
-        return body;
+        return body.toString();
     }
 }

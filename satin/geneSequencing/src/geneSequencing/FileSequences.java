@@ -20,17 +20,16 @@ public class FileSequences implements java.io.Serializable {
 
             while (line != null) {
                 if (line.charAt(0) == '>') {
-                    Sequence seq = new Sequence();
-                    seq.setSequenceName(line);
+
+                    String name = line;
 
                     ArrayList<String> tail = new ArrayList<String>();
                     while ((line = bf.readLine()) != null
                         && line.charAt(0) != '>') {
                         tail.add(line);
                     }
-                    seq.setSequenceBody(tail);
 
-                    sequences.add(seq);
+                    sequences.add(new Sequence(name, tail));
                 }
             }
         } catch (Exception e) {
