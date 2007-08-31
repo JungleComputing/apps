@@ -2,7 +2,7 @@ package geneSequencing;
 
 import java.util.ArrayList;
 
-public final class Sequence implements java.io.Serializable {
+public final class Sequence implements java.io.Serializable, Comparable<Sequence> {
     private String sequenceName;
 
     private String sequenceBody;
@@ -63,5 +63,17 @@ public final class Sequence implements java.io.Serializable {
         }
 
         return body.toString();
+    }
+
+    public int compareTo(Sequence o) {
+        if(score<o.score) {
+            return 1;
+        }
+        if(score>o.score) {
+            return -1;
+        }
+        
+        // scores are equal.
+        return o.sequenceName.compareTo(sequenceName);
     }
 }

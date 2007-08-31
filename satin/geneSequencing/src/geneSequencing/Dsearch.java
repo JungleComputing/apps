@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.TreeSet;
 import java.util.zip.GZIPOutputStream;
 
 import neobio.alignment.ScoringScheme;
@@ -163,7 +164,7 @@ public class Dsearch {
         ArrayList<ResSeq> main) {
         boolean flag = false;
         String name = resSeq.getQuerySequence().getSequenceName();
-        ArrayList<Sequence> newDatabaseSeqs = resSeq.getDatabaseSequences();
+        TreeSet<Sequence> newDatabaseSeqs = resSeq.getDatabaseSequences();
         
         for (int i = 0; i < main.size(); i++) {
             ResSeq resSeqMain = main.get(i);
