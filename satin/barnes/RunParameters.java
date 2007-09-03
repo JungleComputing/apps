@@ -36,7 +36,8 @@ public final class RunParameters implements java.io.Serializable {
     /** the number of iterations of the simulation */
     final int ITERATIONS;
 
-
+    final int IMPLEMENTATION;
+    
     // don't allow uninitialized construction, not used
     private RunParameters() {
         throw new Error("internal error");
@@ -44,7 +45,7 @@ public final class RunParameters implements java.io.Serializable {
 
     public RunParameters(double theta, double dt, double soft,
         int max_bodies_per_leaf, int threshold, boolean useDoubleUpdates,
-        double start_time, double end_time, int iterations) {
+        double start_time, double end_time, int iterations, int implementation) {
         THETA = theta;
         DT = dt;
         DT_HALF = DT / 2.0;
@@ -55,6 +56,7 @@ public final class RunParameters implements java.io.Serializable {
         USE_DOUBLE_UPDATES = useDoubleUpdates;
         START_TIME = start_time;
         END_TIME = end_time;
+        IMPLEMENTATION = implementation;
         
         if (iterations == -1) {
             ITERATIONS = (int) ((END_TIME + 0.1 * DT - START_TIME) / DT);

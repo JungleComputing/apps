@@ -35,7 +35,7 @@ import java.util.ArrayList;
     private static Timer barnesBodyTimer = Timer.createTimer();
 
     private static long bodyInteractions = 0;
-    
+
     static {
         if (BODY_TIMING) {
             Runtime.getRuntime().addShutdownHook(new Thread("xxx") {
@@ -91,55 +91,6 @@ import java.util.ArrayList;
     }
 
     /**
-     * Initializes center, halfSize and maxTheta
-     * 
-     * @param max
-     *            the maximum point the tree should represent
-     * @param min
-     *            the minimum point the tree should represent
-     */
-    private void initCenterSizeMaxtheta(double max_x, double max_y,
-            double max_z, double min_x, double min_y, double min_z,
-            RunParameters params) {
-
-        double size;
-
-        size = Math.max(max_x - min_x, max_y - min_y);
-        size = Math.max(size, max_z - min_z);
-
-        halfSize = size / 2.0;
-
-        // center is the real center (without added DIM_SLACK)
-        center_x = min_x + halfSize;
-        center_y = min_y + halfSize;
-        center_z = min_z + halfSize;
-
-        // make size a little bigger to compensate for very small floating point
-        size *= 1 + 2.0 * DIM_SLACK;
-
-        halfSize = size / 2.0;
-
-        maxTheta = params.THETA * halfSize;
-        maxTheta *= maxTheta;
-        // maxTheta = params.THETA * params.THETA * halfSize * halfSize;
-
-        //        System.out.println("theta = " + params.THETA + ", halfSize = " + halfSize + ", maxx = " + max_x + ", minx = " + min_x + ", maxTheta = " + maxTheta);
-    }
-
-    //constructor to create an empty tree, used during tree contruction
-    private BodyTreeNode(double centerX, double centerY, double centerZ,
-            double halfSize, double maxTheta) {
-        //children = null and bodies = null by default
-        this.center_x = centerX;
-        this.center_y = centerY;
-        this.center_z = centerZ;
-        this.halfSize = halfSize;
-        this.maxTheta = maxTheta;
-        treeNodeId = treeNodeIds.size();
-        treeNodeIds.add(this);
-    }
-
-    /**
      * Generates a new tree with dimensions exactly large enough to contain all
      * bodies.
      * 
@@ -152,12 +103,16 @@ import java.util.ArrayList;
         double max_x = -1000000.0, max_y = -1000000.0, max_z = -1000000.0, min_x =
                 1000000.0, min_y = 1000000.0, min_z = 1000000.0;
 
-        if(treeNodeIds.size() != 0) {
+        if (treeNodeIds.size() != 0) {
             System.err.println("node id list is not empty!");
         }
-        
+
         treeNodeId = 0;
-        treeNodeIds.add(this);
+
+        if (params.IMPLEMENTATION == BarnesHut.IMPL_SO) {
+            treeNodeIds.add(this);
+        }
+
         for (int i = 0; i < bodyArray.length; i++) {
             max_x = Math.max(max_x, bodyArray[i].pos_x);
             max_y = Math.max(max_y, bodyArray[i].pos_y);
@@ -170,31 +125,10 @@ import java.util.ArrayList;
         initCenterSizeMaxtheta(max_x, max_y, max_z, min_x, min_y, min_z, params);
 
         for (int i = 0; i < bodyArray.length; i++) {
-            addBody(bodyArray[i], params.MAX_BODIES_PER_LEAF);
+            addBody(bodyArray[i], params.MAX_BODIES_PER_LEAF, params);
         }
 
         trim();
-    }
-
-    public static BodyTreeNode getTreeNode(int id) {
-        return treeNodeIds.get(id);
-    }
-
-    public int getId() {
-        return treeNodeId;
-    }
-
-    private static double calcSquare(double com, double center, double halfSize) {
-        if (com > center + halfSize) {
-            double dist1D = com - (center + halfSize);
-            return dist1D * dist1D;
-        } else if (com < center - halfSize) {
-            double dist1D = (center - halfSize) - com;
-            return dist1D * dist1D;
-        }
-
-        // centerOfMass is in this dimension between the limits of job
-        return 0.0;
     }
 
     /**
@@ -245,6 +179,78 @@ import java.util.ArrayList;
                 }
             }
         }
+    }
+
+    //constructor to create an empty tree, used during tree contruction
+    private BodyTreeNode(double centerX, double centerY, double centerZ,
+            double halfSize, double maxTheta, RunParameters params) {
+        //children = null and bodies = null by default
+        this.center_x = centerX;
+        this.center_y = centerY;
+        this.center_z = centerZ;
+        this.halfSize = halfSize;
+        this.maxTheta = maxTheta;
+        treeNodeId = treeNodeIds.size();
+        if (params.IMPLEMENTATION == BarnesHut.IMPL_SO) {
+            treeNodeIds.add(this);
+        }
+    }
+
+    public static BodyTreeNode getTreeNode(int id) {
+        return treeNodeIds.get(id);
+    }
+
+    /**
+     * Initializes center, halfSize and maxTheta
+     * 
+     * @param max
+     *            the maximum point the tree should represent
+     * @param min
+     *            the minimum point the tree should represent
+     */
+    private void initCenterSizeMaxtheta(double max_x, double max_y,
+            double max_z, double min_x, double min_y, double min_z,
+            RunParameters params) {
+
+        double size;
+
+        size = Math.max(max_x - min_x, max_y - min_y);
+        size = Math.max(size, max_z - min_z);
+
+        halfSize = size / 2.0;
+
+        // center is the real center (without added DIM_SLACK)
+        center_x = min_x + halfSize;
+        center_y = min_y + halfSize;
+        center_z = min_z + halfSize;
+
+        // make size a little bigger to compensate for very small floating point
+        size *= 1 + 2.0 * DIM_SLACK;
+
+        halfSize = size / 2.0;
+
+        maxTheta = params.THETA * halfSize;
+        maxTheta *= maxTheta;
+        // maxTheta = params.THETA * params.THETA * halfSize * halfSize;
+
+        //        System.out.println("theta = " + params.THETA + ", halfSize = " + halfSize + ", maxx = " + max_x + ", minx = " + min_x + ", maxTheta = " + maxTheta);
+    }
+
+    public int getId() {
+        return treeNodeId;
+    }
+
+    private static double calcSquare(double com, double center, double halfSize) {
+        if (com > center + halfSize) {
+            double dist1D = com - (center + halfSize);
+            return dist1D * dist1D;
+        } else if (com < center - halfSize) {
+            double dist1D = (center - halfSize) - com;
+            return dist1D * dist1D;
+        }
+
+        // centerOfMass is in this dimension between the limits of job
+        return 0.0;
     }
 
     /**
@@ -299,9 +305,9 @@ import java.util.ArrayList;
     /**
      * Adds 'b' to 'this' or its children
      */
-    private void addBody(Body b, int maxLeafBodies) {
+    private void addBody(Body b, int maxLeafBodies, RunParameters params) {
         if (children != null) { // cell node
-            addBody2Cell(b, maxLeafBodies);
+            addBody2Cell(b, maxLeafBodies, params);
             bodyCount++;
             return;
         }
@@ -329,9 +335,9 @@ import java.util.ArrayList;
 
         // we'll have to convert ourselves to a cell
         children = new BodyTreeNode[8];
-        addBody2Cell(b, maxLeafBodies);
+        addBody2Cell(b, maxLeafBodies, params);
         for (int i = 0; i < bodyCount; i++) {
-            addBody2Cell(bodies[i], maxLeafBodies);
+            addBody2Cell(bodies[i], maxLeafBodies, params);
         }
         bodyCount++;
         bodies = null;
@@ -341,7 +347,7 @@ import java.util.ArrayList;
     /**
      * This method is used if 'this' is a cell, to add a body to the appropiate child.
      */
-    private void addBody2Cell(Body b, int maxLeafBodies) {
+    private void addBody2Cell(Body b, int maxLeafBodies, RunParameters params) {
         int child = 0;
 
         if (b.pos_x - center_x >= 0.0)
@@ -352,7 +358,7 @@ import java.util.ArrayList;
             child |= 4;
 
         if (children[child] != null) {
-            children[child].addBody(b, maxLeafBodies);
+            children[child].addBody(b, maxLeafBodies, params);
             return;
         }
 
@@ -382,7 +388,7 @@ import java.util.ArrayList;
 
         children[child] =
                 new BodyTreeNode(newCenterX, newCenterY, newCenterZ,
-                        halfSize / 2.0, maxTheta / 4.0);
+                        halfSize / 2.0, maxTheta / 4.0, params);
         children[child].bodies = new Body[maxLeafBodies];
         children[child].bodies[0] = b;
         children[child].bodyCount = 1;
@@ -504,10 +510,10 @@ import java.util.ArrayList;
                 System.exit(1);
             }
 
-            if(BODY_TIMING) {
+            if (BODY_TIMING) {
                 intTimer.start();
             }
-            
+
             double dx = 0;
             double dy = 0;
             double dz = 0;
@@ -532,7 +538,7 @@ import java.util.ArrayList;
             totalAcc[1] += dy;
             totalAcc[2] += dz;
 
-            if(BODY_TIMING) {
+            if (BODY_TIMING) {
                 bodyInteractions += bodies.length;
                 intTimer.stop();
             }
@@ -675,11 +681,11 @@ import java.util.ArrayList;
             acc[0] = 0;
             acc[1] = 0;
             acc[2] = 0;
-            if(BODY_TIMING) {
+            if (BODY_TIMING) {
                 barnesBodyTimer.start();
             }
             interactTree.barnesBody(bodies[i], acc, params);
-            if(BODY_TIMING) {
+            if (BODY_TIMING) {
                 barnesBodyTimer.stop();
             }
             results.addAccels(bodies[i].number, acc[0], acc[1], acc[2]);

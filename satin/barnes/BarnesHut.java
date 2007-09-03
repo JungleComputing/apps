@@ -33,8 +33,6 @@ import java.util.Arrays;
 
     static final int IMPL_SEQ = 3; // -seq option
 
-    static int impl = IMPL_NTC;
-
     // number of bodies at which the ntc impl work sequentially
     private static int spawn_min = 500; //use -min <threshold> to modify
 
@@ -79,7 +77,7 @@ import java.util.Arrays;
         this.params = new RunParameters(params.THETA, params.DT, params.SOFT,
             params.MAX_BODIES_PER_LEAF, params.THRESHOLD,
             params.USE_DOUBLE_UPDATES, startTtime, params.END_TIME,
-            params.ITERATIONS);
+            params.ITERATIONS, params.IMPLEMENTATION);
 
         // Allocate bodies and read mass.
         bodyArray = new Body[nBodies];
@@ -286,7 +284,7 @@ import java.util.Arrays;
 
         printMemStats("pre bodies");
         
-        if (impl == IMPL_SO) {
+        if (params.IMPLEMENTATION == IMPL_SO) {
             bodies = new BodiesSO(bodyArray, params);
             ((BodiesSO) bodies).exportObject();
         } else {
@@ -310,7 +308,7 @@ import java.util.Arrays;
 
             ibis.satin.SatinObject.resume(); //turn ON divide-and-conquer stuff
 
-            switch (impl) {
+            switch (params.IMPLEMENTATION) {
             case IMPL_NTC:
                 result = doBarnesNTC(bodies.getRoot(), bodies.getRoot(), params);
                 break;
@@ -411,7 +409,7 @@ import java.util.Arrays;
         System.out.println("Iterations: " + params.ITERATIONS + " (timings DO "
             + "include the first iteration!)");
 
-        switch (impl) {
+        switch (params.IMPLEMENTATION) {
         case IMPL_NTC:
             System.out.println("Using necessary tree impl");
             break;
@@ -422,7 +420,7 @@ import java.util.Arrays;
             System.out.println("Using shared object impl");
             break;
         default:
-            System.out.println("EEK! Using unknown implementation #" + impl);
+            System.out.println("EEK! Using unknown implementation #" + params.IMPLEMENTATION);
             System.exit(1);
             break; //blah
         }
@@ -473,6 +471,8 @@ import java.util.Arrays;
         double startTime = 0.0;
         double endTime = 0.175;
         int iterations = -1;
+        int impl = IMPL_NTC;
+
 
         printMemStats("start");
         
@@ -572,7 +572,7 @@ import java.util.Arrays;
 
         RunParameters params = new RunParameters(theta, dt, soft,
             maxBodiesPerLeaf, spawn_min, useDoubleUpdates, startTime, endTime,
-            iterations);
+            iterations, impl);
 
         if (rdr != null) {
             if (nBodiesSeen) {
