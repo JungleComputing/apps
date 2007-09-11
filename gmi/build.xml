@@ -7,5 +7,9 @@
 
     <property name="ibis"        location="${env.IBIS_HOME}"/>
 
+    <property name="test-par-run" value="fft.Main 20"/>
+    <property name="test-seq-java-args" value="-Xmx128M"/>
+    <property name="test-seq-run" value="fft.Main 20"/>
+
     <import file="${ibis}/build-files/apps/build-gmi-app.xml"/>
 </project>
