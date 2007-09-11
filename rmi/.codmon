@@ -1,0 +1,12 @@
+2 acp 2 ACP input0
+2 asp_toplass.Main 1000 -thread-pool
+//2 barnes.BarnesHutt -N50000 -M10 -tstop 0.25 -dtime 0.025 -eps 0.00000025 -das -threads
+2 -Xmx800m fft.fft 22 -warmup 4
+2 latency.Main
+2 leq.Main
+2 qr.Main
+2 radix.Radix -r1024 -n1000000
+2 rmiBench.RMI_Bench 100000 0 -warmup 100000
+4 sor_grid.Main 1024 1024 0 async
+2 tsp.Server src/tsp/table_15.1 -bound 3162
+2 water.Water src/water/random.1728

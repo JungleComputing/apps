@@ -1,1 +1,1 @@
-fft 22 -warmup 4
+fft.fft 22 -warmup 4
