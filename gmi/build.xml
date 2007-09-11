@@ -1,12 +1,11 @@
 <project
-    name="GMI applications"
-    default="build"
+    name="GMI apps"
+    default="jar"
     basedir=".">
 
-    <description>
-	GMI applications build.
-    </description>
+    <property environment="env"/>
 
-    <import file="../build-apps.xml"/>
+    <property name="ibis"        location="${env.IBIS_HOME}"/>
 
+    <import file="${ibis}/build-files/apps/build-gmi-app.xml"/>
 </project>
