@@ -1,11 +1,8 @@
 <project
-    name="MPJ applications"
-    default="build"
+    name="MPJ tests"
+    default="jar"
     basedir=".">
 
-    <description>
-	Ibis applications build.
-    </description>
+    <import file="build-mpj-app.xml"/>
 
-    <import file="../../build-apps.xml"/>
 </project>
