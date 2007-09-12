@@ -1,11 +1,7 @@
 <project
-    name="MPJ applications"
-    default="build"
+    name="MPJ JavaGrande Forum Benchmark Suite"
+    default="jar"
     basedir=".">
 
-    <description>
-	Ibis applications build.
-    </description>
-
-    <import file="../../build-apps.xml"/>
+    <import file="build-mpj-app.xml"/>
 </project>
