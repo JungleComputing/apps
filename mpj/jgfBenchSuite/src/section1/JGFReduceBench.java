@@ -26,6 +26,9 @@
 * 19/06/2005                                                              *
 **************************************************************************/
 
+
+package section1;
+
 import java.io.*;
 import jgfutil.*; 
 import ibis.mpj.*;

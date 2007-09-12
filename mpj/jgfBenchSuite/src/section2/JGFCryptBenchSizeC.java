@@ -26,6 +26,8 @@
 * 19/06/2005                                                              *
 **************************************************************************/
 
+package section2;
+
 import crypt.*;
 import jgfutil.*; 
 import ibis.mpj.*;

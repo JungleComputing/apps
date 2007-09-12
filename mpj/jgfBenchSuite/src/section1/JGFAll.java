@@ -25,6 +25,9 @@
 * Vrije Universiteit Amsterdam Department of Computer Science             *
 * 19/06/2005                                                               *
 **************************************************************************/
+
+package section1;
+
 import jgfutil.*; 
 import ibis.mpj.*;
 

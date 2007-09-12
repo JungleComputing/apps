@@ -191,34 +191,37 @@ public class JGFInstrumentor{
   
     switch (section) {
     case 1: 
-    	header = base + "1";
-    	break;
+      header = base + "1";
+      break;
     case 2:
-    	switch (size) {
-    	case 0:
-    		header = base + "2 - Size A";
-    		break;
-    	case 1:
-    		header = base + "2 - Size B";
-    		break;
-    	case 2:
-    		header = base + "2 - Size C";
-    		break;
-    	}
-    	break; 
+      switch (size) {
+      case 0:
+	header = base + "2 - Size A";
+	break;
+      case 1:
+	header = base + "2 - Size B";
+	break;
+      case 2:
+      	header = base + "2 - Size C";
+      	break;
+      case 3:
+      	header = base + "2 - Size D";
+      	break;
+      }
+      break; 
     case 3:    
-    	switch (size) {
-    	case 0:
-    		header = base + "3 - Size A";
-    		break;
-    	case 1:
-    		header = base + "3 - Size B";
-    		break;
-    	case 2:
-    		header = base + "3 - Size C";
-    		break;
-    	}
-    	break; 
+      switch (size) {
+      case 0:
+	header = base + "3 - Size A";
+	break;
+      case 1:
+	header = base + "3 - Size B";
+	break;
+      case 2:
+        header = base + "3 - Size C";
+        break;
+      }
+      break; 
     }
 
     System.out.println(header); 

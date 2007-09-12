@@ -26,6 +26,8 @@
 * 19/06/2005                                                              *
 **************************************************************************/
 
+package section2;
+
 import series.*; 
 import jgfutil.*; 
 import ibis.mpj.*;
