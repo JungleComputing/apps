@@ -6,7 +6,7 @@ jgfBenchsuite   Java Grande Forum Benchsuite: low-level, kernel and applications
 latency		Benchmark measuring the round-trip latency
 ObjectPingPong  Benchmark measuring the round-trip time of objects
 sor             Successive overrelaxation
-tests           Pragrams testing the MPJ/Ibis implemenation
+tests           Programs testing the MPJ/Ibis implemenation
 
 
 build.xml	Ant build file for building Ibis applications.

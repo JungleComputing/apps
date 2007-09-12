@@ -7,6 +7,8 @@
 * 26/01/2005                                                              *
 **************************************************************************/
 
+package asp;
+
 import java.text.DecimalFormat;
 import java.util.Random;
 import ibis.mpj.*;

@@ -1,5 +1,7 @@
 /* $Id$ */
 
+package objectPingPong;
+
 import ibis.mpj.*;
 
 public class ObjectPingPong {

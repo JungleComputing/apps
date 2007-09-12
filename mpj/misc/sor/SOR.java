@@ -8,6 +8,8 @@
  * ported to MPJ by Markus Bornemann, 9-april-2005
  */
 
+package sor;
+
 import java.text.DecimalFormat;
 
 import ibis.mpj.*;

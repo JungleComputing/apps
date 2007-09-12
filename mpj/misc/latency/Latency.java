@@ -1,5 +1,7 @@
 /* $Id$ */
 
+package latency;
+
 import ibis.mpj.*;
 
 public class Latency {

@@ -1,5 +1,7 @@
 /* $Id$ */
 
+package objectPingPong;
+
 import java.io.IOException;
 import java.io.Serializable;
 

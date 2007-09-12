@@ -1,0 +1,13 @@
+<project
+    name="MPJ misc"
+    default="jar"
+    basedir=".">
+
+    <import file="build-mpj-app.xml"/>
+
+    <property name="test-par-java-args" value=""/>
+    <property name="test-par-run" value="asp.ASP 1024"/>
+    <property name="test-seq-java-args" value=""/>
+    <property name="test-seq-run" value="asp.ASP 1024"/>
+
+</project>
