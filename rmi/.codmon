@@ -1,4 +1,4 @@
-2 acp.acp 2 ACP src/acp/input0
+2 acp.ACP src/acp/input0
 2 asp_toplass.Main 1000 -thread-pool
 //2 barnes.BarnesHutt -N50000 -M10 -tstop 0.25 -dtime 0.025 -eps 0.00000025 -das -threads
 2 -Xmx800m fft.fft 22 -warmup 4
