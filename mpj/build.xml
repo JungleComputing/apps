@@ -47,4 +47,14 @@
 	<ant target="test" dir="tests"/>
     </target>
 
+    <!--
+        Clean
+    -->
+    <target name="clean"
+	    description="cleanup">
+	<ant target="clean" dir="misc"/>
+	<ant target="clean" dir="jgfBenchSuite"/>
+	<ant target="clean" dir="tests"/>
+    </target>
+
 </project>
