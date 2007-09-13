@@ -7,12 +7,6 @@
 	Ibis MPJ applications build.
     </description>
 
-    <property environment="env"/>
-
-    <property name="ibis"        location="${env.IBIS_HOME}"/>
-
-    <import file="${ibis}/build-files/build-properties.xml"/>
-
     <!--
 	Compile only
     -->

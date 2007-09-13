@@ -3,6 +3,6 @@
     default="jar"
     basedir=".">
 
-    <import file="build-mpj-app.xml"/>
+    <import file="../build-mpj-app.xml"/>
 
 </project>

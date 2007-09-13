@@ -1,0 +1,52 @@
+<project
+    name="mpj-app"
+    default="build"
+    basedir=".">
+
+    <property environment="env"/>
+
+    <property name="ibis"        location="${env.IBIS_HOME}"/>
+
+    <property name="mpj"         location="${env.MPJ_HOME}"/>
+
+    <property name="myclasspath" value="${env.CLASSPATH}"/>
+
+    <target name="set-classpath" unless="classpath.initialized">
+	<path id="default.classpath">
+	    <pathelement path="${build}"/>
+	    <pathelement path="${user-classpath}"/>
+	    <pathelement path="${myclasspath}"/>
+	    <fileset dir="${ibis}/lib">
+		<include name="*.jar"/>
+	    </fileset>
+	    <fileset dir="${mpj}/lib">
+		<include name="*.jar"/>
+	    </fileset>
+	</path>
+	<echo	message="Now set default.classpath to ${default.classpath}"
+		level="verbose"/>
+	<property name="classpath.initialized" value="true"/>
+    </target>
+
+    <target name="property-init"
+	    depends="set-classpath">
+    </target>
+
+    <import file="${ibis}/build-files/apps/build-app.xml"/>
+
+    <target name="ibisc">
+	<java   classname="ibis.frontend.Ibisc"
+		taskname="Ibisc"
+		failonerror="true"
+		dir="${build}"
+		fork="true">
+		<arg line="."/>
+	    <classpath refid="default.classpath"/>
+	</java>
+    </target>
+
+    <target name="build"
+	    depends="compile,ibisc"
+	    description="Compile with Ibis-serialization rewriting"/>
+
+</project>
