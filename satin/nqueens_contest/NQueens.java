@@ -120,6 +120,7 @@ final class NQueens extends SatinObject implements NQueensInterface,
             final int ydiff, final int y, final int left, final int right,
             final int mask, final int lastmask, final int sidemask,
             final int bound1) {
+
         int bitmap = mask & ~(left | right);
 
         // Check if we have reached the end of the board. If so, 
@@ -256,12 +257,13 @@ final class NQueens extends SatinObject implements NQueensInterface,
                 // Queen positions from 1 .. size-1. "own" is the bit number.
                 // "ptn" the bit mask.
                 int bit = 1;
+                int bown = board[own];
                 // Here, we are looking for a queen in row "own" as well
                 // as a queen in column "row".
-                for (int you = sizee; board[you] != ptn && board[own] >= bit; you--, bit <<= 1) {
+                for (int you = sizee; board[you] != ptn && bown >= bit; you--, bit <<= 1) {
                 }
 
-                if (board[own] > bit) {
+                if (bown > bit) {
                     // In this case, we found the queen in row "own" first
                     // (from right to left), which means that the row-index
                     // of the queen in column "own" is higher than the
@@ -271,7 +273,7 @@ final class NQueens extends SatinObject implements NQueensInterface,
                     // that it is counted already.
                     return 0;
                 }
-                if (board[own] < bit) {
+                if (bown < bit) {
                     // In this case, we found the queen in column "own" first
                     // (from right to left). This is a new one, and not a
                     // 90-degree rotation of itself.
@@ -302,19 +304,21 @@ final class NQueens extends SatinObject implements NQueensInterface,
             for (you = sizee - 1; own < you; own++, you--) {
                 // stop condition was: own <= sizee
                 int bit = 1;
+                int bown = board[own];
+                int byou = board[you];
                 // Now, we are looking at queens in columns 1 and sizee-2,
                 // 2 and sizee-3, et cetera, to find out if they too are at
                 // 180-degree rotation positions of each other.
-                for (int ptn = topbit; ptn != board[you] && board[own] >= bit; ptn >>= 1, bit <<= 1) {
+                for (int ptn = topbit; ptn != byou && bown >= bit; ptn >>= 1, bit <<= 1) {
                 }
 
-                if (board[own] > bit) {
+                if (bown > bit) {
                     // We found the one in row sizee-own first, which means
                     // that this position has been counted before (when it
                     // was rotated 180 degrees).
                     return 0;
                 }
-                if (board[own] < bit) {
+                if (bown < bit) {
                     // We found the one in column own first. This is a new
                     // one, and not a 180-degree rotation of itself (and also
                     // not a 90-degree rotation).
@@ -341,17 +345,18 @@ final class NQueens extends SatinObject implements NQueensInterface,
             // be a 90-degree rotation as well.
             for (int ptn = topbit >> 1, own = 1; own <= sizee; own++, ptn >>= 1) {
                 int bit = 1;
+                int bown = board[own];
 
-                for (int you = 0; board[you] != ptn && board[own] >= bit; you++, bit <<= 1) {
+                for (int you = 0; board[you] != ptn && bown >= bit; you++, bit <<= 1) {
                 }
 
-                if (board[own] > bit) {
+                if (bown > bit) {
                     // We found a queen on row "sizee-row" first, which means
                     // that the queen on column "row" is higher up, which means
                     // that we have counted this position before.
                     return 0;
                 }
-                if (board[own] < bit) {
+                if (bown < bit) {
                     // Definitely a new position.
                     break;
                 }
