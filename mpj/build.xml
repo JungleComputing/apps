@@ -1,12 +1,56 @@
 <project
     name="MPJ applications"
-    default="build"
+    default="jar"
     basedir=".">
 
     <description>
-	Ibis applications build.
+	Ibis MPJ applications build.
     </description>
 
-    <import file="../build-apps.xml"/>
+    <property environment="env"/>
+
+    <property name="ibis"        location="${env.IBIS_HOME}"/>
+
+    <import file="${ibis}/build-files/build-properties.xml"/>
+
+    <!--
+	Compile only
+    -->
+    <target name="compile"
+	    description="Compile only">
+	<ant target="compile" dir="misc"/>
+	<ant target="compile" dir="jgfBenchSuite"/>
+	<ant target="compile" dir="tests"/>
+    </target>
+
+    <!--
+        Build
+    -->
+    <target name="build"
+	    description="build completely, without creating jars">
+	<ant target="build" dir="misc"/>
+	<ant target="build" dir="jgfBenchSuite"/>
+	<ant target="build" dir="tests"/>
+    </target>
+
+    <!--
+        Jars
+    -->
+    <target name="jar"
+	    description="build completely, creating jars">
+	<ant target="jar" dir="misc"/>
+	<ant target="jar" dir="jgfBenchSuite"/>
+	<ant target="jar" dir="tests"/>
+    </target>
+
+    <!--
+        Test
+    -->
+    <target name="test"
+	    description="tests">
+	<ant target="test" dir="misc"/>
+	<ant target="test" dir="jgfBenchSuite"/>
+	<ant target="test" dir="tests"/>
+    </target>
 
 </project>

@@ -1,16 +1,6 @@
-This directory contains a collection of MPJ/Ibis example programs, test and 
+This directory contains a collection of MPJ/Ibis programs, tests and 
 benchmarks, organized into a number of sub-directories:
 
-asp             All pairs shortest path
+misc            Some small applications and benchmarks
 jgfBenchsuite   Java Grande Forum Benchsuite: low-level, kernel and applications
-latency		Benchmark measuring the round-trip latency
-ObjectPingPong  Benchmark measuring the round-trip time of objects
-sor             Successive overrelaxation
-tests           Programs testing the MPJ/Ibis implemenation
-
-
-build.xml	Ant build file for building Ibis applications.
-		"ant build" (or simply: "ant") will build all applications that
-		are present in your Ibis installation. "ant clean" will remove
-		what "ant build" made.
-    
+tests           mpiJava's test suite.
