@@ -2,20 +2,13 @@
 
 package barnes;
 
-import ibis.util.Log;
-
 import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 
 strictfp public class GlobalData implements Cloneable, Serializable {
 
-    static Logger logger;
-    
-    static {
-        Log.initLog4J("");
-        logger = Logger.getLogger(GlobalData.class.getName());
-    }
+    static Logger logger = Logger.getLogger(GlobalData.class.getName());
 
     public Body gdBodies[];
 

@@ -65,14 +65,14 @@
     </target>
 
     <target name="run2" depends="set-ibis-name">
-        <exec dir="${basedir}" executable="${ibis}/bin/ibis-run" vmlauncher="false" spawn="true">
+        <exec dir="${basedir}" executable="${rmi}/bin/ibis-rmi-run" vmlauncher="false" spawn="true">
             <arg line="-Dibis.pool.size=2" />
             <arg line="-Dibis.pool.name=test-pool" />
             <arg line="-Dibis.server.address=localhost:8888" />
             <arg value="${define-ibis-name}" />
             <arg line="${java-args} ibis.util.Postpone 2 -o ant-test.out ${runjob}" />
         </exec>
-        <exec dir="${basedir}" executable="${ibis}/bin/ibis-run" timeout="500000" failonerror="true" vmlauncher="false">
+        <exec dir="${basedir}" executable="${rmi}/bin/ibis-rmi-run" timeout="500000" failonerror="true" vmlauncher="false">
             <arg line="-Dibis.pool.size=2" />
             <arg line="-Dibis.pool.name=test-pool" />
             <arg line="-Dibis.server.address=localhost:8888" />
@@ -96,7 +96,7 @@
     </target>
 
     <target name="run1" depends="set-ibis-name">
-        <exec dir="${basedir}" executable="${ibis}/bin/ibis-run" timeout="500000" failonerror="true" vmlauncher="false">
+        <exec dir="${basedir}" executable="${rmi}/bin/ibis-rmi-run" timeout="500000" failonerror="true" vmlauncher="false">
             <arg line="-Dibis.pool.size=1" />
             <arg line="-Dibis.pool.name=test-pool" />
             <arg line="-Dibis.server.address=localhost:8888" />
@@ -106,7 +106,7 @@
     </target>
 
     <target name="runseq">
-        <exec dir="${basedir}" executable="${ibis}/bin/ibis-run" timeout="500000" failonerror="true" vmlauncher="false">
+        <exec dir="${basedir}" executable="${rmi}/bin/ibis-rmi-run" timeout="500000" failonerror="true" vmlauncher="false">
             <arg line="${java-args} ${runjob}" />
         </exec>
     </target>
