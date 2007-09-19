@@ -3,10 +3,6 @@
     default="jar"
     basedir=".">
 
-    <property environment="env"/>
-
-    <property name="ibis"        location="${env.IBIS_HOME}"/>
-
     <path id="classpath">
 	<fileset dir="lib">
 	    <include name="*.jar"/>
@@ -24,7 +20,7 @@
     <property name="test-seq-java-args" value="-Dsatin.closed"/>
     -->
 
-    <import file="${ibis}/build-files/apps/build-satin-app.xml"/>
+    <import file="../build-satin-app.xml"/>
 
 </project>
 

@@ -5,8 +5,8 @@
 
 	<!-- Global properties -->
 	<property environment="env"/>
-	<property name="env.IBIS_HOME" location=".." /> 
-    <property name="ibis_lib" location="${env.IBIS_HOME}/lib" />
+	<property name="env.SATIN_HOME" location=".." /> 
+    <property name="satin_lib" location="${env.SATIN_HOME}/lib" />
 	<property name="neobio_lib" location="neobio/lib" />
 
 	<property name="src" location="src" />
@@ -15,7 +15,7 @@
 	<property name="java.debug.value" value="true" />
 
 	<path id="external_jars">
-		<fileset dir="${ibis_lib}">
+		<fileset dir="${satin_lib}">
 			<include name="*.jar" />
 		</fileset>
 		<fileset dir="${neobio_lib}">

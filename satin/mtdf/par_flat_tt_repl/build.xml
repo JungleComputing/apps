@@ -3,16 +3,10 @@
     default="jar"
     basedir=".">
 
-    <property environment="env"/>
-
-    <property name="ibis"        location="${env.IBIS_HOME}"/>
-
-    <property name="rmi"         location="${env.RMI_HOME}"/>
-
     <property name="satinc-flags" value=""/>
     <property name="satin-classes" value="Mtdf"/>
 
-    <import file="${ibis}/build-files/apps/build-satin-app.xml"/>
+    <import file="../../build-satin-app.xml"/>
 
     <property name="rmi"         location="${env.RMI_HOME}"/>
 
@@ -22,13 +16,10 @@
 
     <target name="set-rmiclasspath" unless="rmiclasspath.initialized">
 	<path id="rmi.classpath">
-	    <pathelement path="${build}"/>
+	    <pathelement path="${tmp}"/>
 	    <pathelement path="${user-classpath}"/>
 	    <pathelement path="${myclasspath}"/>
 	    <fileset dir="${rmi}/lib">
-		<include name="*.jar"/>
-	    </fileset>
-	    <fileset dir="${ibis}/lib">
 		<include name="*.jar"/>
 	    </fileset>
 	</path>
@@ -37,7 +28,7 @@
 	<property name="rmiclasspath.initialized" value="true"/>
     </target>
 
-    <property name="builddir" location="${build}"/>
+    <property name="builddir" location="${tmp}"/>
 
     <target name="rmic-sun" depends="set-rmiclasspath">
 	    <!-- Commented out; not toplevel.
@@ -53,33 +44,33 @@
 	    <map from="${builddir}${file.separator}" to=""/>
 	</pathconvert>
 
-	<echo message="${classes.all}" file="${build}/-RMIC-Classes"/>
-	<replace file="${build}/-RMIC-Classes" token=".class" value=""/>
-	<replace file="${build}/-RMIC-Classes" token="${file.separator}" value="."/>
+	<echo message="${classes.all}" file="${tmp}/-RMIC-Classes"/>
+	<replace file="${tmp}/-RMIC-Classes" token=".class" value=""/>
+	<replace file="${tmp}/-RMIC-Classes" token="${file.separator}" value="."/>
 	<loadfile
 		property="rmic-classes"
-		srcFile="${build}/-RMIC-Classes">
+		srcFile="${tmp}/-RMIC-Classes">
 	</loadfile>
 
 	<echo   level="debug"
 		message="All classes to be inspected: ${rmic-classes}"/>
 	<echo   level="debug"
-		message="Run frontend.rmi.Rmic -n -java over all classes under ${build}${file.separator}"/>
+		message="Run frontend.rmi.Rmic -n -java over all classes under ${tmp}${file.separator}"/>
 	<java   classname="ibis.rmi.impl.frontend.Rmic"
 		taskname="rmic locator"
 		dir="${builddir}"
 		failonerror="true"
 		fork="true"
-		output="${build}/-REMOTE-Classes">
+		output="${tmp}/-REMOTE-Classes">
 	    <arg line="-n -java ${rmic-classes}"/>
 	    <classpath refid="rmi.classpath"/>
 	</java>
 	<loadfile
 		property="remote.classes"
-		srcFile="${build}/-REMOTE-Classes"/>
+		srcFile="${tmp}/-REMOTE-Classes"/>
 	<echo   level="debug"
 		message="Now run sun.rmic over '${remote.classes}'"/>
-	<rmic   base="${build}"
+	<rmic   base="${tmp}"
 		includes="${remote.classes}">
 	    <classpath refid="rmi.classpath"/>
 	</rmic>
@@ -90,7 +81,7 @@
 	    description="build Mtdf application">
 	<antcall inheritAll="true" inheritRefs="true" target="compile"/>
 	<antcall inheritRefs="true" target="rmic-sun"/>
-	<antcall inheritRefs="true" target="do-satin"/>
+	<antcall inheritRefs="true" target="satin"/>
     </target>
 
 </project>

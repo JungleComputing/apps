@@ -3,10 +3,6 @@
     default="jar"
     basedir=".">
 
-    <property environment="env"/>
-
-    <property name="ibis"        location="${env.IBIS_HOME}"/>
-
     <property name="satinc-flags" value=""/>
     <property name="satin-classes" value="NQueens"/>
     <property name="main-class" value="NQueens"/>
@@ -16,7 +12,7 @@
     <property name="test-seq-java-args" value="-Dsatin.closed"/>
     <property name="test-seq-run" value="NQueens small-inp"/>
 
-    <import file="${ibis}/build-files/apps/build-satin-app.xml"/>
+    <import file="../build-satin-app.xml"/>
 
 </project>
 

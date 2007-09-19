@@ -3,13 +3,9 @@
     default="jar"
     basedir=".">
 
-    <property environment="env"/>
-
-    <property name="ibis"        location="${env.IBIS_HOME}"/>
-
     <property name="satin-classes" value="Main"/>
 
-    <import file="${ibis}/build-files/apps/build-satin-app.xml"/>
+    <import file="../../build-satin-app.xml"/>
 
 </project>
 

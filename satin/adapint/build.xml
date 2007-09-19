@@ -3,10 +3,6 @@
     default="jar"
     basedir=".">
 
-    <property environment="env"/>
-
-    <property name="ibis"        location="${env.IBIS_HOME}"/>
-
     <property name="satinc-flags" value=""/>
     <property name="satin-classes" value="AdapInt"/>
 
@@ -15,7 +11,7 @@
     <property name="test-seq-java-args" value="-Dibis.name=dummy -Dsatin.closed"/>
     <property name="test-seq-run" value="AdapInt"/>
 
-    <import file="${ibis}/build-files/apps/build-satin-app.xml"/>
+    <import file="../build-satin-app.xml"/>
 </project>
 
 

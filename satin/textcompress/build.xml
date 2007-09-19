@@ -3,17 +3,13 @@
     default="jar"
     basedir=".">
 
-    <property environment="env"/>
-
-    <property name="ibis"        location="${env.IBIS_HOME}"/>
-
     <property name="satinc-flags" value="-keep"/>
     <property name="satin-classes" value="Compress"/>
 
-    <import file="${ibis}/build-files/apps/build-satin-app.xml"/>
+    <import file="../build-satin-app.xml"/>
 
     <target name="test"
-	    depends="compile"
+	    depends="compile-jar"
 	    description="Run Junit test">
 	<antcall target="runseq">
 		<param name="runjob" value="junit.textui.TestRunner Tests"/>
@@ -26,7 +22,7 @@
 	<!-- Create the javadoc directory -->
 	<delete dir="docs"/>
 	<mkdir dir="docs"/>
-	<javadoc destdir="docs" sourcepath="${ibis}/src" author="true" version="true" use="true" windowtitle="Compressor documentation" doctitle="Compressor Documentation" bottom="The Ibis project">
+	<javadoc destdir="docs" sourcepath="." author="true" version="true" use="true" windowtitle="Compressor documentation" doctitle="Compressor Documentation" bottom="The Ibis project">
 	<FileSet file="*.java"/>
 	<classpath refid="default.classpath"/>
 	</javadoc>

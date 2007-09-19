@@ -3,16 +3,13 @@
     default="jar"
     basedir=".">
 
-    <property environment="env"/>
-
-    <property name="ibis"        location="${env.IBIS_HOME}"/>
-
     <property name="satin-classes" value="Mtdf"/>
 
     <property name="satinc-flags" value="-keep"/>
 
     <property name="test-par-java-args" value="-Dsatin.closed"/>
-    <import file="${ibis}/build-files/apps/build-satin-app.xml"/>
+
+    <import file="../../build-satin-app.xml"/>
 
     <target name="run"
 	    depends="build"
