@@ -9,8 +9,6 @@
 
     <property environment="env"/>
 
-    <property name="ibis"        location="${env.IBIS_HOME}"/>
-
     <property name="gmi"         location="${env.GMI_HOME}"/>
 
     <property name="myclasspath"  value="${env.CLASSPATH}"/>
@@ -80,6 +78,9 @@
             </not>
         </condition>
         <echo message="Running parallel test on ${prun-nprocs} nodes, ${ibis-name} Ibis" />
+
+	<property name="ibis"        location="${env.IBIS_HOME}"/>
+
         <exec dir="${basedir}" executable="/usr/local/VU/reserve.sge/bin/prun" vmlauncher="false">
 	    <arg value="COMMAND=${gmi}/bin/ibis-gmi-run" />
             <arg line="-1 ${ibis}/bin/ibis-prun ${prun-nprocs}" />

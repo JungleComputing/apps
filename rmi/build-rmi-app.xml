@@ -13,11 +13,7 @@
     -->
 
     <property environment="env"/>
-
-    <property name="ibis"        location="${env.IBIS_HOME}"/>
-
     <property name="rmi"         location="${env.RMI_HOME}"/>
-
     <property name="myclasspath" value="${env.CLASSPATH}"/>
 
     <property name="tmp"         value="tmp"/>
@@ -85,8 +81,11 @@
             </not>
         </condition>
         <echo message="Running parallel test on ${prun-nprocs} nodes, ${ibis-name} Ibis" />
+
+	<property name="ibis"        location="${env.IBIS_HOME}"/>
+
         <exec dir="${basedir}" executable="/usr/local/VU/reserve.sge/bin/prun" vmlauncher="false">
-	    <arg value="COMMAND=${mpj}/bin/ibis-rmi-run" />
+	    <arg value="COMMAND=${rmi}/bin/ibis-rmi-run" />
             <arg line="-1 ${ibis}/bin/ibis-prun ${prun-nprocs}" />
             <arg value="${define-ibis-name}" />
             <arg line="${java-args} ${runjob}" />
@@ -141,7 +140,7 @@
         </concat>
     </target>
 
-    <target name="test-prun" description="Run a parallel test with prun if the property 'test-par-run' is set" depends="build,set-par-jargs" if="test-par-run">
+    <target name="test-prun" description="Run a parallel test with prun if the property 'test-par-run' is set" depends="jar,set-par-jargs" if="test-par-run">
         <antcall target="do-prun">
             <param name="runjob" value="${test-par-run}" />
             <param name="java-args" value="${jargs}" />

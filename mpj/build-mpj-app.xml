@@ -5,8 +5,6 @@
 
     <property environment="env"/>
 
-    <property name="ibis"        location="${env.IBIS_HOME}"/>
-
     <property name="mpj"         location="${env.MPJ_HOME}"/>
 
     <property name="myclasspath" value="${env.CLASSPATH}"/>
@@ -76,6 +74,9 @@
             </not>
         </condition>
         <echo message="Running parallel test on ${prun-nprocs} nodes, ${ibis-name} Ibis" />
+
+	<property name="ibis"        location="${env.IBIS_HOME}"/>
+
         <exec dir="${basedir}" executable="/usr/local/VU/reserve.sge/bin/prun" vmlauncher="false">
             <arg value="COMMAND=${mpj}/bin/ibis-mpj-run" />
             <arg line="-1 ${ibis}/bin/ibis-prun ${prun-nprocs}" />
