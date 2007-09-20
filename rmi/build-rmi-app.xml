@@ -177,6 +177,7 @@
     <target name="init" depends="property-init">
         <tstamp />
         <mkdir dir="${tmp}" />
+        <mkdir dir="${lib}" />
     </target>
 
     <target name="compile" depends="clean,init"
