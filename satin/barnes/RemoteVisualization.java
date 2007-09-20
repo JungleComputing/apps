@@ -76,7 +76,7 @@ public class RemoteVisualization extends Thread {
     private void init() {
         try {
             IbisCapabilities s = new IbisCapabilities(
-                IbisCapabilities.ELECTIONS);
+                IbisCapabilities.ELECTIONS_STRICT);
             t = new PortType(PortType.SERIALIZATION_OBJECT,
                 PortType.COMMUNICATION_RELIABLE,
                 PortType.CONNECTION_ONE_TO_ONE, PortType.RECEIVE_EXPLICIT);
