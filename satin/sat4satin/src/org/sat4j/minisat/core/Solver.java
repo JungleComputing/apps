@@ -904,7 +904,7 @@ public class Solver extends SatinObject
 
     private Solver serialIbisClone (Solver solver)
     {
-	return (Solver) ibis.util.DeepCopy.deepCopy(solver);
+	return (Solver) deepCopy(solver);
     }
 
     static final boolean reasonDebug = false;

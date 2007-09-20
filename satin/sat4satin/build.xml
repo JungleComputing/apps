@@ -4,7 +4,7 @@
     basedir=".">
 
     <path id="classpath">
-	<fileset dir="lib">
+	<fileset dir="external">
 	    <include name="*.jar"/>
 	</fileset>
     </path>
