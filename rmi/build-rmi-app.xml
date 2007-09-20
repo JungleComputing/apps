@@ -18,6 +18,7 @@
 
     <property name="tmp"         value="tmp"/>
     <property name="src"         value="src"/>
+    <property name="lib"         value="lib"/>
 
     <target name="set-classpath" unless="classpath.initialized">
 	<path id="default.classpath">
@@ -168,7 +169,7 @@
 
     <target name="jar" depends="build" description="Build a Jar file for an application">
         <basename file="." property="application-name" />
-        <jar destfile="${application-name}.jar" basedir="${tmp}" includes="**/*.class">
+	<jar destfile="${lib}/${application-name}.jar" basedir="${tmp}" includes="**/*.class">
         </jar>
         <delete dir="${tmp}" />
     </target>
@@ -190,9 +191,8 @@
     </target>
 
     <target name="clean" description="Clean up the build">
-        <basename file="." property="application-name" />
         <delete dir="${tmp}" />
-        <delete file="${application-name}.jar" />
+        <delete dir="${lib}" />
         <delete file="ant-test.out" />
     </target>
 

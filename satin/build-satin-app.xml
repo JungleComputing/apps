@@ -21,6 +21,7 @@
     <property name="myclasspath" value="${env.CLASSPATH}"/>
 
     <property name="tmp"         value="tmp"/>
+    <property name="lib"         value="lib"/>
 
     <basename file="." property="application-name" />
 
@@ -45,6 +46,7 @@
     <target name="init" depends="property-init">
         <tstamp />
         <mkdir dir="${tmp}" />
+        <mkdir dir="${lib}" />
     </target>
 
     <target name="compile" depends="clean,init"
@@ -112,13 +114,13 @@
 	depends="compile,satin"/>
 
     <target name="jar" depends="build" description="Build a Jar file for an application">
-        <jar destfile="${application-name}.jar" basedir="${tmp}" includes="**/*.class">
+	<jar destfile="${lib}/${application-name}.jar" basedir="${tmp}" includes="**/*.class">
         </jar>
         <delete dir="${tmp}" />
     </target>
 
     <target name="compile-jar" depends="compile" description="Build a Jar file for an application">
-        <jar destfile="${application-name}.jar" basedir="${tmp}" includes="**/*.class">
+	<jar destfile="${lib}/${application-name}.jar" basedir="${tmp}" includes="**/*.class">
         </jar>
         <delete dir="${tmp}" />
     </target>
@@ -254,7 +256,7 @@
 
     <target name="clean" description="Clean up the build">
         <delete dir="${tmp}" />
-        <delete file="${application-name}.jar" />
+        <delete dir="${lib}" />
         <delete file="ant-test.out" />
     </target>
 
