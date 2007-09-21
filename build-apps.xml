@@ -19,10 +19,6 @@
 
     <property name="ibis"        location="${env.IBIS_HOME}"/>
 
-    <!--
-    <import file="${ibis}/build-files/build-properties.xml"/>
-    -->
-
     <target name="-list-build-files" unless="build.files">
 	<path id="buildfiles">
 	    <fileset dir=".">
