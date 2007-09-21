@@ -7,6 +7,7 @@
 	Satin applications build.
     </description>
 
+    <property name="build-apps-dir" location=".."/>
     <import file="../build-apps.xml"/>
 
 </project>

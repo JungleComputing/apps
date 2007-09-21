@@ -15,10 +15,6 @@
 	<echo message="os.name ${os.name} os.arch ${os.arch}"/>
     </target>
 
-    <property environment="env"/>
-
-    <property name="ibis"        location="${env.IBIS_HOME}"/>
-
     <target name="-list-build-files" unless="build.files">
 	<path id="buildfiles">
 	    <fileset dir=".">
@@ -31,7 +27,7 @@
     <target name="load-contrib" unless="contrib-loaded">
 	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
 	    <classpath>
-		<pathelement location="${ibis}/build-files/ant-contrib-0.4.jar"/>
+		<pathelement location="${build-apps-dir}/external/ant-contrib-0.4.jar"/>
 	    </classpath>
 	</taskdef>
 	<property name="contrib-loaded" value="true"/>
