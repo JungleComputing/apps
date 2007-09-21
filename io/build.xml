@@ -1,11 +1,70 @@
-<project
-    name="IO tests"
-    default="jar"
-    basedir=".">
+<project name="IO tests" default="jar" basedir=".">
+
+    <description>
+	Build file for the Ibis IO tests.
+    </description>
+
+    <!-- Global properties -->
 
     <property environment="env"/>
-
     <property name="ibis"        location="${env.IBIS_HOME}"/>
 
-    <import file="${ibis}/build-files/apps/build-ibis-app.xml"/>
+    <property name="src" location="src" />
+    <property name="tmp" location="tmp" />
+    <property name="lib" location="lib" />
+    <property name="jar" location="${lib}/io.jar" />
+
+    <target name="init">
+	<!-- Create the time stamp -->
+	<tstamp />
+
+	<!-- Create the build directory structure used by compile -->
+	<mkdir dir="${tmp}" />
+	<mkdir dir="${lib}" />
+    </target>
+
+    <target name="set-classpath">
+	<path id="default.classpath">
+	    <fileset dir="${ibis}/lib">
+		<include name="*.jar"/>
+	    </fileset>
+	</path>
+    </target>
+
+    <target name="compile" depends="clean,init,set-classpath"
+	description="Compile the application sources">
+	<!-- Compile the java code from ${src} into ${tmp} -->
+	<javac srcdir="${src}" destdir="${tmp}" debug="on" >
+            <classpath refid="default.classpath" />
+	    <compilerarg value="-Xlint:unchecked"/>
+	</javac>
+
+    </target>
+
+    <target name="ibisc" depends="compile">
+	<java   classname="ibis.frontend.Ibisc"
+		taskname="Ibisc"
+		failonerror="true"
+		dir="${tmp}"
+		fork="true">
+		<arg line="."/>
+	    <classpath refid="default.classpath"/>
+	</java>
+    </target>
+
+    <target name="jar" depends="ibisc" description="build the JAR file">
+	<!-- Put everything in ${tmp} into the jar file -->
+	<jar jarfile="${jar}" basedir="${tmp}" />
+
+	<!-- And delete the build dir -->
+	<delete dir="${tmp}" />
+    </target>
+
+    <target name="test" depends="jar" description="test entry just builds jar"/>
+
+    <target name="clean" description="clean up">
+	<delete dir="${tmp}" />
+	<delete dir="${lib}" />
+    </target>
+
 </project>
