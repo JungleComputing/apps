@@ -8,7 +8,7 @@ import ibis.io.DataInputStream;
 import ibis.io.DataOutputStream;
 import ibis.io.IbisSerializationInputStream;
 import ibis.io.IbisSerializationOutputStream;
-import ibis.server.poolInfo.PoolInfo;
+import ibis.poolInfo.PoolInfo;
 
 import java.net.ServerSocket;
 import java.net.Socket;

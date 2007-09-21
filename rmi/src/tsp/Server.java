@@ -6,7 +6,7 @@ package tsp;
 import shared.RMI_init;
 import java.rmi.registry.Registry;
 import java.util.Date;
-import ibis.server.poolInfo.PoolInfo;
+import ibis.poolInfo.PoolInfo;
 
 
 class Server {

@@ -6,7 +6,7 @@ import java.rmi.registry.*;
 import java.rmi.server.*;
 import java.util.Random;
 
-import ibis.server.poolInfo.PoolInfo;
+import ibis.poolInfo.PoolInfo;
 
 import ibis.util.Timer;
 

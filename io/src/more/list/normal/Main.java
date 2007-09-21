@@ -2,7 +2,7 @@ package more.list.normal;
 
 /* $Id: Main.java 5349 2007-04-07 13:59:32Z ceriel $ */
 
-import ibis.server.poolInfo.PoolInfo;
+import ibis.poolInfo.PoolInfo;
 import ibis.io.BufferedArrayInputStream;
 import ibis.io.BufferedArrayOutputStream;
 import ibis.io.DataInputStream;

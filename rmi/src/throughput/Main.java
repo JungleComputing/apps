@@ -4,7 +4,7 @@ package throughput;
 
 
 import shared.RMI_init;
-import ibis.server.poolInfo.PoolInfo;
+import ibis.poolInfo.PoolInfo;
 
 
 final class Main {

@@ -5,7 +5,7 @@ package barnes;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-import ibis.server.poolInfo.PoolInfo;
+import ibis.poolInfo.PoolInfo;
 
 //import DasUtils.*;
 

@@ -3,7 +3,7 @@
 package latency;
 
 
-import ibis.server.poolInfo.PoolInfo;
+import ibis.poolInfo.PoolInfo;
 
 class Main {
 

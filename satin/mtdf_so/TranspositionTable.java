@@ -5,7 +5,7 @@ import java.util.*;
 import java.io.*;
 import java.net.*;
 
-import ibis.server.poolInfo.PoolInfo;
+import ibis.poolInfo.PoolInfo;
 
 import ibis.satin.*;
 

@@ -5,7 +5,7 @@ import java.util.Random;
 import java.io.*;
 import java.net.*;
 
-import ibis.server.poolInfo.PoolInfo;
+import ibis.poolInfo.PoolInfo;
 
 import ibis.util.Timer;
 

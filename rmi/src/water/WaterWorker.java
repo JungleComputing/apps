@@ -6,7 +6,7 @@ package water;
 import shared.RMI_init;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import ibis.server.poolInfo.PoolInfo;
+import ibis.poolInfo.PoolInfo;
 
 
 public class WaterWorker extends UnicastRemoteObject implements

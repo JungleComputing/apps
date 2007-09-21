@@ -162,9 +162,8 @@
 
     <target name="build-and-test" depends="jar, test-seq, test-par"/>
 
-    <target name="test" unless="no-test" description="Build, run sequential test, run parallel test, clean">
+    <target name="test" unless="no-test" description="Build, run sequential test, run parallel test">
         <antcall inheritRefs="true" target="build-and-test" />
-        <antcall inheritRefs="true" target="clean" />
     </target>
 
     <target name="jar" depends="build" description="Build a Jar file for an application">

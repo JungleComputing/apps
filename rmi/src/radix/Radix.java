@@ -8,7 +8,7 @@ import java.rmi.RemoteException;
 import java.io.DataOutputStream;
 import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
-import ibis.server.poolInfo.PoolInfo;
+import ibis.poolInfo.PoolInfo;
 
 
 public class Radix {

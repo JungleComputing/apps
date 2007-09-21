@@ -3,7 +3,7 @@ package sockets_MantaTypedStream;
 /* $Id$ */
 
 
-import ibis.server.poolInfo.PoolInfo;
+import ibis.poolInfo.PoolInfo;
 import ibis.io.BufferedArrayInputStream;
 import ibis.io.BufferedArrayOutputStream;
 import ibis.io.IbisSerializationInputStream;

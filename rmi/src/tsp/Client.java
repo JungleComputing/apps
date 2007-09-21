@@ -5,7 +5,7 @@ package tsp;
 
 import shared.RMI_init;
 import java.rmi.RemoteException;
-import ibis.server.poolInfo.PoolInfo;
+import ibis.poolInfo.PoolInfo;
 
 
 class Client extends Thread {

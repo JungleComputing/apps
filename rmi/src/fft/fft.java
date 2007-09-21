@@ -13,7 +13,7 @@ import shared.RMI_init;
 import java.rmi.registry.Registry;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import ibis.server.poolInfo.PoolInfo;
+import ibis.poolInfo.PoolInfo;
 
 class fft {
 

@@ -8,7 +8,7 @@ import java.io.IOException;
 
 import java.rmi.registry.Registry;
 
-import ibis.server.poolInfo.PoolInfo;
+import ibis.poolInfo.PoolInfo;
 
 class Main {
 

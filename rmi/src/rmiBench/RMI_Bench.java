@@ -3,7 +3,7 @@
 package rmiBench;
 
 import shared.RMI_init;
-import ibis.server.poolInfo.PoolInfo;
+import ibis.poolInfo.PoolInfo;
 
 
 // import java.rmi.server.RMISocketFactory;

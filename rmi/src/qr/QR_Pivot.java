@@ -5,7 +5,7 @@ package qr;
 
 import java.util.Random;
 
-import ibis.server.poolInfo.PoolInfo;
+import ibis.poolInfo.PoolInfo;
 
 
 class QR_Pivot {

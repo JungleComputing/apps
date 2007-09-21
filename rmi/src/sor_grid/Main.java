@@ -18,8 +18,8 @@ import java.rmi.server.UnicastRemoteObject;
 import java.rmi.registry.Registry;
 import java.util.Properties;
 
-import ibis.server.poolInfo.PoolInfo;
-import ibis.server.poolInfo.PoolInfoProperties;
+import ibis.poolInfo.PoolInfo;
+import ibis.poolInfo.PoolInfoProperties;
 
 
 class Main {

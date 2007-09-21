@@ -4,7 +4,7 @@ package asp_toplass;
 
 
 import shared.RMI_init;
-import ibis.server.poolInfo.PoolInfo;
+import ibis.poolInfo.PoolInfo;
 
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.registry.Registry;

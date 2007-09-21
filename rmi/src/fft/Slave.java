@@ -6,7 +6,7 @@ package fft;
 import shared.RMI_init;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import ibis.server.poolInfo.PoolInfo;
+import ibis.poolInfo.PoolInfo;
 
 class Slave extends UnicastRemoteObject implements SlaveInterface {
 

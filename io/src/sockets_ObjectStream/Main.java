@@ -3,7 +3,7 @@ package sockets_ObjectStream;
 /* $Id$ */
 
 
-import ibis.server.poolInfo.PoolInfo;
+import ibis.poolInfo.PoolInfo;
 
 import java.io.InputStream;
 import java.io.ObjectInputStream;

@@ -3,7 +3,7 @@
 package asp_toplass;
 
 
-import ibis.server.poolInfo.PoolInfo;
+import ibis.poolInfo.PoolInfo;
 
 
 import java.rmi.RemoteException;

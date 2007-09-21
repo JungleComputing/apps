@@ -2,7 +2,7 @@
 
 package barnes;
 
-import ibis.server.poolInfo.PoolInfo;
+import ibis.poolInfo.PoolInfo;
 
 public class ProcessorThread extends Thread {
 

@@ -5,7 +5,7 @@ package barnes;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-import ibis.server.poolInfo.PoolInfo;
+import ibis.poolInfo.PoolInfo;
 
 strictfp public class BarnesHut {
 
