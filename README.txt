@@ -54,3 +54,7 @@ Windows 2000, Windows XP
 
 Cygwin
     See the notes on Windows 2000, Windows XP.
+
+This product includes software developed by the
+Ant-Contrib project (http://sourceforge.net/projects/ant-contrib).
+See "notices/LICENSE.ant-contrib.txt" for the ant-contrib copyright notice.
