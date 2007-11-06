@@ -7,6 +7,8 @@
 
     <property name="satin-classes" value="Breeder, SimpleSATSolver, DPLLSolver, SATSolver"/>
 
+    <property name="user-classpath" value="../../external/junit-3.8.2.jar"/>
+
     <import file="../build-satin-app.xml"/>
 
     <target name="test"
