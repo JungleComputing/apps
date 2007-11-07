@@ -33,6 +33,8 @@ import java.util.Arrays;
 
     static final int IMPL_SEQ = 3; // -seq option
 
+    static final int IMPL_FULLTREE = 4; // -fulltree option
+
     // number of bodies at which the ntc impl work sequentially
     private static int spawn_min = 500; //use -min <threshold> to modify
 
@@ -220,11 +222,10 @@ import java.util.Arrays;
             BodyTreeNode ch = me.children[i];
             if (ch != null) {
                 //necessaryTree creation
-                BodyTreeNode necessaryTree = ch == tree ? tree
-                    : new BodyTreeNode(tree, ch);
+                BodyTreeNode necessaryTree =
+                        (params.IMPLEMENTATION == IMPL_FULLTREE 
+                            || ch == tree) ? tree : new BodyTreeNode(tree, ch);
                 res[childcount] = barnesNTC(ch, necessaryTree, params); // spawn
-                //alternative: copy whole tree
-                //res[childcount] = barnesNTC(ch, tree, params);
                 childcount++;
             }
         }
@@ -310,6 +311,7 @@ import java.util.Arrays;
 
             switch (params.IMPLEMENTATION) {
             case IMPL_NTC:
+            case IMPL_FULLTREE:
                 result = doBarnesNTC(bodies.getRoot(), bodies.getRoot(), params);
                 break;
             case IMPL_SO:
@@ -419,6 +421,8 @@ import java.util.Arrays;
         case IMPL_SO:
             System.out.println("Using shared object impl");
             break;
+        case IMPL_FULLTREE:
+            System.out.println("Using full tree impl");
         default:
             System.out.println("EEK! Using unknown implementation #" + params.IMPLEMENTATION);
             System.exit(1);
@@ -501,6 +505,8 @@ import java.util.Arrays;
                 viz = false;
             } else if (argv[i].equals("-ntc")) {
                 impl = IMPL_NTC;
+            } else if (argv[i].equals("-fulltree")) {
+                impl = IMPL_FULLTREE;
             } else if (argv[i].equals("-so")) {
                 impl = IMPL_SO;
             } else if (argv[i].equals("-seq")) {
