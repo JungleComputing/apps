@@ -88,7 +88,7 @@ def build_run_command( pno, command, port ):
     if orderedTuples:
         ot = '-Dsatin.tuplespace.ordered=true '
     if ibisName != '':
-        ot += ('-Dibis.name=%s ' % ibisName)
+        ot += ('-Dibis.implementation=%s ' % ibisName)
     return "prun -t %s %s %d %s%s -satin-closed" % (maxRunTime, run_ibis, pno, ot, command)
 
 def runP( P, command, results ):
