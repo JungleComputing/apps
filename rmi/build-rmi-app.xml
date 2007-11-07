@@ -215,7 +215,7 @@
 	    <!-- Commented out; not toplevel.
 	    description="Preprocess class files in the build tree for RMI"
 	    -->
-	<java   classname="ibis.frontend.Ibisc"
+	<java   classname="ibis.compile.Ibisc"
 		taskname="Ibisc"
 		dir="${tmp}"
 		failonerror="true"

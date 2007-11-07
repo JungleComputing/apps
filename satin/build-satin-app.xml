@@ -61,7 +61,7 @@
     </target>
 
     <target name="satin-internal">
-	<java	classname="ibis.frontend.Ibisc"
+	<java	classname="ibis.compile.Ibisc"
 		taskname="Ibisc"
 		dir="${tmp}"
 		failonerror="true"
