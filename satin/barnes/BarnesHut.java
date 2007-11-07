@@ -423,6 +423,7 @@ import java.util.Arrays;
             break;
         case IMPL_FULLTREE:
             System.out.println("Using full tree impl");
+            break;
         default:
             System.out.println("EEK! Using unknown implementation #" + params.IMPLEMENTATION);
             System.exit(1);
