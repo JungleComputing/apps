@@ -51,7 +51,8 @@
 
     <target name="compile" depends="clean,init"
 	    description="Compile application without any bytecode rewriting">
-	<javac destdir="${tmp}" debug="true" srcdir=".">
+	<javac destdir="${tmp}" debug="true" srcdir="." source="1.5"
+target="1.5">
 	    <classpath refid="default.classpath" />
 	    <!--
 	    <compilerarg value="-Xlint:unchecked"/>
