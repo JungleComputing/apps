@@ -1,8 +1,8 @@
 cd neobio/lib
-$IBIS_HOME/bin/ibisc neobio.jar
+$SATIN_HOME/bin/satinc neobio.jar
 cd -
 
 cd lib
-CLASSPATH=geneSequencing.jar $IBIS_HOME/bin/ibisc \
+CLASSPATH=geneSequencing.jar $SATIN_HOME/bin/satinc \
   -satin geneSequencing.divideAndConquer.DivCon,geneSequencing.Dsearch,geneSequencing.sharedObjects.SharedData,geneSequencing.sharedObjects.DivConSO geneSequencing.jar
 cd -
