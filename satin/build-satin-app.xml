@@ -147,7 +147,7 @@ target="1.5">
     </target>
 
     <target name="run2" depends="set-ibis-implementation">
-        <exec dir="${basedir}" executable="${satin}/bin/ibis-satin-run" vmlauncher="false" spawn="true">
+        <exec dir="${basedir}" executable="${satin}/bin/satin-run" vmlauncher="false" spawn="true">
             <arg line="-Dibis.pool.size=2" />
             <arg line="-Dibis.pool.name=test-pool" />
             <arg line="-Dibis.server.address=localhost:8888" />
@@ -155,7 +155,7 @@ target="1.5">
             <arg line="${java-args} ibis.util.Postpone 2 -o ant-test.out ${runjob}" />
 	    <env key="CLASSPATH" path="${lib}/${application-name}.jar:${user-classpath}"/>
         </exec>
-        <exec dir="${basedir}" executable="${satin}/bin/ibis-satin-run" timeout="500000" failonerror="true" vmlauncher="false">
+        <exec dir="${basedir}" executable="${satin}/bin/satin-run" timeout="500000" failonerror="true" vmlauncher="false">
             <arg line="-Dibis.pool.size=2" />
             <arg line="-Dibis.pool.name=test-pool" />
             <arg line="-Dibis.server.address=localhost:8888" />
@@ -176,7 +176,7 @@ target="1.5">
 	<property name="ibis"        location="${env.IBIS_HOME}"/>
 
         <exec dir="${basedir}" executable="/usr/local/VU/reserve.sge/bin/prun" vmlauncher="false">
-	    <arg value="COMMAND=${satin}/bin/ibis-satin-run" />
+	    <arg value="COMMAND=${satin}/bin/satin-run" />
 	    <arg value="CLASSPATH=${lib}/${application-name}.jar"/>
             <arg line="-1 ${ibis}/bin/ibis-prun ${prun-nprocs}" />
             <arg value="${define-ibis-implementation}" />
@@ -185,7 +185,7 @@ target="1.5">
     </target>
 
     <target name="run1" depends="set-ibis-implementation">
-        <exec dir="${basedir}" executable="${satin}/bin/ibis-satin-run" timeout="500000" failonerror="true" vmlauncher="false">
+        <exec dir="${basedir}" executable="${satin}/bin/satin-run" timeout="500000" failonerror="true" vmlauncher="false">
             <arg line="-Dibis.pool.size=1" />
             <arg line="-Dibis.pool.name=test-pool" />
             <arg line="-Dibis.server.address=localhost:8888" />
@@ -196,7 +196,7 @@ target="1.5">
     </target>
 
     <target name="runseq">
-        <exec dir="${basedir}" executable="${satin}/bin/ibis-satin-run" timeout="500000" failonerror="true" vmlauncher="false">
+        <exec dir="${basedir}" executable="${satin}/bin/satin-run" timeout="500000" failonerror="true" vmlauncher="false">
             <arg line="${java-args} ${runjob}" />
 	    <env key="CLASSPATH" path="${lib}/${application-name}.jar:${user-classpath}"/>
         </exec>
