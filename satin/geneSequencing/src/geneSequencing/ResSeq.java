@@ -23,12 +23,6 @@ public class ResSeq implements Serializable {
         }
     }
 
-    public void processDatabaseSeqs() {
-        while (databaseSequences.size() > maxScores) {
-            databaseSequences.remove(databaseSequences.last());
-        }
-    }
-
     public String toString() {
         String str = "";
         str = str + querySequence.getSequenceName() + "\n\n";
@@ -63,5 +57,9 @@ public class ResSeq implements Serializable {
 
     public void addDatabaseSequences(Sequence databaseSequence) {
         databaseSequences.add(new Sequence(databaseSequence)); // this copy is needed for correctness
+
+        while (databaseSequences.size() > maxScores) {
+            databaseSequences.remove(databaseSequences.last());
+        }
     }
 }

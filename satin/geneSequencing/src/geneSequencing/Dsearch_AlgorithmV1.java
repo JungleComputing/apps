@@ -63,7 +63,7 @@ public class Dsearch_AlgorithmV1 {
                     resSeq.addDatabaseSequences(databaseSequence);
                 }
             }
-            resSeq.processDatabaseSeqs();
+
             if(resSeq.getDatabaseSequences().size() > 0) {
                 results.add(resSeq);
             } else {
