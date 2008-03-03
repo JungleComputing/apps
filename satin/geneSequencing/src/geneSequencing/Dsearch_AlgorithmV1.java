@@ -66,8 +66,6 @@ public class Dsearch_AlgorithmV1 {
 
             if(resSeq.getDatabaseSequences().size() > 0) {
                 results.add(resSeq);
-            } else {
-                System.err.println("size=0");
             }
         }
         return results;
