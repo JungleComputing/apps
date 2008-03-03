@@ -21,9 +21,8 @@ public class Dsearch_AlgorithmV1 {
 
             char[] currentQuerySeq = querySequenceBody.toCharArray();
 
-            // create an array to record the scores
-            ResSeq resSeq = new ResSeq();
-            resSeq.setQuerySequence(querySequence); // add the name of the current query sequence
+            // create an array to record the scores, and add the name of the current query sequence.
+            ResSeq resSeq = new ResSeq(querySequence, maxScores);
 
             for (int j = 0; j < databaseSequences.size(); j++) {
                 Sequence databaseSequence = databaseSequences.get(j);
@@ -58,20 +57,18 @@ public class Dsearch_AlgorithmV1 {
                             + e.toString());
                 }
 
-                // TODO possible optimization:
-                // in the add, check if there are not more than maxScores
-                // entries. If so, remove worst one.
-                
                 if (score > 0) {
                     databaseSequence.setSequenceScore(score);
                     databaseSequence.setSequenceAlignment(alignment);
-
                     resSeq.addDatabaseSequences(databaseSequence);
                 }
             }
-            resSeq.setMaximumScores(maxScores);
             resSeq.processDatabaseSeqs();
-            results.add(resSeq);
+            if(resSeq.getDatabaseSequences().size() > 0) {
+                results.add(resSeq);
+            } else {
+                System.err.println("size=0");
+            }
         }
         return results;
     }

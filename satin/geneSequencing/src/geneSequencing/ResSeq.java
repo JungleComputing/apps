@@ -10,8 +10,9 @@ public class ResSeq implements Serializable {
 
     private TreeSet<Sequence> databaseSequences;
     
-    public ResSeq() {
-        querySequence = new Sequence();
+    public ResSeq(Sequence querySequence, int maxScores) {
+        this.querySequence = querySequence;
+        this.maxScores = maxScores;
         databaseSequences = new TreeSet<Sequence>();
     }
 
@@ -63,13 +64,4 @@ public class ResSeq implements Serializable {
     public void addDatabaseSequences(Sequence databaseSequence) {
         databaseSequences.add(new Sequence(databaseSequence)); // this copy is needed for correctness
     }
-
-    public void setQuerySequence(Sequence querySequence) {
-        this.querySequence = querySequence;
-    }
-
-    public void setMaximumScores(int maxScores) {
-        this.maxScores = maxScores;
-    }
-
 }
