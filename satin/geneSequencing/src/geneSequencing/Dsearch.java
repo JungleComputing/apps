@@ -162,7 +162,7 @@ public class Dsearch {
 
     private static ArrayList<ResSeq> processSubResults(ResSeq resSeq,
         ArrayList<ResSeq> main) {
-        boolean flag = false;
+        boolean newSequence = true;
         String name = resSeq.getQuerySequence().getSequenceName();
         TreeSet<Sequence> newDatabaseSeqs = resSeq.getDatabaseSequences();
         
@@ -171,11 +171,11 @@ public class Dsearch {
             String nameMain = resSeqMain.getQuerySequence().getSequenceName();
 
             if (nameMain.equals(name)) {
-                flag = true;
+                newSequence = false;
                 resSeqMain.updateDatabaseSequences(newDatabaseSeqs);
             }
         }
-        if (!flag) {
+        if (newSequence) {
             main.add(resSeq);
         }
 
