@@ -76,4 +76,8 @@ public final class Sequence implements java.io.Serializable, Comparable<Sequence
         // scores are equal.
         return o.sequenceName.compareTo(sequenceName);
     }
+    
+    public long size() {
+        return (sequenceName.length() + sequenceBody.length() + alignment.length()) * 2;
+    }
 }

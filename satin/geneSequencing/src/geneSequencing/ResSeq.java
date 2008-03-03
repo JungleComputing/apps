@@ -62,4 +62,13 @@ public class ResSeq implements Serializable {
             databaseSequences.remove(databaseSequences.last());
         }
     }
+    
+    public long size() {
+        long size = querySequence.size();
+        for (Sequence sequence : databaseSequences) {
+            size += sequence.size();
+        }
+        
+        return size;
+    }
 }

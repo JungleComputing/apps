@@ -32,6 +32,12 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface {
             result = Dsearch.combineSubResults(subRes1, subRes2);
         }
 
+        long size = 0;
+        for(ResSeq r : result) {
+            size += r.size();
+        }
+        System.err.println("total size = " + size);
+        
         return result;
     }
 
@@ -57,6 +63,11 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface {
             result = Dsearch.combineSubResults(subResult1, subResult2);
         }
 
+        long size = 0;
+        for(ResSeq r : result) {
+            size += r.size();
+        }
+        System.err.println("total size = " + size);
         return result;
     }
 }
