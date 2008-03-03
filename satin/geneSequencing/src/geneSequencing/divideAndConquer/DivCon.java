@@ -36,7 +36,7 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface {
         for(ResSeq r : result) {
             size += r.size();
         }
-        System.err.println("total size = " + size);
+        System.err.println("total size = " + size + " len = " + result.size());
         
         return result;
     }
@@ -67,7 +67,7 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface {
         for(ResSeq r : result) {
             size += r.size();
         }
-        System.err.println("total size = " + size);
+        System.err.println("total size = " + size + " len = " + result.size());
         return result;
     }
 }
