@@ -25,7 +25,7 @@ query.file = testdata/set03q.fasta
 #----------------------------------Number of scores returned---------------------------------------
 
 #how many of top scores to record per query sequence
-top.scores = 20
+top.scores = 2
 
 #------------------------------The value of threshold----------------------------------------------
 #the value of threshold
