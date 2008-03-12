@@ -30,9 +30,10 @@ public class Sequence_Aligner implements AlignmentAlgorithms, Serializable {
 
             // return the actual alignment
             PairwiseAlignment alignment = algorithm.getPairwiseAlignment();
-
-
-            return alignment.toString();
+            String result = alignment.toString(); 
+            algorithm.unloadSequences();
+            
+            return result;
         } catch (Exception e) {
             throw new Error(e);
         }
@@ -61,6 +62,8 @@ public class Sequence_Aligner implements AlignmentAlgorithms, Serializable {
 
         //align the sequences and produce the score
         int score = algorithm.getScore();
+
+        algorithm.unloadSequences();
 
         // close files
         s1.close();
