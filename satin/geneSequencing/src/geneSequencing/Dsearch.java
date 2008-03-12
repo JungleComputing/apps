@@ -213,6 +213,8 @@ public class Dsearch {
             + querySequences.size() + " query sequences, "
             + "threshold " + threshold
             + ", implementation: " + implementationName);
+        System.out.println("maximum database sequence length = " + databaseSequences.maxLength()
+                + ", maximum query sequence length = " + querySequences.maxLength());
 
         double startTime = System.currentTimeMillis();
 

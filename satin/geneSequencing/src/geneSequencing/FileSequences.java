@@ -48,4 +48,15 @@ public class FileSequences implements java.io.Serializable {
     public int size() {
         return sequences.size();
     }
+
+    public int maxLength() {
+        int maxlen = 0;
+        for (Sequence seq : sequences) {
+            int len = seq.length();
+            if (len > maxlen) {
+                maxlen = len;
+            }
+        }
+        return maxlen;
+    }
 }
