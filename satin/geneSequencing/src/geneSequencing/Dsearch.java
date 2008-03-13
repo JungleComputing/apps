@@ -124,7 +124,7 @@ public class Dsearch {
         if (implementationName.equals("dc")) {
             System.out.println("using divide and conquer implementation");
             DivCon dC = new DivCon();
-            result = dC.spawn_splitQuerySequences(workUnit);
+            result = dC.spawn_splitDatabaseSequences(workUnit);
             dC.sync();
         } else if (implementationName.equals("so")) {
             System.out.println("using shared objects implementation");
@@ -153,9 +153,11 @@ public class Dsearch {
     }
 
     public static ArrayList<ResSeq> combineSubResults(
-            ArrayList<ResSeq> main, ArrayList<ResSeq> additional) {
-        for (int i = 0; i < additional.size(); i++) {
-            main = processSubResults(additional.get(i), main);
+            ArrayList<ResSeq> main, ArrayList<ResSeq>... additional) {
+        for (ArrayList<ResSeq> add : additional) {
+            for (int i = 0; i < add.size(); i++) {
+                main = processSubResults(add.get(i), main);
+            }
         }
         return main;
     }

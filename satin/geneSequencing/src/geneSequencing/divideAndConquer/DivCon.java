@@ -15,8 +15,7 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface {
         ArrayList<ResSeq> result;
 
         if (workUnit.querySequences.size() <= workUnit.threshold) {
-            result = spawn_splitDatabaseSequences(workUnit);
-            sync();
+            result = Dsearch.createTrivialResult(workUnit);
         } else {
             int newSplitSize = workUnit.querySequences.size() / 2;
 
@@ -40,7 +39,8 @@ public class DivCon extends ibis.satin.SatinObject implements DivConInterface {
         int newSplitSize;
 
         if (workUnit.databaseSequences.size() <= workUnit.threshold) {
-            result = Dsearch.createTrivialResult(workUnit);
+            result = spawn_splitQuerySequences(workUnit);
+            sync();
         } else {
             newSplitSize = workUnit.databaseSequences.size() / 2;
 
