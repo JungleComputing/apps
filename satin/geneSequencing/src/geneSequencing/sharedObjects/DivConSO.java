@@ -12,6 +12,7 @@ public class DivConSO extends ibis.satin.SatinObject implements
     public DivConSO() {
     }
 
+    @SuppressWarnings("unchecked")
     public ArrayList<ResSeq> spawn_splitQuerySequences(WorkUnit workUnit,
         SharedData sharedData, int startQuery, int endQuery, int startDatabase,
         int EndDatabase) {
@@ -24,22 +25,24 @@ public class DivConSO extends ibis.satin.SatinObject implements
             sync();
         } else {
             int newSplitSize = (endQuery - startQuery) / 2;
+            ArrayList<ResSeq>[] sub = (ArrayList<ResSeq>[]) (new ArrayList[2]);
             
-            ArrayList<ResSeq> subRes1 = spawn_splitQuerySequences(workUnit,
+            sub[0] = spawn_splitQuerySequences(workUnit,
                 sharedData, startQuery, startQuery + newSplitSize,
                 startDatabase, EndDatabase);
 
-            ArrayList<ResSeq> subRes2 = spawn_splitQuerySequences(workUnit,
+            sub[1] = spawn_splitQuerySequences(workUnit,
                 sharedData, startQuery + newSplitSize, endQuery, startDatabase, EndDatabase);
 
             sync();
 
-            result = Dsearch.combineSubResults(subRes1, subRes2);
+            result = Dsearch.combineSubResults(sub);
         }
 
         return result;
     }
 
+    @SuppressWarnings("unchecked")
     public ArrayList<ResSeq> spawn_splitDatabaseSequences(WorkUnit workUnit,
         SharedData sharedData, int startQuery, int endQuery, int startDatabase,
         int EndDatabase) {
@@ -50,18 +53,19 @@ public class DivConSO extends ibis.satin.SatinObject implements
                 startQuery, endQuery, startDatabase, EndDatabase);
         } else {
             int newSplitSize = (EndDatabase - startDatabase) / 2;
+            ArrayList<ResSeq>[] sub = (ArrayList<ResSeq>[]) (new ArrayList[2]);
 
-            ArrayList<ResSeq> subResult1 = spawn_splitDatabaseSequences(
+            sub[0] = spawn_splitDatabaseSequences(
                 workUnit, sharedData, startQuery, endQuery, startDatabase,
                 startDatabase + newSplitSize);
 
-            ArrayList<ResSeq> subResult2 = spawn_splitDatabaseSequences(
+            sub[1] = spawn_splitDatabaseSequences(
                 workUnit, sharedData, startQuery, endQuery, startDatabase
                     + newSplitSize, EndDatabase);
 
             sync();
 
-            result = Dsearch.combineSubResults(subResult1, subResult2);
+            result = Dsearch.combineSubResults(sub);
         }
 
         return result;

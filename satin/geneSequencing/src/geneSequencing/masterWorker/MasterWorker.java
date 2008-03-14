@@ -21,29 +21,22 @@ public class MasterWorker extends ibis.satin.SatinObject implements
 
         resultUnits = generateResultUnits(workUnits);
 
-        return processResultUnits(resultUnits);
+        return Dsearch.combineSubResults(resultUnits);
     }
 
     @SuppressWarnings("unchecked")
     private ArrayList<ResSeq>[] generateResultUnits(
             ArrayList<WorkUnit> workUnits) {
-        ArrayList<ResSeq> resultUnitsArray[] = new ArrayList[workUnits.size()];
+        ArrayList<ResSeq> resultUnitsArray[]
+                = (ArrayList<ResSeq>[]) (new ArrayList[workUnits.size()]);
 
-        for (int i = 0; i < workUnits.size(); i++) {
+        for (int i = 0; i < resultUnitsArray.length; i++) {
             resultUnitsArray[i] = spawn_createResultUnit(workUnits.get(i));
         }
 
         sync();
 
         return resultUnitsArray;
-    }
-
-    private ArrayList<ResSeq> processResultUnits(ArrayList<ResSeq>[] resultUnits) {
-        ArrayList<ResSeq> first = resultUnits[0];
-        for (int i = 1; i < resultUnits.length; i++) {
-            first = Dsearch.combineSubResults(first, resultUnits[i]);
-        }
-        return first;
     }
 
     public ArrayList<ResSeq> spawn_createResultUnit(WorkUnit workUnit) {

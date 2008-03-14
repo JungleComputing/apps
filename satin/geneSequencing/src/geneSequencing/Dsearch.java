@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.TreeSet;
 import java.util.zip.GZIPOutputStream;
 
@@ -124,7 +125,7 @@ public class Dsearch {
         if (implementationName.equals("dc")) {
             System.out.println("using divide and conquer implementation");
             DivCon dC = new DivCon();
-            result = dC.spawn_splitDatabaseSequences(workUnit);
+            result = dC.spawn_splitSequences(workUnit);
             dC.sync();
         } else if (implementationName.equals("so")) {
             System.out.println("using shared objects implementation");
@@ -153,35 +154,28 @@ public class Dsearch {
     }
 
     public static ArrayList<ResSeq> combineSubResults(
-            ArrayList<ResSeq> main, ArrayList<ResSeq>... additional) {
-        for (ArrayList<ResSeq> add : additional) {
-            for (int i = 0; i < add.size(); i++) {
-                main = processSubResults(add.get(i), main);
+            ArrayList<ResSeq>[] subResults) {
+        HashMap<String, ResSeq> map = new HashMap<String, ResSeq>();
+        for (ArrayList<ResSeq> sub : subResults) {
+            for (ResSeq res : sub) {
+                processSubResults(res, map);
             }
         }
-        return main;
+        return new ArrayList<ResSeq>(map.values());
     }
 
-    private static ArrayList<ResSeq> processSubResults(ResSeq resSeq,
-        ArrayList<ResSeq> main) {
-        boolean newSequence = true;
+    private static void processSubResults(ResSeq resSeq,
+        HashMap<String, ResSeq> main) {
+        
         String name = resSeq.getQuerySequence().getSequenceName();
         TreeSet<Sequence> newDatabaseSeqs = resSeq.getDatabaseSequences();
-        
-        for (int i = 0; i < main.size(); i++) {
-            ResSeq resSeqMain = main.get(i);
-            String nameMain = resSeqMain.getQuerySequence().getSequenceName();
 
-            if (nameMain.equals(name)) {
-                newSequence = false;
-                resSeqMain.updateDatabaseSequences(newDatabaseSeqs);
-            }
+        ResSeq entry = main.get(name);
+        if (entry != null) {
+            entry.updateDatabaseSequences(newDatabaseSeqs);
+        } else {
+            main.put(name, resSeq);
         }
-        if (newSequence) {
-            main.add(resSeq);
-        }
-
-        return main;
     }
 
     public void start() {
