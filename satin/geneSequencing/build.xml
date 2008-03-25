@@ -39,7 +39,8 @@
 		<javac srcdir="${src}" destdir="${tmp}" debug="on" >
 			<classpath refid="external_jars" />
 		</javac>
-	</target>
+
+		</target>
 
 	<target name="build" depends="clean,compile" description="build the JAR file">
 		<!-- Create the distribution directory -->
@@ -47,6 +48,11 @@
 
 		<jar jarfile="${lib}/geneSequencing.jar" basedir="${tmp}" />
 		<delete dir="${tmp}" />
+
+	<exec executable="/bin/sh">
+			  <arg value="rewrite.sh"/>
+				    </exec>
+
 	</target>
 
 	<target name="jar" depends="build"/>
