@@ -15,7 +15,7 @@ final class Sleep extends ibis.satin.SatinObject implements SleepInterface {
             try {
                 Thread.sleep((long) (seconds * 1000.0));
             } catch (InterruptedException e) {
-                System.err.println("interrupred while sleeping: " + e);
+                System.err.println("interrupted while sleeping: " + e);
             }
             return seconds;
         }
