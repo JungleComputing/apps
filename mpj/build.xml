@@ -38,16 +38,6 @@
     </target>
 
     <!--
-        Test
-    -->
-    <target name="test"
-	    description="tests">
-	<ant target="test" dir="misc"/>
-	<ant target="test" dir="jgfBenchSuite"/>
-	<ant target="test" dir="tests"/>
-    </target>
-
-    <!--
         Clean
     -->
     <target name="clean"

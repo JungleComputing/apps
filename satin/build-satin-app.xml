@@ -12,8 +12,6 @@
 	    names that must be rewritten.
 	Optional definition of 'satinc-flags': extra options to be supplied
 	    to Ibisc.
-	Backwards compatibility: instead of 'satin-classes', 'satin-main-class'
-	    and 'satin-so-class' are also recognized.
     -->
 
     <property environment="env"/>
@@ -68,7 +66,7 @@ target="1.5">
 		failonerror="true"
 		maxmemory="512M"
 		fork="true">
-		<arg line="${satinc-flags.value} ${satin-so} ${satin-main} ${satin-classes.value} ."/>
+		<arg line="${satinc-flags.value} ${satin-classes.value} ."/>
 		<classpath refid="default.classpath"/>
 	</java>
 
@@ -82,22 +80,6 @@ target="1.5">
 	<property name="satinc-flags.value" value=""/>
     </target>
 
-    <target name="set-satinc-main" if="satin-main-class">
-	<property name="satin-main" value="-satin &quot;${satin-main-class}&quot;"/>
-    </target>
-
-    <target name="set-satinc-main-notset" unless="satin-main-class">
-	<property name="satin-main" value=""/>
-    </target>
-
-    <target name="set-satinc-so" if="satin-so-class">
-	<property name="satin-so" value="-satin &quot;${satin-so-class}&quot;"/>
-    </target>
-
-    <target name="set-satinc-so-notset" unless="satin-so-class">
-	<property name="satin-so" value=""/>
-    </target>
-
     <target name="set-satinc-classes" if="satin-classes">
 	<property name="satin-classes.value" value="-satin &quot;${satin-classes}&quot;"/>
     </target>
@@ -107,7 +89,7 @@ target="1.5">
     </target>
 
     <target name="satin"
-	depends="set-satinc-flags-set,set-satinc-flags-notset,set-satinc-main-notset,set-satinc-main,set-satinc-classes,set-satinc-classes-notset,set-satinc-so-notset,set-satinc-so,satin-internal">
+	depends="set-satinc-flags-set,set-satinc-flags-notset,set-satinc-classes,set-satinc-classes-notset,satin-internal">
     </target>
 
     <target name="build"
@@ -126,143 +108,9 @@ target="1.5">
         <delete dir="${tmp}" />
     </target>
 
-    <property name="java-args" value="" />
-
-    <target name="set-ibis-implementation">
-
-        <condition property="ibis-implementation" value="tcp">
-            <not>
-                <isset property="ibis-implementation" />
-            </not>
-        </condition>
-
-        <condition property="define-ibis-implementation" value="&quot;-Dibis.implementation^=${ibis-implementation}&quot;">
-            <os family="windows" />
-        </condition>
-        <condition property="define-ibis-implementation" value="-Dibis.implementation=${ibis-implementation}">
-            <not>
-                <isset property="define-ibis-implementation" />
-            </not>
-        </condition>
-    </target>
-
-    <target name="run2" depends="set-ibis-implementation">
-        <exec dir="${basedir}" executable="${satin}/bin/satin-run" vmlauncher="false" spawn="true">
-            <arg line="-Dibis.pool.size=2" />
-            <arg line="-Dibis.pool.name=test-pool" />
-            <arg line="-Dibis.server.address=localhost:8888" />
-            <arg value="${define-ibis-implementation}" />
-            <arg line="${java-args} ibis.util.Postpone 2 -o ant-test.out ${runjob}" />
-	    <env key="CLASSPATH" path="${lib}/${application-name}.jar:${user-classpath}"/>
-        </exec>
-        <exec dir="${basedir}" executable="${satin}/bin/satin-run" timeout="500000" failonerror="true" vmlauncher="false">
-            <arg line="-Dibis.pool.size=2" />
-            <arg line="-Dibis.pool.name=test-pool" />
-            <arg line="-Dibis.server.address=localhost:8888" />
-            <arg value="${define-ibis-implementation}" />
-            <arg line="${java-args} ${runjob}" />
-	    <env key="CLASSPATH" path="${lib}/${application-name}.jar:${user-classpath}"/>
-        </exec>
-    </target>
-
-    <target name="do-prun" depends="set-ibis-implementation">
-        <condition property="prun-nprocs" value="2">
-            <not>
-                <isset property="prun-nprocs" />
-            </not>
-        </condition>
-        <echo message="Running parallel test on ${prun-nprocs} nodes, ${ibis-implementation} Ibis" />
-
-	<property name="ibis"        location="${env.IBIS_HOME}"/>
-
-        <exec dir="${basedir}" executable="/usr/local/VU/reserve.sge/bin/prun" vmlauncher="false">
-	    <arg value="COMMAND=${satin}/bin/satin-run" />
-	    <arg value="CLASSPATH=${lib}/${application-name}.jar"/>
-            <arg line="-1 ${ibis}/bin/ibis-prun ${prun-nprocs}" />
-            <arg value="${define-ibis-implementation}" />
-            <arg line="${java-args} ${runjob}" />
-        </exec>
-    </target>
-
-    <target name="run1" depends="set-ibis-implementation">
-        <exec dir="${basedir}" executable="${satin}/bin/satin-run" timeout="500000" failonerror="true" vmlauncher="false">
-            <arg line="-Dibis.pool.size=1" />
-            <arg line="-Dibis.pool.name=test-pool" />
-            <arg line="-Dibis.server.address=localhost:8888" />
-            <arg value="${define-ibis-implementation}" />
-            <arg line="${java-args} ${runjob}" />
-	    <env key="CLASSPATH" path="${lib}/${application-name}.jar:${user-classpath}"/>
-        </exec>
-    </target>
-
-    <target name="runseq">
-        <exec dir="${basedir}" executable="${satin}/bin/satin-run" timeout="500000" failonerror="true" vmlauncher="false">
-            <arg line="${java-args} ${runjob}" />
-	    <env key="CLASSPATH" path="${lib}/${application-name}.jar:${user-classpath}"/>
-        </exec>
-    </target>
-
-    <target name="set-par-jargs-def" unless="test-par-java-args">
-        <property name="jargs" value="" />
-    </target>
-
-    <target name="set-par-jargs-par" if="test-par-java-args">
-        <property name="jargs" value="${test-par-java-args}" />
-    </target>
-
-    <target name="set-par-jargs" depends="set-par-jargs-def,set-par-jargs-par" />
-
-    <target name="set-seq-jargs-def" unless="test-seq-java-args">
-        <property name="jargs" value="" />
-    </target>
-
-    <target name="set-seq-jargs-seq" if="test-seq-java-args">
-        <property name="jargs" value="${test-seq-java-args}" />
-    </target>
-
-    <target name="set-seq-jargs" depends="set-seq-jargs-def,set-seq-jargs-seq" />
-
-    <target name="test-par" description="Run a parallel test if the property 'test-par-run' is set" depends="set-par-jargs" if="test-par-run">
-        <echo message="Running parallel test on two JVM instances" />
-        <antcall target="run2">
-            <param name="runjob" value="${test-par-run}" />
-            <param name="java-args" value="${jargs}" />
-        </antcall>
-        <echo message="Output of 2nd JVM" />
-        <concat>
-            <fileset dir="." includes="ant-test.out" />
-        </concat>
-    </target>
-
-    <target name="test-prun" description="Run a parallel test with prun if the property 'test-par-run' is set" depends="jar,set-par-jargs" if="test-par-run">
-        <antcall target="do-prun">
-            <param name="runjob" value="${test-par-run}" />
-            <param name="java-args" value="${jargs}" />
-        </antcall>
-    </target>
-
-    <target name="test-seq" if="test-seq-run" depends="set-seq-jargs" description="Run a sequential test if the property 'test-seq-run' is set">
-        <echo message="Running sequential test" />
-        <antcall target="run1">
-            <param name="runjob" value="${test-seq-run}" />
-            <param name="java-args" value="${jargs}" />
-        </antcall>
-    </target>
-
-    <!-- Default test target, for if the application does not have one.
-	 Does test-par as well as test-seq.
-    -->
-
-    <target name="build-and-test" depends="jar, test-seq, test-par"/>
-
-    <target name="test" unless="no-test" description="Build, run sequential test, run parallel test">
-        <antcall inheritRefs="true" target="build-and-test" />
-    </target>
-
     <target name="clean" description="Clean up the build">
         <delete dir="${tmp}" />
         <delete dir="${lib}" />
-        <delete file="ant-test.out" />
     </target>
 
 </project>

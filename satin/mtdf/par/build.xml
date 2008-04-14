@@ -7,8 +7,6 @@
 
     <property name="satinc-flags" value="-keep"/>
 
-    <property name="test-par-java-args" value="-Dsatin.closed"/>
-
     <import file="../../build-satin-app.xml"/>
 
     <target name="run"

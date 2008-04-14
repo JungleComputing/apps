@@ -5,11 +5,6 @@
 
     <property name="satin-classes" value="TwoOutThree"/>
 
-    <property name="test-par-run" value="TwoOutThree"/>
-    <property name="test-par-java-args" value="-Dsatin.closed"/>
-    <property name="test-seq-run" value="TwoOutThree"/>
-    <property name="test-seq-java-args" value="-Dsatin.closed"/>
-
     <import file="../build-satin-app.xml"/>
 
 </project>

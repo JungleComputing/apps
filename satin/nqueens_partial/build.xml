@@ -5,7 +5,6 @@
 
     <property name="satinc-flags" value=""/>
     <property name="satin-classes" value="NQueensPartial"/>
-    <property name="main-class" value="NQueensPartial"/>
 
     <import file="../build-satin-app.xml"/>
 

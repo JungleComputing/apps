@@ -6,13 +6,6 @@
     <property name="satinc-flags" value="-keep"/>
     <property name="satin-classes" value="BarnesHut,BodiesSO"/>
 
-    <property name="test-par-java-args" value="-Dsatin.closed"/>
-    <property name="test-par-run"
-	      value="BarnesHut -so 1000 5 -min 1"/>
-    <property name="test-seq-java-args" value="-Dsatin.closed"/>
-    <property name="test-seq-run"
-	      value="BarnesHut -so 1000 5 -min 1"/>
-
     <import file="../build-satin-app.xml"/>
 
 </project>

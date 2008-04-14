@@ -6,11 +6,6 @@
     <property name="satinc-flags" value="-keep"/>
     <property name="satin-classes" value="Knapsack"/>
 
-    <property name="test-par-java-args" value="-Dsatin.closed"/>
-    <property name="test-par-run" value="Knapsack"/>
-    <property name="test-seq-java-args" value="-Dsatin.closed"/>
-    <property name="test-seq-run" value="Knapsack"/>
-
     <import file="../build-satin-app.xml"/>
 
 </project>

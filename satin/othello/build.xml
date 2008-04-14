@@ -6,13 +6,6 @@
     <property name="satinc-flags" value="-keep"/>
     <property name="satin-classes" value="Othello,TranspositionTable"/>
 
-    <property name="test-par-java-args" value="-Dsatin.closed -Xmx256M"/>
-    <property name="test-par-run"
-	      value="Othello 2"/>
-    <property name="test-seq-java-args" value="-Dsatin.closed -Xmx256M"/>
-    <property name="test-seq-run"
-	      value="Othello 2"/>
-
     <import file="../build-satin-app.xml"/>
 
 </project>

@@ -6,9 +6,6 @@
     <property name="satinc-flags" value=""/>
     <property name="satin-classes" value="SpawnOverhead"/>
 
-    <property name="test-par-java-args" value="-Dsatin.closed"/>
-    <property name="test-seq-java-args" value="-Dsatin.closed"/>
-	
     <import file="../build-satin-app.xml"/>
 
 </project>

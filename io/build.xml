@@ -7,7 +7,7 @@
     <!-- Global properties -->
 
     <property environment="env"/>
-    <property name="ibis"        location="${env.IBIS_HOME}"/>
+    <property name="ibis"        location="${env.IPL_HOME}"/>
 
     <property name="src" location="src" />
     <property name="tmp" location="tmp" />
@@ -59,8 +59,6 @@
 	<!-- And delete the build dir -->
 	<delete dir="${tmp}" />
     </target>
-
-    <target name="test" depends="jar" description="test entry just builds jar"/>
 
     <target name="clean" description="clean up">
 	<delete dir="${tmp}" />

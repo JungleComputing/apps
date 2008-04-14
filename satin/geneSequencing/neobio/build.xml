@@ -45,9 +45,6 @@
 
 	<target name="jar" description="build everything" depends="build"/>
 
-	<target name="test" description="test">
-	</target>
-
 	<target name="clean" description="clean up">
 		<delete dir="${tmp}" />
 		<delete dir="${lib}" />

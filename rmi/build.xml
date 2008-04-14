@@ -3,8 +3,5 @@
     default="jar"
     basedir=".">
 
-    <property name="test-par-run" value="radix.Radix -t -r64"/>
-    <property name="test-seq-run" value="radix.Radix -t -r64"/>
-
     <import file="build-rmi-app.xml"/>
 </project>

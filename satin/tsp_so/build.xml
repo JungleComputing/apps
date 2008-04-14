@@ -6,11 +6,6 @@
     <property name="satinc-flags" value="-keep"/>
     <property name="satin-classes" value="Tsp,DistanceTable,Minimum"/>
 
-    <property name="test-par-java-args" value="-Dsatin.closed"/>
-    <property name="test-par-run" value="Tsp"/>
-    <property name="test-seq-java-args" value="-Dsatin.closed"/>
-    <property name="test-seq-run" value="Tsp"/>
-
     <import file="../build-satin-app.xml"/>
 
 </project>

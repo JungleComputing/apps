@@ -62,8 +62,4 @@
 		<delete dir="${lib}" />
 	</target>
 
-	<target name="test" description="test" depends="build">
-		<delete dir="${tmp}" />
-		<delete dir="${lib}" />
-	</target>
 </project>
