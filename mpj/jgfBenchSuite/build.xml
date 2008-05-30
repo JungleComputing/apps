@@ -1,7 +1,0 @@
-<project
-    name="MPJ JavaGrande Forum Benchmark Suite"
-    default="jar"
-    basedir=".">
-
-    <import file="../build-mpj-app.xml"/>
-</project>
