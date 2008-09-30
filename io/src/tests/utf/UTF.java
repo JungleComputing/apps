@@ -1,4 +1,4 @@
-package tests.testfinal;
+package tests.utf;
 
 /* $Id: UTF.java 2844 2004-11-24 10:52:27Z ceriel $ */
 
