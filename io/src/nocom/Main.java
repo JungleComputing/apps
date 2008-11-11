@@ -156,7 +156,7 @@ public class Main {
     }
 
     static void run_class(String classname, int ser) {
-        Class classdef = null;
+        Class<?> classdef = null;
         TestObject obj = null;
 
         try {

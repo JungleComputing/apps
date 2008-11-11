@@ -10,6 +10,7 @@ import ibis.io.IbisSerializationOutputStream;
  */
 public class UTF implements java.io.Serializable {
 
+    private static final long serialVersionUID = -8228246742646268571L;
     String s;
 
     public UTF() {
