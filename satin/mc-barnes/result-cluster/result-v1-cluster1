@@ -1,0 +1,77 @@
+Iterations: 50 (timings DO include the first iteration!)
+BarnesHut: simulating 1000000 bodies, 64 bodies/leaf node, theta = 5.0, spawn-min-threshold = 1
+Iteration 0 done, update = 1770, force = 9659, viz = 0, total = 11429
+Iteration 1 done, update = 1485, force = 7639, viz = 0, total = 9124
+Iteration 2 done, update = 1427, force = 8285, viz = 0, total = 9712
+Iteration 3 done, update = 1439, force = 8225, viz = 0, total = 9664
+Iteration 4 done, update = 1458, force = 7619, viz = 0, total = 9077
+Iteration 5 done, update = 1557, force = 7106, viz = 0, total = 8663
+Iteration 6 done, update = 1458, force = 7618, viz = 0, total = 9076
+Iteration 7 done, update = 1486, force = 8385, viz = 0, total = 9871
+Iteration 8 done, update = 1438, force = 7798, viz = 0, total = 9236
+Iteration 9 done, update = 1513, force = 7340, viz = 0, total = 8853
+Iteration 10 done, update = 1382, force = 6941, viz = 0, total = 8323
+Iteration 11 done, update = 1505, force = 7591, viz = 0, total = 9096
+Iteration 12 done, update = 1357, force = 7152, viz = 0, total = 8509
+Iteration 13 done, update = 1347, force = 6819, viz = 0, total = 8166
+Iteration 14 done, update = 1522, force = 7013, viz = 0, total = 8535
+Iteration 15 done, update = 1482, force = 6500, viz = 0, total = 7982
+Iteration 16 done, update = 1524, force = 7192, viz = 0, total = 8716
+Iteration 17 done, update = 1423, force = 8532, viz = 0, total = 9955
+Iteration 18 done, update = 1633, force = 6810, viz = 0, total = 8443
+Iteration 19 done, update = 1582, force = 9180, viz = 0, total = 10762
+Iteration 20 done, update = 1475, force = 7216, viz = 0, total = 8691
+Iteration 21 done, update = 1372, force = 7206, viz = 0, total = 8578
+Iteration 22 done, update = 1484, force = 8856, viz = 0, total = 10340
+Iteration 23 done, update = 1475, force = 6658, viz = 0, total = 8133
+Iteration 24 done, update = 1631, force = 7031, viz = 0, total = 8662
+Iteration 25 done, update = 1434, force = 8087, viz = 0, total = 9521
+Iteration 26 done, update = 1402, force = 6838, viz = 0, total = 8240
+Iteration 27 done, update = 1413, force = 6799, viz = 0, total = 8212
+Iteration 28 done, update = 1673, force = 8758, viz = 0, total = 10431
+Iteration 29 done, update = 1411, force = 7233, viz = 0, total = 8644
+Iteration 30 done, update = 1493, force = 8518, viz = 0, total = 10011
+Iteration 31 done, update = 1588, force = 7100, viz = 0, total = 8688
+Iteration 32 done, update = 1375, force = 8411, viz = 0, total = 9786
+Iteration 33 done, update = 1454, force = 7280, viz = 0, total = 8734
+Iteration 34 done, update = 1493, force = 7311, viz = 0, total = 8804
+Iteration 35 done, update = 1492, force = 6972, viz = 0, total = 8464
+Iteration 36 done, update = 1603, force = 6956, viz = 0, total = 8559
+Iteration 37 done, update = 1727, force = 7149, viz = 0, total = 8876
+Iteration 38 done, update = 1423, force = 7088, viz = 0, total = 8511
+Iteration 39 done, update = 1424, force = 6615, viz = 0, total = 8039
+Iteration 40 done, update = 1353, force = 8354, viz = 0, total = 9707
+Iteration 41 done, update = 1471, force = 7064, viz = 0, total = 8535
+Iteration 42 done, update = 1505, force = 6753, viz = 0, total = 8258
+Iteration 43 done, update = 1409, force = 6888, viz = 0, total = 8297
+Iteration 44 done, update = 1440, force = 7631, viz = 0, total = 9071
+Iteration 45 done, update = 1315, force = 9148, viz = 0, total = 10463
+Iteration 46 done, update = 1513, force = 8200, viz = 0, total = 9713
+Iteration 47 done, update = 1411, force = 7080, viz = 0, total = 8491
+Iteration 48 done, update = 1628, force = 7276, viz = 0, total = 8904
+Iteration 49 done, update = 2339, force = 6774, viz = 0, total = 9113
+update took             75.014 s
+Force calculation took  376.654 s
+visualization took      0.0 s
+application barnes took 451.671 s
+-------------------------------SATIN STATISTICS--------------------------------
+SATIN: SPAWN:       2,965,778 spawns, 2,965,778 executed, 370,972 syncs
+SATIN: STEAL:       58,058,039 attempts, 76,162 successes (0.131 %)
+SATIN: ASYNCSTEAL:   227,459 attempts, 45,603 successes (20.049 %)
+SATIN: MESSAGES:    intra 116,184,716 msgs, 4,168,571,762 bytes; inter 500,660 msgs, 1,176,714,167 bytes
+-------------------------------SATIN TOTAL TIMES-------------------------------
+SATIN: STEAL_TIME:                 total 11806.095  s time/req    203.350 us
+SATIN: HANDLE_STEAL_TIME:          total 955.258  s time/handle  16.454 us
+SATIN: THROTTLE_STEAL_TIME:        total   0.000  s time/req      0.000  s
+SATIN: INV SERIALIZATION_TIME:     total   4.387  s time/write   57.600 us
+SATIN: INV DESERIALIZATION_TIME:   total  19.381  s time/read   254.477 us
+SATIN: RET SERIALIZATION_TIME:     total  93.008  s time/write  763.836 us
+SATIN: RET DESERIALIZATION_TIME:   total 219.884  s time/read     1.806 ms
+-------------------------------SATIN RUN TIME BREAKDOWN------------------------
+SATIN: TOTAL_RUN_TIME:                              463.229  s
+SATIN: STEAL_THROTTLE_TIME:        agv. per machine   0.000  s ( 0.000 %)
+SATIN: (DE)SERIALIZATION_TIME:     agv. per machine   5.260  s ( 1.136 %)
+SATIN: LOAD_BALANCING_TIME:        agv. per machine 179.210  s (38.687 %)
+
+SATIN: TOTAL_PARALLEL_OVERHEAD:    agv. per machine 184.479  s (39.825 %)
+SATIN: USEFUL_APP_TIME:            agv. per machine 278.750  s (60.175 %)
