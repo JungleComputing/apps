@@ -1,0 +1,7 @@
+# OPTIONS="$OPTIONS -Dsatin.detailedStats"
+OPTIONS="$OPTIONS -Dsatin.closed"
+# OPTIONS="$OPTIONS -Dlrmc.queueSize=2048"
+# OPTIONS="$OPTIONS -Dibis.server.address=titan.cs.vu.nl"
+OPTIONS="$OPTIONS -server"
+
+prun -t 6:00:0 SATIN_HOME=$SATIN_HOME COMMAND=$SATIN_HOME/bin/satin-run CLASSPATH='./lib/*' -rsh ssh -1 -o out2 -v $HOME/bin/ibis-prun $1 $OPTIONS -Xms64M -Xmx400M mc_barnes.v2.BarnesHut -theta 5 -float -dt 0.03125 -it 50 -eps 0.025 -min 1 1000000 64
