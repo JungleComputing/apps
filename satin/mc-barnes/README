@@ -1,0 +1,31 @@
+Prerequisites
+-------------
+
+Assumption is: you are on fs0.das3, and in the root directory of this
+project. You also need Satin, which you can check out from
+https://gforge.cs.vu.nl/svn/ibis/satin/trunk, and build using 'ant'.
+You also need to set the SATIN_HOME environment variable to the
+root of the Satin tree.
+
+Compiling
+---------
+Should now be a piece of cake: just call "ant".
+
+Running using the cluster simulator
+-----------------------------------
+First, you need to run a PoolInfo server (not the one included with Ibis!).
+Run the following command in the background:
+
+java -cp 'lib/*' clusteremulation.PoolInfoServer -port 12349 &
+
+Also, you need to run an Ibis/Satin server, but without a hub:
+
+$SATIN_HOME/bin/satin-run -Xmx256M -Dsmartsockets.networks.name=ns ibis.server.Server --no-hub --events --port 12345 > server.out 2>&1 &
+
+You can change the port numbers, but then you must also change the
+port numbers in the scripts in the job sub-directory.
+
+Now you are ready to run any of the jobs from the jobs sub-directory.
+These scripts run the two Barnes versions on three different cluster
+configurations: cluster/barnes01.env, cluster/barnes02.env,
+and cluster/barnes01.env without traffic shaping.

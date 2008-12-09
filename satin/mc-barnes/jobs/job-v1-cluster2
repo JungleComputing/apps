@@ -4,8 +4,9 @@ OPTIONS="$OPTIONS -Dsatin.closeConnections=false"
 OPTIONS="$OPTIONS -Dsatin.connectionsOnDemand=false"
 OPTIONS="$OPTIONS -Dsatin.so.waitTime=300"
 # OPTIONS="$OPTIONS -Dlrmc.queueSize=2048"
-OPTIONS="$OPTIONS -Dibis.server.address=titan.cs.vu.nl"
-OPTIONS="$OPTIONS -Dibis.pool.server.host=titan.cs.vu.nl"
+OPTIONS="$OPTIONS -Dibis.server.address=fs0.das3.cs.vu.nl:12345"
+OPTIONS="$OPTIONS -Dibis.pool.server.host=fs0.das3.cs.vu.nl"
+OPTIONS="$OPTIONS -Dibis.pool.server.port=12349"
 OPTIONS="$OPTIONS -server"
 
 OPTIONS="$OPTIONS -Dclusteremulation.bandwidth=true"
@@ -13,4 +14,4 @@ OPTIONS="$OPTIONS -Dclusteremulation.delay=true"
 OPTIONS="$OPTIONS -Dclusteremulation.fast_local_network=true"
 OPTIONS="$OPTIONS -Dclusteremulation.hubrouted_buffer=8388608"
 
-prun -t 20:0 SATIN_HOME=$SATIN_HOME COMMAND=$SATIN_HOME/bin/satin-run CLASSPATH='./lib/*' -1 -o out-v2-cluster2 -v $HOME/bin/ibis-prun 68 $OPTIONS -Xms64M -Xmx1500M clusteremulation.ApplicationRunner -tell-start ../barnes02.env mc_barnes.v2.BarnesHut -theta 5 -float -dt 0.03125 -it 50 -eps 0.025 -min 1 1000000 64
+prun -t 15:0 SATIN_HOME=$SATIN_HOME COMMAND=$SATIN_HOME/bin/satin-run CLASSPATH='./lib/*' -1 -o out-v1-cluster2 -v $HOME/bin/ibis-prun 68 $OPTIONS -Xms64M -Xmx1500M clusteremulation.ApplicationRunner -tell-start clusters/barnes02.env mc_barnes.v1.BarnesHut -theta 5 -float -dt 0.03125 -it 50 -eps 0.025 -min 1 1000000 64
