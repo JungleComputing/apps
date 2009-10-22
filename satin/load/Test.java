@@ -3,16 +3,16 @@ class Test extends ibis.satin.SatinObject implements TestInterface {
     public Test() {
     }
 
-    public int start(int branch, int depth, int load) {
+    public long start(int branch, int depth, int load) {
 
-      	int result = spawn_test(branch, depth, load);
+      	long result = spawn_test(branch, depth, load);
 
 	sync();
 
 	return result;
     }
   
-    public int spawn_test(int branch, int depth, int load) {
+    public long spawn_test(int branch, int depth, int load) {
 
 	if (depth == 0) {            
 
@@ -24,13 +24,15 @@ class Test extends ibis.satin.SatinObject implements TestInterface {
                 while (time < load) { 
                     time = System.currentTimeMillis() - start;
                 } 
+
+                return time;
             }
 
-            return 1;
+            return 0;
 
 	} else { 
 	    
-            int [] tmp = new int[branch];
+            long [] tmp = new long[branch];
 
             for (int i = 0; i < branch; i++) {
                 tmp[i] = spawn_test(branch, depth-1, load);
@@ -38,7 +40,7 @@ class Test extends ibis.satin.SatinObject implements TestInterface {
 
 	    sync();
 
-            int result = 1;
+            long result = 0;
  
             for (int i = 0; i < branch; i++) {
 		result += tmp[i];

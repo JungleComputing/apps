@@ -25,17 +25,16 @@ class SpawnTest {
 
             long start = System.currentTimeMillis();
 
-	    int result = t.start(branch, depth, load);
+	    long result = t.start(branch, depth, load);
 
             long end = System.currentTimeMillis();
 
-            double nsPerJob = (1000.0*1000.0 * (end-start)) / count;
+            double msPerJob = ((double)(end-start)) / count;
 
-            String correct = (result == count) ? " (CORRECT)" : " (WRONG!)";
-
-            System.out.println("D&C(" + branch + ", " + depth + ") = " + result + 
-                     correct + " total time = " + (end-start) + " job time = " + 
-                     nsPerJob + " nsec/job");
+            System.out.println("D&C(" + branch + ", " + depth + ") " 
+                        + " wall clock time = " + (end-start) 
+                        + " processing time = " + result  
+                        + " avg job time = " + msPerJob + " msec/job");
 
         } catch (Exception e) {
             System.err.println("Oops: " + e);
