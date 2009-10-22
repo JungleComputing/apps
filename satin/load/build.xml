@@ -1,0 +1,11 @@
+<project
+    name="ibis.apps.satin.spawntest"
+    default="jar"
+    basedir=".">
+
+    <property name="satinc-flags" value=""/>
+    <property name="satin-classes" value="SpawnTest,Test"/>
+
+    <import file="../build-satin-app.xml"/>
+
+</project>
