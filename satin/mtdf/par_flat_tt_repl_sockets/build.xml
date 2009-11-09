@@ -5,6 +5,8 @@
 
     <property name="satin-classes" value="Mtdf"/>
 
+    <property name="user-classpath" value="../../../external/ibis-poolinfo-2.2.jar"/>
+
     <import file="../../build-satin-app.xml"/>
 
 </project>
