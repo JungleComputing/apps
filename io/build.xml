@@ -28,7 +28,7 @@
 	    <fileset dir="${ibis}/lib">
 		<include name="*.jar"/>
 	    </fileset>
-	    <fileset dir="external">
+	    <fileset dir="../external">
 		<include name="*.jar"/>
 	    </fileset>
 	</path>
