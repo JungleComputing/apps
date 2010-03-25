@@ -55,6 +55,10 @@ public class RemoteVisualization extends Thread {
 
     private boolean haveClient = false;
 
+    private boolean stop = false;
+
+    private boolean quit = false;
+
     private SendPort sport;
 
     private DataOutputStream out;
@@ -73,16 +77,21 @@ public class RemoteVisualization extends Thread {
         start();
     }
 
+    public synchronized void stopRemoteViz() {
+        stop = true;
+        notifyAll();
+    }
+
     private void init() {
         try {
             IbisCapabilities s = new IbisCapabilities(
                 IbisCapabilities.ELECTIONS_STRICT);
-            t = new PortType(PortType.SERIALIZATION_OBJECT,
+            t = new PortType(PortType.SERIALIZATION_DATA,
                 PortType.COMMUNICATION_RELIABLE,
                 PortType.CONNECTION_ONE_TO_ONE, PortType.RECEIVE_EXPLICIT);
 
             Properties p = new Properties();
-            p.setProperty("ibis.serialization", "ibis");
+            // p.setProperty("ibis.serialization", "ibis");
             p.setProperty("ibis.pool.name", "barnes-viz");
 
             ibis = IbisFactory.createIbis(s, p, true, null, t);
@@ -174,12 +183,17 @@ public class RemoteVisualization extends Thread {
 
     private synchronized BodyList getBodies() {
 
-        while (list.size() == 0) {
+        while (list.size() == 0 && ! stop) {
             try {
                 wait();
             } catch (Exception e) {
                 // ignore
             }
+        }
+
+        if (list.size() == 0) {
+            quit = true;
+            return null;
         }
 
         return list.removeFirst();
@@ -191,6 +205,10 @@ public class RemoteVisualization extends Thread {
             //  System.out.println("Sending");
 
             BodyList bodies = getBodies();
+
+            if (bodies == null) {
+                return;
+            }
 
             start = System.currentTimeMillis();
 
@@ -225,6 +243,10 @@ public class RemoteVisualization extends Thread {
 
             BodyList bodies = getBodies();
 
+            if (bodies == null) {
+                return;
+            }
+
             start = System.currentTimeMillis();
 
             WriteMessage m = sport.newMessage();
@@ -234,9 +256,7 @@ public class RemoteVisualization extends Thread {
             m.writeLong(bodies.getRunTime());
 
             float[] b = bodies.getBodies();
-            for (int i = 0; i < b.length; i++) {
-                m.writeFloat(b[i]);
-            }
+            m.writeArray(b);
             m.finish();
             
             long time = System.currentTimeMillis() - start;
@@ -270,7 +290,7 @@ public class RemoteVisualization extends Thread {
     
     public void run() {
 
-        while (true) {
+        while (! quit) {
 
             if (!haveClient) {
                 connect();
@@ -278,5 +298,7 @@ public class RemoteVisualization extends Thread {
 
             doSend();
         }
+
+        close();
     }
 }

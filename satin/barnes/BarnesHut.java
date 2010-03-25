@@ -383,6 +383,9 @@ import java.util.Arrays;
 
         end = System.currentTimeMillis();
         totalTime = end - start;
+        if (rv != null) {
+            rv.stopRemoteViz();
+        }
     }
 
     void printBodies(Body[] bodyArray) {
