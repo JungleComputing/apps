@@ -2,6 +2,8 @@ package tests.utf;
 
 /* $Id: StoreBuffer.java 2907 2005-01-31 20:05:32Z ceriel $ */
 
+import java.nio.ByteBuffer;
+
 final class StoreBuffer {
 
     // This is the write part. It's slow, but we don't care
@@ -189,6 +191,20 @@ final class StoreBuffer {
             double_store = temp;
         }
         count += len * 8;
+    }
+
+    public void writeByteBuffer(ByteBuffer b) {
+        int len = b.limit() - b.position();
+        if (byte_store == null) {
+            byte_store = new byte[len];
+            b.get(byte_store, 0, len);
+        } else {
+            byte[] temp = new byte[byte_store.length + len];
+            System.arraycopy(byte_store, 0, temp, 0, byte_store.length);
+            b.get(temp, byte_store.length, len);
+            byte_store = temp;
+        }
+        count += len;
     }
 
     public void clear() {

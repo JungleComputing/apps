@@ -6,6 +6,7 @@ package tests.utf;
 import ibis.io.DataOutputStream;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 final class StoreArrayOutputStream extends DataOutputStream {
 
@@ -104,6 +105,11 @@ final class StoreArrayOutputStream extends DataOutputStream {
         this.len += 8 * len;
         buf.writeArray((double[]) a, off, len);
     }
+
+    public void writeByteBuffer(ByteBuffer arg0) throws IOException {
+        buf.writeByteBuffer(arg0);
+    }
+
 
     public void flush() throws IOException {
     }

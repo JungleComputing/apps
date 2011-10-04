@@ -1,5 +1,6 @@
 package nocom;
 
+import java.nio.ByteBuffer;
 
 /* $Id$ */
 
@@ -252,6 +253,25 @@ final class StoreBuffer {
             doubleLen += len;
         }
         count += len * 8;
+    }
+
+    public void writeByteBuffer(ByteBuffer b) {
+        int len = b.limit() - b.position();
+        if (byte_store == null) {
+            byte_store = new byte[len];
+            b.get(byte_store, 0, len);
+        } else {
+            if (byteLen + len < byte_store.length) { // it fits
+                b.get(byte_store, byteLen, len);
+            } else { // it does not fit
+                byte[] temp = new byte[(byteLen + len) * 2];
+                System.arraycopy(byte_store, 0, temp, 0, byteLen);
+                b.get(byte_store, byteLen, len);
+                byte_store = temp;
+            }
+            byteLen += len;
+        }
+        count += len;
     }
 
     public void clear() {

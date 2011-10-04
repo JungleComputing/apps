@@ -6,6 +6,7 @@ package nocom;
 import ibis.io.DataOutputStream;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 final class NullArrayOutputStream extends DataOutputStream {
 
@@ -120,5 +121,9 @@ final class NullArrayOutputStream extends DataOutputStream {
 
     public final long bytesWritten() {
         return len;
+    }
+
+    public void writeByteBuffer(ByteBuffer b) throws IOException {
+        len += b.limit() - b.position();
     }
 }

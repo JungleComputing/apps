@@ -4,6 +4,8 @@ package nocom;
 
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ReadOnlyBufferException;
 
 /**
  * Extends InputStream with read of array of primitives and readSingleInt
@@ -165,6 +167,12 @@ public class StoreArrayInputStream extends ibis.io.DataInputStream {
         return len;
     }
 
+    public void readByteBuffer(ByteBuffer arg0) throws IOException,
+            ReadOnlyBufferException {
+	int len = arg0.limit() - arg0.position();
+	arg0.put(buf.byte_store, byte_count, len);
+	byte_count += len;
+    }
     public long bytesRead() {
         return 0L;
     }
