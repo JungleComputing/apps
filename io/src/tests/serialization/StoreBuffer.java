@@ -1,4 +1,4 @@
-package tests.testfinal;
+package tests.serialization;
 
 import java.nio.ByteBuffer;
 

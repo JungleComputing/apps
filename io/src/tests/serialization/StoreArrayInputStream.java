@@ -1,4 +1,4 @@
-package tests.utf;
+package tests.serialization;
 
 /* $Id: StoreArrayInputStream.java 5349 2007-04-07 13:59:32Z ceriel $ */
 
@@ -6,6 +6,7 @@ package tests.utf;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ReadOnlyBufferException;
+
 
 /**
  * Extends InputStream with read of array of primitives and readSingleInt

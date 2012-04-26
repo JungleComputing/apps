@@ -1,4 +1,4 @@
-package tests.utf;
+package tests.serialization;
 
 /* $Id: StoreArrayOutputStream.java 5349 2007-04-07 13:59:32Z ceriel $ */
 
@@ -109,7 +109,6 @@ final class StoreArrayOutputStream extends DataOutputStream {
     public void writeByteBuffer(ByteBuffer arg0) throws IOException {
         buf.writeByteBuffer(arg0);
     }
-
 
     public void flush() throws IOException {
     }
