@@ -15,6 +15,7 @@ public class Fields implements TestObject {
     public short sval;
     String strval;
     private int[] a;
+    Class<?> cl;
     
     public void init() {
         ival = 10;
@@ -31,6 +32,7 @@ public class Fields implements TestObject {
         }
         strval = b.toString();
         a = new int[] { 0, 1, 2};
+        cl = StringBuffer.class;
     }
     
     public boolean testResult(Object o) {
@@ -82,6 +84,10 @@ public class Fields implements TestObject {
         }
         if (lval != f.lval) {
             System.err.println("Fields: Wrong long value");
+            return false;
+        }
+        if (cl != StringBuffer.class) {
+            System.err.println("Fields: Wrong class value");
             return false;
         }
         return true;
