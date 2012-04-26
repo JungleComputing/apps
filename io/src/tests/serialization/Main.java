@@ -20,6 +20,7 @@ public class Main {
         objectsToTest.add(new SerialPersistent());
         objectsToTest.add(new Transient());
         objectsToTest.add(new BitsetTest());
+        objectsToTest.add(new CircularObject());
         
         StoreBuffer buf = new StoreBuffer();
         StoreArrayInputStream store_in = new StoreArrayInputStream(buf);
