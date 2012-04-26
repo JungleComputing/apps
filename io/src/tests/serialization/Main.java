@@ -21,6 +21,9 @@ public class Main {
         objectsToTest.add(new Transient());
         objectsToTest.add(new BitsetTest());
         objectsToTest.add(new CircularObject());
+        objectsToTest.add(new ReadWriteObject());
+        objectsToTest.add(new ExternalizableTest());
+        objectsToTest.add(new SuperClass());
         
         StoreBuffer buf = new StoreBuffer();
         StoreArrayInputStream store_in = new StoreArrayInputStream(buf);
