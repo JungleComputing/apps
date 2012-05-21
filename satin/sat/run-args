@@ -1,1 +1,1 @@
--Dsatin.tuplespace.numbered=true SATSolver examples/benchmark-suite/qg5-10.cnf -satin-closed
+SATSolver examples/benchmark-suite/qg5-10.cnf
