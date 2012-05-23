@@ -110,7 +110,7 @@ strictfp public class GlobalData implements Cloneable, Serializable {
         gdMaxBodies = (int) ((double) gdTotNumBodies * GD_EXTRA_BODY_SPACE_FACTOR);
         gdMaxLocalBodies = (int) ((double) (gdTotNumBodies / gdNumProcs) * GD_EXTRA_BODY_SPACE_FACTOR);
 
-        gdMaxTempBodies = Math.max(gdTotNumBodies / 10, 500);
+        gdMaxTempBodies = Math.max(gdTotNumBodies /4, 500);
         gdMaxTempCentersOfMass = Math.max(gdTotNumBodies / 10, 500);
     }
 
