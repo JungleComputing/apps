@@ -21,6 +21,9 @@
 	    <pathelement path="${tmp}"/>
 	    <pathelement path="${user-classpath}"/>
 	    <pathelement path="${myclasspath}"/>
+	    <fileset dir="${satin}/lib">
+		<include name="*.jar"/>
+	    </fileset>
 	    <fileset dir="${rmi}/lib">
 		<include name="*.jar"/>
 	    </fileset>
