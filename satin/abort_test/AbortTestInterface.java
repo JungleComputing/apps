@@ -1,5 +1,5 @@
 /* $Id$ */
 
 interface AbortTestInterface extends ibis.satin.Spawnable {
-    public void foo();
+    public int foo();
 }

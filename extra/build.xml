@@ -17,13 +17,10 @@
     <target name="init">
 	<!-- Create the time stamp -->
 	<tstamp />
-
 	<!-- Create the build directory structure used by compile -->
 	<mkdir dir="${tmp}" />
 	<mkdir dir="${lib}" />
-    </target>
-
-    <target name="set-classpath">
+	<!-- Set classpath -->
 	<path id="default.classpath">
 	    <fileset dir="${ibis}/lib">
 		<include name="*.jar"/>
@@ -31,7 +28,7 @@
 	</path>
     </target>
 
-    <target name="compile" depends="clean,init,set-classpath"
+    <target name="compile" depends="clean,init"
 	description="Compile the application sources">
 	<!-- Compile the java code from ${src} into ${tmp} -->
 	<javac srcdir="${src}" destdir="${tmp}" debug="on" >

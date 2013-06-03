@@ -1,6 +1,6 @@
 <project
     name="gmi-app"
-    default="build"
+    default="jar"
     basedir=".">
 
     <description>
@@ -10,14 +10,24 @@
     <property environment="env"/>
 
     <property name="gmi"         location="${env.GMI_HOME}"/>
-
     <property name="myclasspath"  value="${env.CLASSPATH}"/>
 
     <property name="tmp"         value="tmp"/>
     <property name="src"         value="src"/>
     <property name="lib"         value="lib"/>
 
-    <target name="set-classpath" unless="classpath.initialized">
+    <target name="jar" depends="gmic"
+	    description="Build a Jar file for an application">
+        <basename file="." property="application-name" />
+	<jar destfile="${lib}/${application-name}.jar" basedir="${tmp}" includes="**/*.class">
+        </jar>
+        <delete dir="${tmp}" />
+    </target>
+
+    <target name="init">
+        <tstamp />
+        <mkdir dir="${tmp}" />
+        <mkdir dir="${lib}" />
 	<path id="default.classpath">
 	    <pathelement path="${tmp}"/>
 	    <pathelement path="${user-classpath}"/>
@@ -28,26 +38,6 @@
 	</path>
 	<echo	message="Now set default.classpath to ${default.classpath}"
 		level="verbose"/>
-	<property name="classpath.initialized" value="true"/>
-    </target>
-
-    <target name="property-init"
-	    depends="set-classpath">
-    </target>
-
-    <property name="java-args" value="" />
-
-    <target name="jar" depends="build" description="Build a Jar file for an application">
-        <basename file="." property="application-name" />
-	<jar destfile="${lib}/${application-name}.jar" basedir="${tmp}" includes="**/*.class">
-        </jar>
-        <delete dir="${tmp}" />
-    </target>
-
-    <target name="init" depends="property-init">
-        <tstamp />
-        <mkdir dir="${tmp}" />
-        <mkdir dir="${lib}" />
     </target>
 
     <target name="compile" depends="clean,init"
@@ -61,13 +51,7 @@
         </javac>
     </target>
 
-    <target name="clean" description="Clean up the build">
-        <delete dir="${tmp}" />
-	<delete dir="${lib}" />
-        <delete file="ant-test.out" />
-    </target>
-
-    <target name="gmi">
+    <target name="gmic" depends="compile">
 	<java   classname="ibis.compile.Ibisc"
 		taskname="Ibisc"
 		failonerror="true"
@@ -78,8 +62,9 @@
 	</java>
     </target>
 
-    <target name="build"
-	    depends="compile, gmi"
-	    description="Compile a GMI program"/>
+    <target name="clean" description="Clean up the build">
+        <delete dir="${tmp}" />
+	<delete dir="${lib}" />
+    </target>
 
 </project>

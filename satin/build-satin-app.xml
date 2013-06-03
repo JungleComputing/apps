@@ -12,6 +12,7 @@
 	    names that must be rewritten.
 	Optional definition of 'satinc-flags': extra options to be supplied
 	    to Ibisc.
+	Optional definition of 'user-classpath' : extra classpath elements.
     -->
 
     <property environment="env"/>
@@ -37,11 +38,7 @@
 	<property name="classpath.initialized" value="true"/>
     </target>
 
-    <target name="property-init"
-	    depends="set-classpath">
-    </target>
-
-    <target name="init" depends="property-init">
+    <target name="init" depends="set-classpath">
         <tstamp />
         <mkdir dir="${tmp}" />
         <mkdir dir="${lib}" />
@@ -66,45 +63,38 @@ target="1.5">
 		failonerror="true"
 		maxmemory="512M"
 		fork="true">
-		<arg line="${satinc-flags.value} ${satin-classes.value} ."/>
+		<arg line="${satinc-flags} -satin &quot;${satin-classes}&quot; ."/>
 		<classpath refid="default.classpath"/>
 	</java>
-
     </target>
 
-    <target name="set-satinc-flags-set" if="satinc-flags">
-	<property name="satinc-flags.value" value="${satinc-flags}"/>
+    <target name="satin-adviser">
+	<java	classname="ibis.satin.impl.syncrewriter.SyncAdviser"
+		taskname="SyncAdviser"
+		dir="${tmp}"
+		failonerror="true"
+		maxmemory="512M"
+		fork="true">
+		<arg line="${satin-classes}"/>
+		<classpath refid="default.classpath"/>
+	</java>
     </target>
 
     <target name="set-satinc-flags-notset" unless="satinc-flags">
-	<property name="satinc-flags.value" value=""/>
-    </target>
-
-    <target name="set-satinc-classes" if="satin-classes">
-	<property name="satin-classes.value" value="-satin &quot;${satin-classes}&quot;"/>
-    </target>
-
-    <target name="set-satinc-classes-notset" unless="satin-classes">
-	<property name="satin-classes.value" value=""/>
-    </target>
-
-    <target name="satin"
-	depends="set-satinc-flags-set,set-satinc-flags-notset,set-satinc-classes,set-satinc-classes-notset,satin-internal">
+	<property name="satinc-flags" value=""/>
     </target>
 
     <target name="build"
 	description="Compile Satin application for parallel execution"
-	depends="compile,satin"/>
+	depends="compile,set-satinc-flags-notset,satin-adviser,satin-internal"/>
 
     <target name="jar" depends="build" description="Build a Jar file for an application">
-	<jar destfile="${lib}/${application-name}.jar" basedir="${tmp}" includes="**/*.class">
-        </jar>
+	<jar destfile="${lib}/${application-name}.jar" basedir="${tmp}" includes="**/*.class"/>
         <delete dir="${tmp}" />
     </target>
 
     <target name="compile-jar" depends="compile" description="Build a Jar file for an application">
-	<jar destfile="${lib}/${application-name}.jar" basedir="${tmp}" includes="**/*.class">
-        </jar>
+	<jar destfile="${lib}/${application-name}.jar" basedir="${tmp}" includes="**/*.class"/>
         <delete dir="${tmp}" />
     </target>
 

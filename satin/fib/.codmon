@@ -1,1 +1,1 @@
-3 `cat run-args`
+3 -Dsatin.closed `cat run-args`

@@ -2,8 +2,9 @@
 
 final class AbortTest extends ibis.satin.SatinObject implements
         AbortTestInterface, java.io.Serializable {
-    public void foo() {
+    public int foo() {
         System.out.println("running foo!");
+        return 0;
     }
 
     public static void main(String[] args) {
@@ -11,7 +12,7 @@ final class AbortTest extends ibis.satin.SatinObject implements
         int n = 0;
 
         for (int i = 0; i < 3; i++) {
-            t.foo();
+            int f = t.foo();
         }
         t.abort();
         t.sync();

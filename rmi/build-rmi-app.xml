@@ -1,6 +1,6 @@
 <project
     name="rmi-app"
-    default="build"
+    default="jar"
     basedir=".">
 
     <description>
@@ -20,7 +20,17 @@
     <property name="src"         value="src"/>
     <property name="lib"         value="lib"/>
 
-    <target name="set-classpath" unless="classpath.initialized">
+    <target name="jar" depends="rmic" description="Build a Jar file for an application">
+        <basename file="." property="application-name" />
+	<jar destfile="${lib}/${application-name}.jar" basedir="${tmp}" includes="**/*.class">
+        </jar>
+        <delete dir="${tmp}" />
+    </target>
+
+    <target name="init">
+        <tstamp />
+        <mkdir dir="${tmp}" />
+        <mkdir dir="${lib}" />
 	<path id="default.classpath">
 	    <pathelement path="${tmp}"/>
 	    <pathelement path="${user-classpath}"/>
@@ -31,24 +41,6 @@
 	</path>
 	<echo	message="Now set default.classpath to ${default.classpath}"
 		level="verbose"/>
-	<property name="classpath.initialized" value="true"/>
-    </target>
-
-    <target name="property-init"
-	    depends="set-classpath">
-    </target>
-
-    <target name="jar" depends="build" description="Build a Jar file for an application">
-        <basename file="." property="application-name" />
-	<jar destfile="${lib}/${application-name}.jar" basedir="${tmp}" includes="**/*.class">
-        </jar>
-        <delete dir="${tmp}" />
-    </target>
-
-    <target name="init" depends="property-init">
-        <tstamp />
-        <mkdir dir="${tmp}" />
-        <mkdir dir="${lib}" />
     </target>
 
     <target name="compile" depends="clean,init"
@@ -65,92 +57,21 @@
     <target name="clean" description="Clean up the build">
         <delete dir="${tmp}" />
         <delete dir="${lib}" />
-        <delete file="ant-test.out" />
     </target>
 
-
-    <property name="tmpdir" location="${tmp}"/>
-
-    <target name="set-to-rmic-flags" if="rmic-flags">
-	<property name="rmic-flags.value" value="${rmic-flags}"/>
+    <target name="set-default-rmic-flags" unless="rmic-flags">
+	<property name="rmic-flags" value=""/>
     </target>
 
-    <target name="set-def-rmic-flags" unless="rmic-flags">
-	<property name="rmic-flags.value" value=""/>
-    </target>
-
-    <target name="set-rmic-flags"
-	depends="set-to-rmic-flags,set-def-rmic-flags"/>
-
-    <target name="rmic"
-	    depends="set-rmic-flags">
-	    <!-- Commented out; not toplevel.
-	    description="Preprocess class files in the build tree for RMI"
-	    -->
+    <target name="rmic" depends="compile,set-default-rmic-flags">
 	<java   classname="ibis.compile.Ibisc"
 		taskname="Ibisc"
 		dir="${tmp}"
 		failonerror="true"
 		fork="true">
-		<arg line="${rmic-flags.value} -rmi -rmi-java2ibis ."/>
+		<arg line="${rmic-flags} -rmi -rmi-java2ibis ."/>
 	    <classpath refid="default.classpath"/>
 	</java>
-    </target>
-
-    <target name="rmic-sun">
-	    <!-- Commented out; not toplevel.
-	    description="Preprocess class files in the build tree for SUN RMI"
-	    -->
-
-	<path id="all-classes">
-	    <fileset dir="${tmpdir}">
-		<include name="**/*.class"/>
-	    </fileset>
-	</path>
-	<pathconvert pathsep=" " property="classes.all" refid="all-classes">
-	    <map from="${tmpdir}${file.separator}" to=""/>
-	</pathconvert>
-
-	<echo message="${classes.all}" file="${tmp}/-RMIC-Classes"/>
-	<replace file="${tmp}/-RMIC-Classes" token=".class" value=""/>
-	<replace file="${tmp}/-RMIC-Classes" token="${file.separator}" value="."/>
-	<loadfile
-		property="rmic-classes"
-		srcFile="${tmp}/-RMIC-Classes">
-	</loadfile>
-
-	<echo   level="debug"
-		message="All classes to be inspected: ${rmic-classes}"/>
-	<echo   level="debug"
-		message="Run frontend.rmi.Rmic -n -java over all classes under ${tmp}${file.separator}"/>
-	<java   classname="ibis.rmi.impl.frontend.Rmic"
-		taskname="rmic locator"
-		dir="${tmpdir}"
-		failonerror="true"
-		fork="true"
-		output="${tmp}/-REMOTE-Classes">
-	    <arg line="-n -java ${rmic-classes}"/>
-	    <classpath refid="default.classpath"/>
-	</java>
-	<loadfile
-		property="remote.classes"
-		srcFile="${tmp}/-REMOTE-Classes"/>
-	<echo   level="debug"
-		message="Now run sun.rmic over '${remote.classes}'"/>
-	<rmic   base="${tmp}"
-		includes="${remote.classes}">
-	    <classpath refid="default.classpath"/>
-	</rmic>
-    </target>
-
-    <target name="build"
-	    depends="compile, rmic"
-	    description="Compile RMI application for Ibis RMI">
-    </target>
-
-    <target name="build-sun"
-	    depends="compile, rmic-sun"
-	    description="Compile RMI application for Sun RMI">
     </target>
 
 </project>

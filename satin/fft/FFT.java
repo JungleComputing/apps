@@ -63,6 +63,7 @@ public final class FFT extends ibis.satin.SatinObject implements FFTInterface,
         // compute forward FFT
         Complex[] y = fft(x);
 
+        // TODO: Sync adviser suggests a sync here. This is correct, I think. --Ceriel
         // take conjugate again
         for (int i = 0; i < N; i++)
             y[i] = y[i].conjugate();
@@ -86,6 +87,7 @@ public final class FFT extends ibis.satin.SatinObject implements FFTInterface,
         Complex[] b = fft(y);
 
         // point-wise multiply
+        // TODO: Sync adviser suggests a sync here. It is right, I think --Ceriel
         Complex[] c = new Complex[N];
         for (int i = 0; i < N; i++)
             c[i] = a[i].times(b[i]);

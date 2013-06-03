@@ -488,9 +488,10 @@ final class NQueens extends SatinObject implements NQueensInterface,
                 }
                 results[pos] *= 2;
             } else {
-                results[pos] = spawn_QueenCountPartial(
+                long result = spawn_QueenCountPartial(
                     spawnLevel, SIZEE-1, bit << 1, bit >> 1, MASK ^ bit);
                 sync();
+                results[pos] = result;
             }
         }
 
@@ -525,6 +526,8 @@ final class NQueens extends SatinObject implements NQueensInterface,
             // Likewise, the "right" parameter is ((1 >> 1) | bit) >> 1.
         }
 
+        long[] tempResults2 = new long[maxbound+1];
+
         for (int i = 1; i <= maxbound; i++) {
             final int BOUND1 = i;
 
@@ -540,12 +543,15 @@ final class NQueens extends SatinObject implements NQueensInterface,
                 LASTMASK |= LASTMASK >> 1 | LASTMASK << 1;
             }
 
-            results[i] = spawn_QueenNotInCorner(board, SIZEE, spawnLevel, 1,
+            tempResults2[i] = spawn_QueenNotInCorner(board, SIZEE, spawnLevel, 1,
                     bit << 1, bit >> 1, MASK ^ bit, LASTMASK, SIDEMASK,
                     BOUND1);
         }
 
         sync();
+        for (int i = 1; i <= maxbound; i++) {
+            results[i] = tempResults2[i];
+        }
 
         if (size == 1) {
             results[0] = 1;

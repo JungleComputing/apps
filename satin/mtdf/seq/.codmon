@@ -1,1 +1,1 @@
-1 -Xms256m -Xmx800m Main 15
+1 -Xms256m -Xmx800m -Dsatin.closed Main 15

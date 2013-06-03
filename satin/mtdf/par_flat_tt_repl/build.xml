@@ -86,7 +86,7 @@
 	    description="build Mtdf application">
 	<antcall inheritAll="true" inheritRefs="true" target="compile"/>
 	<antcall inheritRefs="true" target="rmic-sun"/>
-	<antcall inheritRefs="true" target="satin"/>
+	<antcall inheritRefs="true" target="satin-internal"/>
     </target>
 
 </project>
