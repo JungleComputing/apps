@@ -1,0 +1,59 @@
+========================================================================================================================
+The code in this directory was created for the bachelor thesis of Patrick Goddijn.
+========================================================================================================================
+
+
+CONTENTS OF THIS PROJECT
+------------------------------------------------------------------------------------------------------------------------
+
+This directory contains a variety of graph traversal programs. Search, Search_IA, Search_IA_SO and Search_SO
+all contain a Divide-and-Conquer search program in Satin, while the packages seq_bfs and seq_dfs contain
+sequential breadth and depth first search programs. The IO package had a config file, a Graph class and
+the means to turn a graph-text-file from for example SNAP and CONECT into a faster data type (WriteFile),
+and to read this new file and turn it into a Graph object from aforementioned Graph class.
+
+Also available is the build.xml file used to build all Satin programs.
+
+
+
+COMPILATION
+------------------------------------------------------------------------------------------------------------------------
+
+All four Satin versions of the search algorithm can be easily compiled using the build file with ant. Location in line
+18 has to be set to the SATIN HOME location. The IO and sequential versions can be compiled using javac.
+sequential
+
+
+
+USAGE
+------------------------------------------------------------------------------------------------------------------------
+
+WriteFile:
+This program can be run with one argument: the complete path to the input file without the .txt extension.
+This input file should be a txt file containing a graph, where on every line two integers are given, to illustrate the
+an edge between two nodes illustrated by the two integers. These should be split by a space (or line 37 should be
+edited).
+
+All search programs can be run with 2 arguments: a number to select the graph and a word to select the kind of operation
+to do. There are just two graphs included in this code, Amazon0312
+(source: https://snap.stanford.edu/data/amazon0312.html) and p2p-Gnutella08
+(source: https://snap.stanford.edu/data/p2p-Gnutella08.html). To add more to this the wanted graph should be processed
+using WriteFile, and then the if-statement starting with:
+
+        if (args[0].equals("0")) {
+
+Should be extended with a new ifelse for the next number, containing the name of the graph (ending in .dat), the
+number of nodes in it and a boolean which contains whether or not the graph is directed or not.
+
+The graphs found in the thesis can be found here:
+https://snap.stanford.edu/data/soc-LiveJournal1.html
+http://konect.uni-koblenz.de/networks/orkut-links
+
+This editing has to be done for every different version of the search algorithm which contains this graph. This could
+in the future be improved.
+
+The second argument can contain 'full', 'all' or 'par'. These all stand for one of the experiments described in the
+thesis. 'full' is the full traversal of a graph, by searching for a node not in the graph. 'all' searches a certain
+number of random nodes from random starting points, and calculates the averages. 'par' does the same thing, but allows
+the searches to be done in parallel. The number of random searches for those last two experiments is defined in
+IO.Config.

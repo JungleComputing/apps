@@ -1,0 +1,83 @@
+<project
+        name="bfs"
+        default="jar"
+        basedir=".">
+
+    <description>
+        Ibis satin application build
+    </description>
+
+    <!-- satin classes, must be passed on to Satin rewriter. -->
+    <property name="satin-classes" value="
+    bfs.BFS,
+    bfs_ia.BFS_IA, bfs_ia.SearchResultFound,
+    bfs_so.BFS_SO, bfs_so.BFS_SO_G, bfs_so.Visited,
+    bfs_so_ia.BFS_SO_IA, bfs_so_ia.BFS_SO_IA_G, bfs_so_ia.SearchResultFound, bfs_so_ia.Visited,
+    queue_bfs.BFS_queue,
+    pbfs.PBFS,
+    test.Test"/>
+
+    <property environment="env"/>
+    <property name="satin"       location="/home/rob/workspace/ibis/satin-trunk"/>
+
+    <property name="tmp"         value="tmp"/>
+    <property name="lib"         value="lib"/>
+
+    <target name="init">
+        <tstamp />
+        <mkdir dir="${tmp}" />
+        <mkdir dir="${lib}" />
+        <path id="default.classpath">
+            <pathelement path="${tmp}"/>
+            <fileset dir="${satin}/lib">
+                <include name="*.jar"/>
+            </fileset>
+        </path>
+        <echo	message="Now set default.classpath to ${default.classpath}"
+                 level="verbose"/>
+    </target>
+
+    <target name="compile" depends="clean,init"
+            description="Compile application without any bytecode rewriting">
+        <javac destdir="${tmp}" debug="true" srcdir="src">
+            <classpath refid="default.classpath" />
+            <include name="**/*.java" />
+        </javac>
+    </target>
+
+    <target name="satinc">
+        <java	classname="ibis.compile.Ibisc"
+                 taskname="Ibisc"
+                 dir="${tmp}"
+                 failonerror="true"
+                 maxmemory="512M"
+                 fork="true">
+            <arg line="-satin &quot;${satin-classes}&quot; ."/>
+            <classpath refid="default.classpath"/>
+        </java>
+    </target>
+
+    <target name="build"
+            description="Compile Satin application for parallel execution"
+            depends="compile,satinc"/>
+
+    <target name="jar" depends="build"
+            description="Build a Jar file for an application">
+        <jar destfile="${lib}/satin-examples.jar" basedir="${tmp}"
+             includes="**/*.class"/>
+        <delete dir="${tmp}" />
+    </target>
+
+    <target name="compile-jar" depends="compile"
+            description="Build a Jar file for an application">
+        <jar destfile="${lib}/examples.jar" basedir="${tmp}"
+             includes="**/*.class"/>
+        <delete dir="${tmp}" />
+    </target>
+
+    <target name="clean" description="Clean up the build">
+        <delete dir="${tmp}" />
+        <delete dir="${lib}" />
+    </target>
+
+</project>
