@@ -15,7 +15,8 @@
     search_ia_so.Search_IA_SO, search_ia_so.SearchResultFound, search_ia_so.Visited"/>
 
     <property environment="env"/>
-    <property name="satin"       location="/home/patrick/satin"/>
+    <property name="satin"       location="${env.SATIN_HOME}"/>
+
 
     <property name="tmp"         value="tmp"/>
     <property name="lib"         value="lib"/>

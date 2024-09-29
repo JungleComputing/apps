@@ -53,9 +53,7 @@
 	    description="Compile application without any bytecode rewriting">
 	<javac destdir="${tmp}"
 	    debug="true"
-	    srcdir="."
-	    source="1.5"
-	    target="1.5">
+	    srcdir=".">
 	    <classpath refid="default.classpath" />
 	    <!--
 	    <compilerarg value="-Xlint:unchecked"/>

@@ -18,7 +18,8 @@
     test.Test"/>
 
     <property environment="env"/>
-    <property name="satin"       location="/home/rob/workspace/ibis/satin-trunk"/>
+    <property name="satin"       location="${env.SATIN_HOME}"/>
+
 
     <property name="tmp"         value="tmp"/>
     <property name="lib"         value="lib"/>
